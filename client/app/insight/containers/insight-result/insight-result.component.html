@@ -1,0 +1,60 @@
+<ng-container *ngIf="(state$ | async) === EStateInsight.InsightView; else MatchTemplate">
+  <ps-insight-tool-bar
+  [showCompactView]="showCompactView$ | async"
+  [showComparison]="showComparison$ | async"
+  [showDensity]="showDensity$ | async"
+  [showPercentage]="showPercentage$ | async"
+  [loading]="downloadLoading$ | async"
+  [createMatchLoading]="createMatchLoading$ | async"
+  [isCreateMatch]="(account$ | async)?.createMatch"
+  [createMatchDisabled]="loading$ | async"
+  (toggle)="onToggle($event)"
+  (download)="onDownload($event)"
+  (createMatch)="onCreateMatch($event)"
+  ></ps-insight-tool-bar>
+
+  <ps-insight-list
+  [showCompactView]="showCompactView$ | async"
+  [showComparison]="showComparison$ | async"
+  [showDensity]="showDensity$ | async"
+  [showPercentage]="showPercentage$ | async"
+  [polygons]="polygons$ | async"
+  [results]="results$ | async"
+  [groups]="groups$|async"
+  (located)="onLocated($event)"
+  (edited)="onEdited($event)"
+  ></ps-insight-list>
+</ng-container>
+<ng-template #MatchTemplate>
+  <ps-match-tool-bar
+  [isLoading]="matchItLoading$ | async"
+  [disablePreviewMatch]="disablePreviewMatch"
+  [data]="matchData"
+  [stateView]="state$ | async"
+  [previewData]="reviewData$ | async"
+  [polygonOptions]="polygonOptions$ | async"
+  (previewMatch)="onPreviewMatch($event)"
+  (changeState)="onChangeState($event)"
+  (changeShape)="onChangeShape($event)"
+  (saveMatch)="onSaveMatch($event)"
+  ></ps-match-tool-bar>
+  <ng-container *ngIf="(state$ | async) === EStateInsight.FilterView; else MatchPreview">
+    <ps-match-weight-setup
+    [densityValues]="densityValues"
+    [showCompactView]="showCompactView$ | async"
+    [showComparison]="showComparison$ | async"
+    [showDensity]="showDensity$ | async"
+    [showPercentage]="showPercentage$ | async"
+    [polygons]="polygons$ | async"
+    [results]="results$ | async"
+    [groups]="groups$|async"
+    [loading]="matchItLoading$ | async"
+    [selectedPolygonIndex]="selectedPolygonIndex"
+    (filterChange)="onFilterChange($event)"
+    ></ps-match-weight-setup>
+  </ng-container>
+
+  <ng-template #MatchPreview>
+    <go-match-it-review [reviewData]="reviewData$ |async"   [loading]="matchItLoading$ | async"></go-match-it-review>
+  </ng-template>
+</ng-template>

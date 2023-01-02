@@ -1,0 +1,87 @@
+<div class="customer-sessions-warper">
+    <div class="main-section">
+        <ng-content></ng-content>
+        <ng-container *ngIf="data">
+            <div class="groups-container">
+                <div class="group-content">
+                    <div class="group-detail" *ngIf="data?.coreBranch">
+                        <div class="detail-title">
+                            Core Branch
+                        </div>
+                        <div class="detail-text">
+                            {{data?.coreBranch}}
+                        </div>
+                    </div>
+                    <div class="group-detail" *ngIf="data?.outreachCluster">
+                        <div class="detail-title">
+                            Outreach Cluster
+                        </div>
+                        <div class="detail-text">
+                            {{data?.outreachCluster}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="outreach-services-table">
+                <periscope-table [data]="(_data | async)?.outreaches" [rowTemplate]="rowTemplate">
+                    <ng-container *goTableHeader>
+                        <div class="rTableHeading">
+                            <ng-container *ngFor="let header of headers">
+                                <ng-container *ngIf="header.trackBy;else actionHeader">
+                                    <div class="rTableHead" [ngClass]="header.class">
+                                        {{header.name}}
+                                    </div>
+                                </ng-container>
+                                <ng-template #actionHeader>
+                                    <div class="rTableHead" [ngClass]="header.class">
+                                        <go-button-group>
+                                            <go-button [disabled]="disabledShowAll" button-toolbar [selected]="isShowAll"
+                                                (clicked)="onToggleShowAll()" type="icon"
+                                                [icon]="isShowAll ? 'location_off': 'location_on'" size="medium"
+                                                title="Show all locations">
+                                            </go-button>
+                                        </go-button-group>
+                                    </div>
+                                </ng-template>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <ng-template #rowTemplate let-row>
+                        <ng-container *ngFor="let header of headers">
+                            <ng-container *ngIf="header.trackBy; else action">
+                                <div class="rTableCell" [ngClass]="header.class">
+                                    <div >
+                                        {{row[header.trackBy]}}
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #action>
+                                <div class="rTableCell" [ngClass]="header.class">
+                                    <go-button-group>
+                                        <go-button [disabled]="!(row.outreachLat && row.outreachLng)" button-toolbar
+                                            [selected]="row.isSelected" type="icon" icon="road-route-map" size="medium"
+                                            title="Show route" (clicked)="onMarkerClick(row)"></go-button>
+                                    </go-button-group>
+                                </div>
+                            </ng-template>
+                        </ng-container>
+                    </ng-template>
+                </periscope-table>
+            </div>
+        </ng-container>
+        <div class="empty" *ngIf="!data">
+          No data available
+        </div>
+        <go-spinner *ngIf="loading"></go-spinner>
+    </div>
+    <div class="info-section">
+        <ps-outreach-service-info [unit]="isMetric ? UnitTypeId.METRIC : UnitTypeId.IMPERIAL"
+            [hidden]="!(selectedRouteData$ | async)"
+            [selectedRoute]="selectedRouteData$"
+            [selectedTravelMode]="selectedTravelMode$"
+            [reverseDirection]="reverseDirection$"
+            (selected)="onSelectedTravelMode($event)"
+            (reverseDirection)="onReverseDirection()"
+            ></ps-outreach-service-info>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+<ng-template [ngIf]="isLoading">
+	..Loading
+</ng-template>
+<ng-template [ngIf]="!isLoading">
+
+	<svg viewBox="0 0 100 100" class="histogram" preserveAspectRatio="none">
+		<path class="histogram-svg" [attr.d]="path"/>
+	</svg>
+
+	<div *ngIf="range" class="range"
+		 [style.left.%]="(value[0] - min) * 100 / (max - min)"
+		 [style.width.%]="((value[1] - min) * 100 / (max - min)) - ((value[0] - min) * 100 / (max - min))"></div>
+
+	<div (mousedown)="onMouseDown($event,0)" class="handle"
+		 [class.handle-active]="activeHandleIndex === 0"
+		 [style.left.%]="(value[0] - min) * 100 / (max - min)" tabindex="0">
+		<div class="handle-value handle-value-left">{{percent ? (value[0]/100 | percent:'1.1-1') : (value[0] | number) }}</div>
+	</div>
+
+
+
+	<div *ngIf="range" (mousedown)="onMouseDown($event,1)" class="handle"
+		 [class.handle-active]="activeHandleIndex === 1"
+		 [style.left.%]="(value[1] - min) * 100 / (max - min)" tabindex="0">
+		<div class="handle-value handle-value-right">{{percent ? (value[1]/100 | percent:'1.1-1') : (value[1] | number) }}</div>
+	</div>
+
+
+	<div class="value-min">{{percent ? (min/100 | percent:'1.1-1') : (min | number)}}</div>
+	<div class="value-max">{{percent ? (max/100 | percent:'1.1-1') : (max | number)}}</div>
+	<div class="position-min"><input *ngIf="value" class="input-min" type="text" #minInput
+
+									 [value]="value[0]"
+									 (blur)="onInputChange(0, minInput.value)"/></div>
+									 <!--(ngModelChange)="onInputChange(0, $event)"-->
+	<div class="position-max"><input *ngIf="value && range" class="input-max" type="text" #maxInput
+
+									 [value]="value[1]"
+									 (blur)="onInputChange(1, maxInput.value)" /></div>
+									 <!--(ngModelChange)="onInputChange(1, $event)"-->
+</ng-template>

@@ -1,0 +1,83 @@
+@import 'shared-mixins';
+
+go-details-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: @color-inverted;
+  overflow-y: hidden;
+  .empty {
+    text-align: center;
+    font-weight: 400;
+    margin: 2em 0;
+    font-size: 20px;
+    width: 100%;
+  }
+  .groups-container:nth-child(1) {
+    margin-top: 0px;
+  }
+  .groups-container {
+    margin-top: 5px;
+    .group-label {
+      display: flex;
+      font-weight: 500;
+      background-color: @color-background-stressed;
+      border: 1px solid @color-item-border;
+      padding: 10px;
+      align-items: center;
+      cursor: pointer;
+    }
+    .group-content {
+      width: 100%;
+    }
+    .group-detail {
+      border-bottom: 1px solid @color-item-border;
+      display: flex;
+    }
+    .detail-text {
+      flex: 1 0;
+      padding: 10px;
+    }
+    .detail-title {
+      flex: 1 0;
+      padding: 10px;
+    }
+  }
+
+  .toolbar {
+    z-index: 2;
+    height: 41px;
+  }
+
+  .page {
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+
+  .toolbar-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0px 10px;
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+
+  .toolbar-title--sub {
+    font-weight: 400;
+    font-size: 18px;
+    padding-left: 5px;
+  }
+  .cta-wrap {
+    z-index: 1;
+    flex-shrink: 0;
+    box-shadow: 0 -3px 4px rgba(0, 0, 0, 0.2);
+  }
+  .cta-inner {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+  }
+}

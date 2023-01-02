@@ -1,0 +1,17 @@
+<go-dialog [title]="deleteModel?.title" (close)="onDialogClose()" #deleteConfirmDialog>
+    <div class="page-content">
+      <div class="row">
+        <ng-template [ngIf]="deleteModel?.innerHtml">
+          <div [innerHtml]="deleteModel?.innerHtml"></div>
+        </ng-template>
+        <ng-template [ngIf]="deleteModel?.content">
+          {{deleteModel?.content}}
+        </ng-template>
+      </div>
+    </div>
+    <div class="row-button">
+      <div class="separator"></div>
+      <go-button button-flat (clicked)="onDeleteCancel()">Cancel</go-button>
+      <go-button button-raised (clicked)="onDelete()">Delete</go-button>
+    </div>
+  </go-dialog>

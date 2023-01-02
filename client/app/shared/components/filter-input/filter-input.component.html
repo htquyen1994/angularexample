@@ -1,0 +1,13 @@
+<ng-template [ngIf]="isLoading">
+	..Loading
+</ng-template>
+<ng-template [ngIf]="!isLoading">
+	<input goOnlyNumber goInputValidator [validateObj]="{'min': realMin, 'max': max}" *ngIf="value" class="input"
+		type="text" [formControl]="displayValue.controls['minValue']" [attr.placeholder]="'Min: '+min" />
+	<div [style.visibility]="value && range ? 'visible' : 'hidden'">
+		and
+	</div>
+	<input goOnlyNumber goInputValidator [validateObj]="{'min': min, 'max': realMax}"
+		[style.visibility]="value && range ? 'visible' : 'hidden'" class="input" type="text"
+		[formControl]="displayValue.controls['maxValue']" [attr.placeholder]="'Max: '+max" />
+</ng-template>

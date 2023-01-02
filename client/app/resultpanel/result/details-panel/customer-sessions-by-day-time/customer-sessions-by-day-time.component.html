@@ -1,0 +1,32 @@
+<div class="customer-sessions-warper">
+    <div class="customer-sessions-table">
+        <div class="customer-sessions-filter">
+            <go-button-group>
+                <go-button button-toolbar (clicked)="onSelect(1)" [selected]="isCore">Core Hours</go-button>
+                <go-button button-toolbar (clicked)="onSelect(0)" [selected]="!isCore">All Hours</go-button>
+            </go-button-group>
+            <go-button-group class="group-separator">
+                <go-button class="group-separator" button-raised (clicked)="onDownload(isCore)"
+                    [isLoading]="loadingDownload$ | async" [disabled]="loadingDownload$ | async">
+                    Download
+                </go-button>
+            </go-button-group>
+            <p>Average CS by Day of Week by 15 Minute timeslot:</p>
+        </div>
+        <periscope-table *ngIf="(loading$ | async) || (data$ | async)?.length" [columns]="headers"
+            [loading]="loading$ | async" [data]="data$ | async" [rowTemplate]="rowTemplate">
+            <ng-template #rowTemplate let-row>
+                <ng-container *ngFor="let header of headers">
+                    <div class="rTableCell" [ngClass]="header.class">
+                        <div class="text-truncate">
+                            {{row[header.trackBy]}}
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-template>
+        </periscope-table>
+        <div class="empty" *ngIf="!(loading$ | async) && !(data$ | async)?.length">
+            No customer sessions by Day / Time available for this branch.
+        </div>
+    </div>
+</div>

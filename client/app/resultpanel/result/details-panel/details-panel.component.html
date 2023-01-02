@@ -1,0 +1,156 @@
+<go-spinner *ngIf="isLoading$ | async"></go-spinner>
+<go-toolbar class="toolbar">
+  <div class="toolbar-title">
+    <span *ngIf="activeTab == EDetailPanelTabs.BranchDetails">
+      Details
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.BranchPeople">
+      People
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.OpeningHours">
+      Opening Hours
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.CustomerSessions">
+      Sessions
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.OutreachServices">
+      Outreach
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.NearestLocations">
+      Nearest
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.Security">
+      Security
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.Images">
+      Images
+    </span>
+    <span *ngIf="activeTab == EDetailPanelTabs.Documents">
+      Documents
+    </span>
+    <span class="toolbar-title--sub">
+      {{detailPanelData?.FadCode ? detailPanelData?.FadCode + ' ' +  (detailPanelData?.BranchName ? detailPanelData?.BranchName : '')  : ''}}
+    </span>
+  </div>
+  <div class="group-push"></div>
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [icon]="'streetview'" title="Show in street view" [disabled]="!shapeId"
+      (clicked)="onStreetView()">
+    </go-button>
+  </go-button-group>
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.BranchDetails"
+      (clicked)="onSelectTab(EDetailPanelTabs.BranchDetails)">
+      Details
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.BranchPeople"
+      (clicked)="onSelectTab(EDetailPanelTabs.BranchPeople)">
+      People
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.OpeningHours"
+      (clicked)="onSelectTab(EDetailPanelTabs.OpeningHours)">
+      Opening Hours
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.CustomerSessions"
+      (clicked)="onSelectTab(EDetailPanelTabs.CustomerSessions)">
+      Sessions
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.OutreachServices"
+      (clicked)="onSelectTab(EDetailPanelTabs.OutreachServices)">
+      Outreach
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.NearestLocations"
+      (clicked)="onSelectTab(EDetailPanelTabs.NearestLocations)">
+      Nearest
+    </go-button>
+    <go-button *ngIf="hasPOLSecurity" button-toolbar [selected]="activeTab == EDetailPanelTabs.Security"
+      (clicked)="onSelectTab(EDetailPanelTabs.Security)">
+      Security
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.Images"
+      (clicked)="onSelectTab(EDetailPanelTabs.Images)">
+      Images
+    </go-button>
+    <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.Documents"
+      (clicked)="onSelectTab(EDetailPanelTabs.Documents)">
+      Documents
+    </go-button>
+  </go-button-group>
+</go-toolbar>
+<div class="page">
+  <go-branch-details [data]="branchDetailModel" [hidden]="activeTab !== EDetailPanelTabs.BranchDetails">
+  </go-branch-details>
+  <ps-branch-people [data]="branchPeopleModel" [hidden]="activeTab !== EDetailPanelTabs.BranchPeople">
+  </ps-branch-people>
+  <ps-nearest-locations #nearestLocations [centroid]="centroid" [fadCode]="detailPanelData?.FadCode"
+    [hidden]="activeTab !== EDetailPanelTabs.NearestLocations" (filter)="onNearestFilter($event)"
+    (downloading)="onNearestDownloading($event)"></ps-nearest-locations>
+  <ps-outreach-services [active]="activeTab === EDetailPanelTabs.OutreachServices"
+    [loading]="loadingGettingOutreachServices$ | async" [data]="outreachServicesData$ | async"
+    [hidden]="activeTab !== EDetailPanelTabs.OutreachServices"></ps-outreach-services>
+  <go-security [active]="activeTab === EDetailPanelTabs.Security && detailPanelData?.FadCode" [id]="detailPanelData?.FadCode"
+    [hidden]="activeTab !== EDetailPanelTabs.Security"></go-security>
+  <ps-customer-sessions [active]="activeTab === EDetailPanelTabs.CustomerSessions" [data]="detailPanelData"
+    [hidden]="activeTab !== EDetailPanelTabs.CustomerSessions">
+  </ps-customer-sessions>
+  <go-opening-hours [data]="openingHoursData" [hidden]="activeTab !== EDetailPanelTabs.OpeningHours">
+  </go-opening-hours>
+  <go-images [layer]="layer" [id]="detailPanelData?.FadCode" [hidden]="activeTab !== EDetailPanelTabs.Images"
+    [openUpload]="openUpload" [type]="TypeOfImage.BranchImages">
+  </go-images>
+  <go-documents [layer]="layer" [id]="detailPanelData?.FadCode" [hidden]="activeTab !== EDetailPanelTabs.Documents"
+    [openUpload]="openUpload"></go-documents>
+</div>
+
+<div class="cta-wrap">
+  <div class="cta-inner">
+    <go-button-group class="group-separator">
+      <go-button button-toolbar [selected]="reportLocationOpen" title="Report location"
+        (clicked)="onClickReportLocation()" [disabled]="!detailPanelData || crimeStatisticOpen">
+        Report incorrect location
+        <go-dropdown dropdown position-top-right (close)="onCloseReportLocation()" [autoClose]="false"
+          [isOpen]="reportLocationOpen">
+          <ps-report-location-form *ngIf="reportLocationOpen" [shape]="decorateShape(detailPanelData)"
+          [loadingObservable]="submittingReportLocation$" [warningText]="'to report the actual location for the branch.'"
+            (close)="onCloseReportLocation()" (submit)="onSaveReportLocation($event)"></ps-report-location-form>
+        </go-dropdown>
+      </go-button>
+    </go-button-group>
+    <!-- <go-button-group class="group-separator" *ngIf="hasPOLSecurity">
+      <go-button button-toolbar [selected]="crimeStatisticOpen" title="Report location"
+        (clicked)="onClickCrimeStatistic()" [disabled]="!detailPanelData || reportLocationOpen">
+        Crime Statistic
+        <go-dropdown dropdown position-top-right (close)="onCloseCrimeStatistic()" [autoClose]="false"
+          [isOpen]="crimeStatisticOpen">
+          <ps-report-location-form *ngIf="crimeStatisticOpen"
+          [loadingObservable]="submittingCrimeStatistic$" [warningText]="'to get crime statistic.'"
+            (close)="onCloseCrimeStatistic()" (submit)="onGetCrimeStatistic($event)"></ps-report-location-form>
+        </go-dropdown>
+      </go-button>
+    </go-button-group> -->
+    <div class="separator"></div>
+    <go-button-group>
+      <go-button *ngIf="activeTab == EDetailPanelTabs.Images" button-toolbar [selected]="openUpload"
+        (clicked)="onToggleUploadImage()">
+        Manage Images
+      </go-button>
+      <go-button *ngIf="activeTab == EDetailPanelTabs.Documents" button-toolbar [selected]="openUpload"
+        (clicked)="onToggleUploadImage()">
+        Manage Documents
+      </go-button>
+    </go-button-group>
+    <go-button-group>
+      <go-button [disabled]="loadingDownload$ | async" *ngIf="activeTab == EDetailPanelTabs.OutreachServices"
+        button-raised (clicked)="onDownloadOutreachServices()">
+        Download Opening Times
+      </go-button>
+    </go-button-group>
+    <go-button-group>
+      <go-button [disabled]="(loadingDownloadNearest$ | async) || !nearestFilter"
+        *ngIf="activeTab == EDetailPanelTabs.NearestLocations" button-raised (clicked)="onDownloadNearest()">
+        Download Nearest
+      </go-button>
+    </go-button-group>
+    <go-button button-flat (clicked)="onClose()">Close</go-button>
+  </div>
+</div>

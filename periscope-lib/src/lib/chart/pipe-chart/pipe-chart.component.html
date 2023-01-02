@@ -1,0 +1,7 @@
+<div class="chart-container">
+  <canvas *ngIf="isChartReady" baseChart [datasets]="chartData" [labels]="chartLabels" [options]="chartOptions"
+    [colors]="chartColors" [legend]="chartLegend" [chartType]="chartType" [plugins]="chartPlugins">
+  </canvas>
+  <go-spinner *ngIf="loading$ | async"></go-spinner>
+  <div class="overlay" *ngIf="loading$ | async"></div>
+</div>

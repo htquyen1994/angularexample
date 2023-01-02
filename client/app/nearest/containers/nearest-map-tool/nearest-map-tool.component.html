@@ -1,0 +1,53 @@
+<go-spinner class="spinner" *ngIf="(loading$ | async)"></go-spinner>
+<go-error-message class="row" *ngIf="error$ | async" [error]="error$ | async"></go-error-message>
+<ng-container [formGroup]="formGroup">
+  <div class="row">
+    <go-button-group class="group-separator">
+      <label class="row-label">Find</label>
+      <input class="input-small" type="text" pInputText pKeyFilter="num" formControlName="value">
+    </go-button-group>
+    <go-button-group class="group-separator">
+      <label class="row-label">nearest</label>
+      <ps-select class="select" [ngStyle]="{'width': '165px'}" [options]="layerGroupOptions$ | async" formControlName="layerId"
+        [placeholder]="'Select a layer'" [appendTo]="'body'" [group]="true" [isFilter]="true"></ps-select>
+    </go-button-group>
+    <go-button-group>
+      <label class="row-label">filtered by</label>
+      <ps-select class="select" [ngStyle]="{'width': '102px'}" [options]="filterOptions$ | async"
+        formControlName="filterId" [placeholder]="'Select a filter'" [appendTo]="'body'"></ps-select>
+    </go-button-group>
+  </div>
+  <div class="row">
+    <go-button-group class="group-separator">
+      <label class="row-label">From the selected points by</label>
+      <go-button-group>
+        <go-button class="button-icon" button-toolbar type="icon" icon="move-car" title="Car"
+          [selected]="travelMode === travelModes.CAR" (clicked)="onSelectedTravelMode(travelModes.CAR)">
+        </go-button>
+        <go-button class="button-icon" button-toolbar type="icon" icon="move-walk" title="Walking"
+          [selected]="travelMode === travelModes.WALKING" (clicked)="onSelectedTravelMode(travelModes.WALKING)">
+        </go-button>
+        <go-button class="button-icon" button-toolbar type="icon" icon="move-bike" title="Bicycle"
+          [selected]="travelMode === travelModes.BIKE" (clicked)="onSelectedTravelMode(travelModes.BIKE)">
+        </go-button>
+        <go-button class="button-icon" button-toolbar type="icon" icon="radius" title="Radius"
+          [selected]="travelMode === travelModes.CIRCLE" (clicked)="onSelectedTravelMode(travelModes.CIRCLE)">
+        </go-button>
+      </go-button-group>
+    </go-button-group>
+    <div class="divider"></div>
+    <ng-container *ngIf="!(loading$ | async); else CancelButton">
+      <go-button class="button-block-width" button-raised title="Run Nearest" icon="playrun" (clicked)="onRun()"
+        [disabled]="(selectedShapes$ | async) < 1 || formGroup?.invalid">Run</go-button>
+    </ng-container>
+    <ng-template #CancelButton>
+      <go-button-group>
+        <go-button class="button-block-width" button-toolbar title="Cancel Nearest" icon="cancel"
+          (clicked)="onCancel()">Cancel</go-button>
+      </go-button-group>
+    </ng-template>
+  </div>
+  <div class="text-info">
+    <small>Select at least one point on the map</small>
+  </div>
+</ng-container>

@@ -1,0 +1,5 @@
+<go-button type="icon" icon="help" (clicked)="$event.stopImmediatePropagation();dropdown.toggle($event)"></go-button>
+<ps-overlaypanel dropdown #dropdown [styleClass]="'help-dropdown'">
+	<ng-content></ng-content>
+</ps-overlaypanel>
+

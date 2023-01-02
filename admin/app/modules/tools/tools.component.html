@@ -1,0 +1,16 @@
+<ng-container *ngIf="account.isSuperUser === true">
+	<h1>Delete tile cache</h1>
+	<p>Text about what data in what format you can download</p>
+	<button mat-raised-button color="accent" (click)="onDownload()">Delete tile cache</button>
+	<h1>Re-index databases</h1>
+	<p>Text about what data in what format you can download</p>
+	<button mat-raised-button color="accent" (click)="onDownload()">Re-index databases</button>
+</ng-container>
+
+
+<ng-container *ngIf="account.isSuperUser === false">
+	<h1>Data</h1>
+	<p>Text about what data in what format you can download</p>
+	<button mat-raised-button color="accent" (click)="onDownload()">Download All Data</button>
+</ng-container>
+

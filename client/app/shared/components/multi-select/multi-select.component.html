@@ -1,0 +1,82 @@
+<ng-container *ngIf="isLoading === false && (childColumn || parentColumn)">
+	<div class="info" *ngIf="childColumn && parentColumn">
+		Note: Data is a Sub Group of "{{parentColumn.name}}" and is linked to "{{childColumn.name}}"
+	</div>
+
+	<div class="info" *ngIf="childColumn && !parentColumn">
+		Note: Data is linked to "{{childColumn.name}}"
+	</div>
+
+	<div class="info" *ngIf="parentColumn && !childColumn">
+		Note: is a Sub Group of "{{parentColumn.name}}"
+	</div>
+
+	<div class="multi-select-tag-list">
+		<ng-container *ngIf="isDisabled === false">
+			<ng-container *ngIf="isLoading === true">
+				<div class="multi-class-loading">
+					Loading...
+				</div>
+			</ng-container>
+			<ng-container *ngIf="isLoading === false && (childColumn || parentColumn)">
+				<div class="multi-select-tag" *ngFor="let selection of selected">
+					<div class="multi-select-tag-content" [title]="selection.description">{{selection.description}}
+					</div>
+					<mat-icon class="icon" svgIcon="close" (click)="removeSelection(selection)"></mat-icon>
+				</div>
+			</ng-container>
+		</ng-container>
+	</div>
+
+	<go-button button-raised [disabled]="isDisabled" class="multi-class-select" (clicked)="openPanel()">Select
+		<go-dropdown class="dropdown" #dropdownComp (close)="closePanel()" [isOpen]="showPanel">
+			<div class="button-close-wrap">
+				<go-button type="icon" icon="close" class="button-close"
+					(clicked)="closePanel(); dropdownComp.onState(false)"></go-button>
+			</div>
+			<input class="input" type="text" placeholder="Search" #term (keyup)="filter$.next(term.value)">
+			<ng-container *ngIf="hasParent">
+				<div class="group-label">Group: {{parentColumn.name}}</div>
+				<select class="select" #group ([ngModel])="searchGroup"
+					(change)="searchGroup = group.value;updateFilter()">
+					<ng-container *ngFor="let x of parentPicklist">
+						<option *ngIf="parentFilter.includes(x.value)" [value]="x.value">{{x.description}}</option>
+					</ng-container>
+				</select>
+			</ng-container>
+			<div class="multi-class-dropdown">
+				<virtual-scroller #virtualScroll class="virtual-container" [items]="currentList"
+					(vsUpdate)="viewPortItems = $event" *ngIf="currentList.length > 0">
+					<go-multi-select-item *ngFor="let item of viewPortItems" [item]="item"
+						[checked]="selected.includes(item)" [class]="item.isParent ?'dropdown-parent': 'dropdown-child'"
+						(update)="addSelection($event)">
+					</go-multi-select-item>
+				</virtual-scroller>
+				<ng-container *ngIf="currentList.length === 0">
+					<div class="empty-selection virtual-container">No Values</div>
+				</ng-container>
+			</div>
+		</go-dropdown>
+	</go-button>
+</ng-container>
+
+<ng-container *ngIf="isLoading === false && !(childColumn || parentColumn)">
+	<div class="single-wrap">
+		<input class="input search-auto" type="text" placeholder="Search" #term (keyup)="filter$.next(term.value)">
+		<ng-template [ngIf]="realFullList?.length > 500">
+			<virtual-scroller #virtualScroll class="virtual-container w-100" [items]="currentList"
+				(vsUpdate)="viewPortItems = $event" *ngIf="currentList.length > 0">
+				<go-multi-select-item *ngFor="let item of viewPortItems" [item]="item"
+					[checked]="selected.includes(item)" [class]="item.isParent ?'dropdown-parent': 'dropdown-child'"
+					(update)="addSelection($event)">
+				</go-multi-select-item>
+			</virtual-scroller>
+		</ng-template>
+		<ng-template [ngIf]="realFullList?.length < 501">
+			<go-multi-select-item *ngFor="let item of currentList" [item]="item" [checked]="selected.includes(item)"
+				class="dropdown-child" (update)="addSelection($event)">
+			</go-multi-select-item>
+		</ng-template>
+	</div>
+</ng-container>
+<mat-spinner *ngIf="isLoading" color="primary" strokeWidth="3" diameter="24"></mat-spinner>

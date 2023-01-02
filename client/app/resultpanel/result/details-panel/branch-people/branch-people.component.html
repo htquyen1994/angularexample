@@ -1,0 +1,32 @@
+<div class="details-panel-container">
+  <ng-template ngFor let-group let-index="index" [ngForOf]="data?.groups">
+      <div class="groups-container">
+          <!-- <div class="group-label" *ngIf="group?.details?.length > 0">
+              <span *ngIf="groupCollapse[index]" class="d-flex mr-5px">
+                  <mat-icon svgIcon="expand_more" size="medium"></mat-icon>
+              </span>
+              <span *ngIf="!groupCollapse[index]" class="d-flex mr-5px">
+                  <mat-icon svgIcon="chevron_right" size="medium"></mat-icon>
+              </span>
+              {{group?.name}}
+          </div> -->
+          <div class="group-content">
+              <ng-template ngFor let-detail [ngForOf]="group?.details">
+                  <div class="group-detail">
+                      <div class="detail-title">
+                          {{detail?.name}}
+                      </div>
+                      <div class="detail-text">
+                          <ng-template [ngIf]="detail.formatPipe && detail.format">
+                              {{detail?.value | dynamicPipe:detail.formatPipe:detail.format}}
+                          </ng-template>
+                          <ng-template [ngIf]="!(detail.formatPipe && detail.format)">
+                              {{detail?.value}}
+                          </ng-template>
+                      </div>
+                  </div>
+              </ng-template>
+          </div>
+      </div>
+  </ng-template>
+</div>

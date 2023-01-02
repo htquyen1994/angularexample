@@ -1,0 +1,28 @@
+<div class="ruler">
+    <ng-container *ngFor="let item of result$ | async">
+        <div class="info">
+            <label>Distance:</label>
+            <div class="text">
+                <span>{{item?.result?.lengthText}}</span>
+                <ng-container *ngIf="item?.result?.area">
+                    <span class="text-area">{{'(Area: ' +item?.result?.areaText + ')'}}</span>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+    <div class="ruler-instructions" *ngIf="isCreating">Click on the map to start measuring</div>
+</div>
+<div class="actions d-flex w-100" *ngIf="(result$ | async)?.length">
+    <go-button-group>
+        <go-button button-toolbar (clicked)="onNew()" [disabled]="numberSegmentsActiveMeasure < 1 || isCreating">
+            New
+        </go-button>
+    </go-button-group>
+    <div class="divider"></div>
+    <go-button-group>
+        <go-button button-toolbar (clicked)="onClear()">
+            Clear
+        </go-button>
+    </go-button-group>
+
+</div>

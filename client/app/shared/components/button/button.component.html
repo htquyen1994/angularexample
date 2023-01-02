@@ -1,0 +1,6 @@
+<div class="button-wrapper" pTooltip="{{_title}}" [tooltipPosition]="tooltipPosition">
+    <mat-icon *ngIf="icon && !_isLoading" [svgIcon]="icon" class="icon" [attr.size]="!size ? type === 'icon' ? 'big': 'medium' : size "></mat-icon>
+    <mat-spinner *ngIf="_isLoading" color="primary"  strokeWidth="3" diameter="24"></mat-spinner>
+    <div class="overflow"><ng-content></ng-content></div>
+</div>
+<ng-content select="[dropdown]"></ng-content>

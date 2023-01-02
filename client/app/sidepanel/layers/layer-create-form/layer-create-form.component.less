@@ -1,0 +1,248 @@
+@import 'shared-mixins';
+
+:host {
+  z-index: 1;
+
+  .column-row {
+    display: flex;
+    padding: 2px 5px;
+    align-items: center;
+    // &:hover {
+    // 	background-color: @color-hover;
+    // }
+  }
+}
+go-spinner{
+	z-index: 1;
+}
+.row {
+	padding: 5px 0;
+}
+.row-line {
+	display: flex;
+}
+.row-value {
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.page-row {
+	padding: 5px 0;
+	display: flex;
+	justify-content: flex-end;
+}
+
+// .groups {
+// 	padding-bottom: 50px;
+// }
+
+.group-wrap:not(:last-child) {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 50px;
+}
+
+.form-heading {
+	margin-bottom: 20px;
+	font-size: 18px;
+}
+
+.group-row {
+	display: flex;
+	// background-color: @color-background-stressed;
+  padding: 2px 0px;
+  align-items: center;
+	// &:hover {
+	// 	background-color: @color-hover;
+	// }
+}
+
+.error-wrap {
+	padding: 5px 0 15px 0;
+	color: @color-error;
+}
+
+.group-input {
+	margin: 0 5px;
+	flex-grow: 1;
+	width: auto;
+	border-width: 0;
+	border-bottom-width: 1px;
+	border-radius: 0;
+}
+
+
+.column-input {
+	margin: 0 5px 0 10px;
+	flex-grow: 1;
+	width: 100%;
+
+	border-width: 0;
+	border-bottom-width: 1px;
+	border-radius: 0;
+}
+
+.column-input-first {
+	margin: 0 5px 0 30px;
+
+}
+
+.column-required {
+	display: flex;
+	align-items: center;
+	padding: 0 5px 0 10px;
+	min-width: 75px;
+	flex-shrink: 1;
+	flex-direction: column;
+}
+
+
+.column-icon{
+	width: 40px;
+}
+
+.drag-icon {
+	align-self: center;
+	opacity: 0;
+	width: 18px;
+	padding: 0 2px 0 5px;
+	cursor: move;
+	color: @color-text;
+	.column-row:hover & {
+		opacity: 1;
+	}
+	.group-row:hover & {
+		opacity: 1;
+	}
+}
+
+.edit-icon {
+	align-self: center;
+	opacity: 0;
+	cursor: pointer;
+	flex-shrink: 0;
+	color: @color-text;
+	.column-row:hover & {
+		opacity: 1;
+	}
+	.group-row:hover & {
+		opacity: 1;
+	}
+	&.show-icon {
+		opacity: 1;
+	}
+}
+
+.row-button {
+	margin-top: 0px;
+    display: flex;
+    width: 100%;
+}
+
+.separator {
+	flex-grow: 1;
+}
+
+.file {
+	border: 1px solid @color-background-stressed;
+
+	margin: 3px 0;
+}
+
+.page {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.page-content {
+	max-height: unset;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.page-content-short {
+	max-height: ~"calc(100vh - 400px)";
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+
+.field-group {
+
+}
+
+.field-group-label {
+	padding: 5px 10px;
+	font-weight: 600;
+	background-color: @color-background-stressed;
+}
+
+.filed-wrap {
+	display: flex;
+	align-items: center;
+	height: @hitarea-size;
+	margin: 2px 0;
+
+}
+
+.field-label {
+	flex-grow: 1;
+	margin-right: 10px;
+}
+
+.field-type {
+	width: 100px;
+}
+
+.progress {
+	height: 3px;
+	margin-bottom: 20px;
+	overflow: hidden;
+	background-color: #f5f5f5;
+	border-radius: 1px;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+}
+
+.progress-bar {
+	float: left;
+	width: 0;
+	height: 100%;
+	font-size: 12px;
+	line-height: 20px;
+	color: #fff;
+	text-align: center;
+	background-color: #337ab7;
+	box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+	transition: width .6s ease;
+}
+
+.file-wrap {
+	display: flex;
+	align-items: center;
+}
+
+.file-name {
+	flex-grow: 1;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-right: 10px;
+}
+
+.file-size {
+	white-space: nowrap;
+	margin-right: 10px;
+}
+
+.ng-invalid.ng-touched {
+	border-color: @color-error !important;
+}
+
+.error-message {
+	color: @color-error;
+	padding: 5px 0;
+}
+
+.method-note {
+	margin-top: 5px;
+}

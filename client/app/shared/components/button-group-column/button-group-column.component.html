@@ -1,0 +1,10 @@
+<go-button-group class="group-flex-column">
+  <ng-container *ngFor="let item of items">
+    <go-button *ngIf="isExpanded || defaultItem?.id === item?.id" type="icon" [icon]="item?.icon" [title]="item.title"
+      [disabled]="disabled" [selected]="active === item?.id" (clicked)="onClickButton(item)" tooltipPosition="left"></go-button>
+  </ng-container>
+  <go-button [disabled]="disabled" class="expand-more-button" type="icon" [icon]="isExpanded ? 'expand-up' : 'expand-down'"
+    [title]="isExpanded ? 'Collapse':'More'" (clicked)="onToggleDrawingTool()" tooltipPosition="left">
+  </go-button>
+</go-button-group>
+<ng-content select="[dropdown]"></ng-content>

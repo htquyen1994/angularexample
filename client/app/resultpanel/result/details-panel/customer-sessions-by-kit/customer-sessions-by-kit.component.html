@@ -1,0 +1,36 @@
+<div class="customer-sessions-warper">
+    <div class="customer-sessions-graph">
+        <div class="customer-sessions-filter" [formGroup]="form">
+            <div class="form-control">
+                <input type="text" [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="mindate">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker (opened)="onDatePickerOpened()"></mat-datepicker>
+            </div>
+            <div class="group-separator">and</div>
+            <div class="group-separator form-control">
+                <input type="text" [min]="minDate" [max]="maxDate" [matDatepicker]="picker1" formControlName="maxdate">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1 (opened)="onDatePickerOpened()"></mat-datepicker>
+            </div>
+            <go-button-group class="group-separator">
+                <go-button class="group-separator" button-raised (clicked)="onUpdate()" [disabled]="loading$ | async">
+                    Update
+                </go-button>
+            </go-button-group>
+            <go-button-group class="group-separator form-control">
+                <mat-slide-toggle formControlName="onlyShowKits">Only show kits</mat-slide-toggle>
+            </go-button-group>
+        </div>
+        <div class="customer-sessions-chart" *ngIf="(loading$ | async) || (data$ | async)?.length">
+            <ps-line-chart #lineChart [customClickLegend]="false" [data]="data$ | async" [labels]="labels$ | async" [loading]="loading$ | async"
+            (onClick)="onClickChart($event)"  [options]="chartOptions">
+            </ps-line-chart>
+        </div>
+        <div class="empty" *ngIf="!(loading$ | async) && !(data$ | async)?.length">
+            No customer sessions available for this branch for this date range. Please adjust your date range.
+        </div>
+    </div>
+</div>
+<div #tooltipEl class="chart-tooltip">
+  <table></table>
+</div>

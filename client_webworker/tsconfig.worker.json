@@ -1,0 +1,28 @@
+{
+  // "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./web-worker",
+    "outDir": "./dist/out-tsc/woker",
+    "sourceMap": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "module": "es2015",
+    "typeRoots": [
+      "../../node_modules/@types"
+    ],
+    "types": [],
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts"
+  ]
+}

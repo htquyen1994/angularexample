@@ -1,0 +1,59 @@
+@import 'shared-mixins';
+
+ps-account-setting-dialog {
+  .link-container {
+    padding: 15px;
+  }
+
+  .link-container-flex-center {
+    display: flex;
+    align-items: center;
+  }
+
+  .link-container-border {
+    border-bottom: 1px solid @color-item-border;
+  }
+
+  .dialog-wrap {
+    max-height: ~'calc(100vh - 200px)';
+    overflow: auto;
+    .link-container {
+      padding: 5px 10px;
+    }
+  }
+  .range-number {
+    width: 40px;
+    height: 25px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .row-action-label {
+    flex-grow: 1;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    .icon {
+      margin-left: 5px;
+    }
+  }
+  .row-label {
+    font-weight: 600;
+    margin: 0 -10px;
+  }
+  .row-action {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding: 3px 0;
+    width: 100%;
+    go-button-group {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+  }
+  .icon-number-value-horizontal {
+    margin-left: 7px;
+  }
+}

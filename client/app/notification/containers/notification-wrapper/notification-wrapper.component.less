@@ -1,0 +1,40 @@
+ps-notification-wrapper {
+  .notification-wrapper{
+    position: relative;
+    height: 100%;
+  }
+  .notification-wrapper-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0 0 5px 0;
+
+    .left {
+      margin-right: auto;
+      padding: 0 5px;
+    }
+
+    .right {
+      margin-left: auto;
+      padding: 0 5px;
+    }
+  }
+
+  .notification-wrapper-content {
+    padding: 5px 0 0 0;
+    height: calc(100% - 30px);
+    overflow: auto;
+  }
+
+  .empty {
+    font-size: 18px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .link {
+    cursor: pointer;
+  }
+}

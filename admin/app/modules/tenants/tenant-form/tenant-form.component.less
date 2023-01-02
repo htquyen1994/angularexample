@@ -1,0 +1,21 @@
+@import "shared-mixins";
+/* dialog */
+.mat-dialog-container {
+	position: relative;
+	[mat-dialog-close] {
+		position: absolute;
+		right: 10px;
+		top: 10px;
+	}
+}
+
+.mat-dialog-content {
+	.mat-form-field {
+		width: 100%;
+	}
+}
+
+.mat-dialog-actions {
+	justify-content: flex-end;
+}
+

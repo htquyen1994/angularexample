@@ -1,0 +1,410 @@
+<ng-template [ngIf]="!form && style && isCreate === null">
+  <div class="row">
+    <ps-select class="select" [options]="styleOptions" [ngModel]="styleIndex" (ngModelChange)="setActiveStyle($event)"
+      [showClear]="false" [placeholder]="'Select a style'">
+    </ps-select>
+    <go-button [disabled]="!canEditSymbology" title="Add style" type="icon" icon="small-add" class="icon-small"
+      (clicked)="onCreateForm()">
+    </go-button>
+    <go-button [disabled]="style.isDefault || !canEditSymbology" title="Edit style" type="icon" icon="small-edit"
+      class="icon-small" (clicked)="onUpdateForm()"></go-button>
+      <ng-container *ngIf="canShare$ | async">
+        <go-button [disabled]="style.isDefault || (disableShare$ | async)" title="Share style" type="icon" icon="layer-share"
+          size="small" class="icon-small" (clicked)="onShareStyle()"></go-button>
+      </ng-container>
+  </div>
+
+  <ng-template [ngIf]="isShowLegends">
+    <div [ngSwitch]="style.type" class="legend-wrap">
+      <ng-template [ngSwitchCase]="layerStyleType.BASIC">
+        <div class="row">
+          <ng-template [ngIf]="iconsPath[style.opts.icon]">
+            <mat-icon *ngIf="layer.type === layerType.POLYLINE" class="icon" svgIcon="map-{{style.opts.icon}}"
+              [style.color]="style.opts.strokeColor"></mat-icon>
+            <mat-icon *ngIf="layer.type !== layerType.POLYLINE" class="icon" svgIcon="map-{{style.opts.icon}}"
+              [style.color]="style.opts.fillColor"></mat-icon>
+          </ng-template>
+          <ng-template [ngIf]="iconsSVG[style.opts.icon]">
+            <mat-icon *ngIf="layer.type === layerType.POLYLINE" class="icon" svgIcon="map-{{style.opts.icon}}"
+              [style.color]="style.opts.strokeColor"></mat-icon>
+            <mat-icon *ngIf="layer.type !== layerType.POLYLINE" class="icon" svgIcon="map-{{style.opts.icon}}"
+              [style.color]="style.opts.fillColor"></mat-icon>
+          </ng-template>
+          <ng-template [ngIf]="!iconsPath[style.opts.icon] && !iconsSVG[style.opts.icon]">
+            <img class="icon-raster" src="/client/assets/{{style.opts.icon}}.png" width="16" height="16">
+          </ng-template>
+          <div>{{style.opts.label}}</div>
+        </div>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.SELECTION">
+        <ng-template [ngIf]="!isMorrisonLegend">
+          <div class="row-legend">{{style.opts.label}}</div>
+          <ng-template [ngIf]="list?.length < 20">
+            <div class="row-scroll-wrapper">
+              <ng-template [ngIf]="!isLoading && list?.length == 0">
+                <div class="text-center" style="margin-left: -23px;">
+                  No results for current filter
+                </div>
+              </ng-template>
+              <go-style-legend-item *ngFor="let item of list; let i = index" [isShowHiddenIcon]="hasQuickFilter"
+                [isIcon]="iconsPath[item.icon] !== undefined || iconsSVG[item.icon] !== undefined" [item]="item"
+                [isShowStroke]="style.opts.isDisplayStrokePoint" (toggle)="onToggle($event, item, i)">
+              </go-style-legend-item>
+            </div>
+          </ng-template>
+          <ng-template [ngIf]="list?.length > 19">
+            <virtual-scroller #virtualScroll class="virtual-container" *ngIf="list.length > 0"
+              [items]="list | pipeFunction : getVirtualScrollerList" (vsUpdate)="viewPortItems = $event">
+              <go-style-legend-item *ngFor="let item of viewPortItems" [isShowHiddenIcon]="hasQuickFilter"
+                [isIcon]="iconsPath[item.icon] !== undefined || iconsSVG[item.icon] !== undefined" [item]="item"
+                [isShowStroke]="style.opts.isDisplayStrokePoint" (toggle)="onToggle($event, item, item._index)">
+              </go-style-legend-item>
+            </virtual-scroller>
+          </ng-template>
+
+        </ng-template>
+        <ng-template [ngIf]="isMorrisonLegend">
+          <div class="row">
+            <img src="/client/assets/Legend.png" />
+          </div>
+        </ng-template>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.GRADIENT">
+        <div class="row">
+          <label class="label">Restrict to current Filter</label>
+          <mat-slide-toggle [ngModel]="style.opts.isFilterApplied" (ngModelChange)="setFilter($event)">
+          </mat-slide-toggle>
+        </div>
+        <div class="row-legend">{{style.opts.label}}</div>
+        <div class="row">
+
+          <ng-template [ngIf]="layer.type === layerType.POINT">
+            <ng-template [ngIf]="iconsPath[style.opts.icon]">
+              <mat-icon class="icon" svgIcon="map-{{style.opts.icon}}" [style.color]="style.opts.fillColor"></mat-icon>
+            </ng-template>
+            <ng-template [ngIf]="iconsSVG[style.opts.icon]">
+              <mat-icon class="icon" svgIcon="map-{{style.opts.icon}}" [style.color]="style.opts.fillColor"></mat-icon>
+            </ng-template>
+            <ng-template [ngIf]="!iconsPath[style.opts.icon] && !iconsSVG[style.opts.icon]">
+              <img class="icon-raster" src="/client/assets/{{style.opts.icon}}.png" width="16" height="16">
+            </ng-template>
+          </ng-template>
+
+          <div class="gradient"
+            [style.background]="sanitizer.bypassSecurityTrustStyle('linear-gradient(to right, ' + style.opts.gradient.join(',') + ')')">
+          </div>
+        </div>
+        <div class="row">
+          <div>{{columnStatistics.min}}</div>
+          <div class="separator"></div>
+          <div>{{columnStatistics.max}}</div>
+        </div>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.HEATMAP">
+        <div class="row-legend">{{style.opts.label}}</div>
+        <div class="row">
+          <div class="gradient"
+            [style.background]="sanitizer.bypassSecurityTrustStyle('linear-gradient(to right, ' + style.opts.gradient.join(',') + ')')">
+          </div>
+        </div>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.CLUSTER">
+        <div class="row" *ngIf="style.opts.mapType == ClusterType.AREA">
+          <label class="label">Labels:</label>
+          <mat-slide-toggle [ngModel]="style.opts.isLabeling" (ngModelChange)="setIsLabeling($event)">
+          </mat-slide-toggle>
+        </div>
+        <div class="row">
+          <div class="gradient"
+            [style.background]="sanitizer.bypassSecurityTrustStyle('linear-gradient(to right, ' + style.opts.gradient.join(',') + ')')">
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </ng-template>
+</ng-template>
+
+<go-spinner *ngIf="isLoading"></go-spinner>
+
+<ng-template [ngIf]="form && styleTemp && !isLoading">
+  <div [formGroup]="form">
+    <div class="row-column" *ngIf="isCreate === true">
+      <label class="label">Style Type</label>
+      <ps-select [options]="styleTypeList" formControlName="type" (ngModelChange)="onTypeChange($event)"
+       [placeholder]="'Select a style'">
+      </ps-select>
+    </div>
+
+    <div class="row-column">
+      <label class="label">Name</label>
+      <input type="text" formControlName="name">
+    </div>
+
+    <div class="row">
+      <label class="label">Default style</label>
+      <mat-slide-toggle formControlName="isDefault"></mat-slide-toggle>
+    </div>
+    <ng-container *ngIf="styleTemp.type !== layerStyleType.CLUSTER">
+      <div class="row-column" *ngIf="layer.type !== layerType.POLYLINE">
+        <label class="label" *ngIf="layer.type === layerType.POLYGON">Fill Opacity</label>
+        <label class="label" *ngIf="layer.type === layerType.POINT">Icon Opacity</label>
+        <div class="line">
+          <!--
+      <mat-slider formControlName="transparency" [min]="0" [max]="1" [step]="0.05"
+            [thumb-label]="form.controls['transparency'].value | percent:'1.0-0'"></mat-slider>
+-->
+          <input class="range" type="range" min="0" max="1" step="0.05" formControlName="transparency">
+          <div class="range-number">{{form.controls['transparency'].value | percent:'1.0-0'}}</div>
+        </div>
+      </div>
+      <div class="row-column" *ngIf="layer.type !== layerType.POINT && styleTemp.type !== layerStyleType.HEATMAP">
+        <label class="label" *ngIf="layer.type === layerType.POLYGON">Outline Opacity</label>
+        <label class="label" *ngIf="layer.type === layerType.POLYLINE">Line Opacity</label>
+        <div class="line">
+          <input class="range" type="range" min="0" max="1" step="0.05" formControlName="strokeTransparency">
+          <div class="range-number">{{form.controls['strokeTransparency'].value | percent:'1.0-0'}}</div>
+        </div>
+      </div>
+      <div class="row-column" *ngIf="layer.type === layerType.POINT && styleTemp.type !== layerStyleType.HEATMAP">
+        <label class="label">Icon Size</label>
+        <div class="line">
+          <input class="range" type="range" min="4" max="32" step="1" formControlName="iconSize">
+          <div class="range-number">{{form.controls['iconSize'].value}}</div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="layer.type === layerType.POLYLINE">
+      <div class="row-column">
+        <label class="label">Line Width</label>
+        <div class="line">
+          <input class="range" type="range" min="1" max="10" step="1" formControlName="strokeWeight">
+          <div class="range-number">{{form.controls['strokeWeight'].value}}</div>
+        </div>
+      </div>
+      <div class="row-column">
+        <label class="label">Line Style</label>
+        <ps-select [options]="lineStyle" formControlName="lineStyle"
+          [placeholder]="'Select a style'"></ps-select>
+      </div>
+    </ng-container>
+    <div [ngSwitch]="styleTemp.type">
+      <ng-template [ngSwitchCase]="layerStyleType.BASIC">
+        <div class="row" *ngIf="layer.type !== layerType.POLYLINE">
+          <label class="label">Colour</label>
+          <input type="color" formControlName="fillColor">
+        </div>
+        <div class="row" *ngIf="layer.type !== layerType.POINT">
+          <label class="label" *ngIf="layer.type === layerType.POLYGON">Outline</label>
+          <label class="label" *ngIf="layer.type === layerType.POLYLINE">Line colour</label>
+          <input type="color" formControlName="strokeColor">
+        </div>
+        <div class="row-column" *ngIf="layer.type === layerType.POINT">
+          <label class="label">Icon</label>
+          <div class="row">
+            <go-icon-select formControlName="icon" [fillColor]="form?.controls['fillColor']?.value" ngDefaultControl>
+            </go-icon-select>
+            <input type="text" formControlName="label" />
+          </div>
+        </div>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.SELECTION">
+        <div class="row">
+          <label class="label">Restrict to current Filter</label>
+          <mat-slide-toggle formControlName="isFilterApplied" (ngModelChange)="onFilterChange($event)">
+          </mat-slide-toggle>
+        </div>
+        <div class="row-column">
+          <label class="label">Column Name</label>
+          <ps-select [options]="pickListColumnOptions" formControlName="columnName" (ngModelChange)="onSelectChange($event)"
+          [placeholder]="'Select a column'"></ps-select>
+        </div>
+        <div class="row-column" *ngIf="colourPicklist.length">
+          <label class="label">Pick Column for Colour</label>
+          <ps-select [options]="colourPicklist" formControlName="joinColumnName" (ngModelChange)="onSelectChangeHex($event)"
+          [placeholder]="'Select a style'" [showClear]="showClear"></ps-select>
+        </div>
+
+        <virtual-scroller #virtualScroll class="virtual-container" [items]="list">
+          <go-style-form-item *ngFor="let item of virtualScroll.viewPortItems"
+            [isPointLayer]="layer.type === layerType.POINT" [item]="item" (update)="onUpdateIcon($event, item);">
+          </go-style-form-item>
+        </virtual-scroller>
+
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.GRADIENT">
+        <div class="row">
+          <label class="label">Restrict to current Filter</label>
+          <mat-slide-toggle formControlName="isFilterApplied">
+          </mat-slide-toggle>
+        </div>
+        <div class="row-column" *ngIf="hasAdvancedStyling">
+          <label class="label">Value Function</label>
+          <ps-select [options]="valueFunctionOptions" formControlName="valueFunction"
+          [placeholder]="'Select a function'"></ps-select>
+        </div>
+        <div class="row-column">
+          <label class="label">Column Name</label>
+          <ps-select [options]="numberColumnOptions" formControlName="columnName"
+          [placeholder]="'Select a column'"></ps-select>
+        </div>
+
+        <div class="row" *ngIf="layer.type === layerType.POLYGON">
+          <label class="label" *ngIf="layer.type === layerType.POLYGON">Outline</label>
+          <input type="color" formControlName="strokeColor">
+        </div>
+        <div class="row-column" *ngIf="layer.type === layerType.POINT">
+          <label class="label">Icon</label>
+          <go-icon-select formControlName="icon" ngDefaultControl></go-icon-select>
+        </div>
+        <ng-container *ngIf="!showColourRamp; else ColorRampTemplate">
+          <div class="row">
+            <label class="label">Colour range</label>
+            <go-button button-flat *ngIf="oldGradient" type="icon" icon="refresh" title="Reset colour ramp"
+              (clicked)="onRestore()">
+            </go-button>
+            <go-button button-flat type="icon" icon="swap_vert" title="reverse" (clicked)="onReverse()">
+            </go-button>
+            <go-button button-flat class="px-0" (clicked)="onToggleColourRamp()" *ngIf="(colourRamps$ | async)?.length">
+              Colour ramp
+            </go-button>
+          </div>
+          <div class="row-control" *ngFor="let control of form.controls['gradient'].controls; let i = index">
+            <input type="color" [formControl]="control">
+            <go-button *ngIf="i> 0 && form.controls['gradient'].controls.length > 2" type="icon" icon="small-delete"
+              (clicked)="removeColor(i)"></go-button>
+          </div>
+          <div class="row-column">
+            <go-button button-toolbar icon="small-add" (clicked)="addColor()">Add Colour</go-button>
+          </div>
+        </ng-container>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.HEATMAP">
+        <div class="row-column">
+          <label class="label">Weight Column Name</label>
+          <ps-select [options]="numberColumnOptions" formControlName="columnName"
+          [placeholder]="'Select a column'" [showClear]="true"></ps-select>
+        </div>
+        <ng-container *ngIf="!showColourRamp; else ColorRampTemplate">
+          <div class="row">
+            <label class="label">Colour range</label>
+            <go-button button-flat *ngIf="oldGradient" type="icon" icon="refresh" title="Reset colour ramp"
+              (clicked)="onRestore()">
+            </go-button>
+            <go-button button-flat type="icon" icon="swap_vert" title="reverse" (clicked)="onReverse()">
+            </go-button>
+            <go-button button-flat class="px-0" (clicked)="onToggleColourRamp()" *ngIf="(colourRamps$ | async)?.length">
+              Colour ramp
+            </go-button>
+          </div>
+          <div class="row-control" *ngFor="let control of form.controls['gradient'].controls; let i = index">
+            <input type="color" [formControl]="control">
+            <go-button *ngIf="i !== 0" type="icon" icon="small-delete" (clicked)="removeColor(i)">
+            </go-button>
+          </div>
+          <div class="row-column">
+            <go-button button-toolbar icon="small-add" (clicked)="addColor()">Add Colour</go-button>
+          </div>
+        </ng-container>
+      </ng-template>
+      <ng-template [ngSwitchCase]="layerStyleType.CLUSTER">
+        <div class="row" *ngIf="form.controls['mapType'].value === ClusterType.AREA">
+          <label class="label">Labels:</label>
+          <mat-slide-toggle formControlName="isLabeling">
+          </mat-slide-toggle>
+        </div>
+        <div class="row" *ngIf="hasAdvancedStyling">
+          <label class="label">Map type:</label>
+          <go-button-group>
+            <go-button button-toolbar [selected]="form.controls['mapType'].value === ClusterType.POINTS" type="icon"
+              type="icon" icon="cluster_points" title="Clustered Points"
+              (clicked)="form.controls['mapType'].setValue(ClusterType.POINTS)"></go-button>
+            <go-button button-toolbar [selected]="form.controls['mapType'].value === ClusterType.AREA" type="icon"
+              type="icon" icon="cluster_area" title="Area density"
+              (clicked)="form.controls['mapType'].setValue(ClusterType.AREA)"></go-button>
+          </go-button-group>
+        </div>
+        <div class="row-column">
+          <label class="label">Weight Column Name</label>
+          <ps-select [options]="numberColumnOptions" formControlName="columnName"
+          [placeholder]="'Select a column'" [showClear]="true"></ps-select>
+        </div>
+        <ng-container *ngIf="form.controls['mapType'].value === ClusterType.AREA">
+          <div class="row-column">
+            <label class="label">Fill Opacity</label>
+            <div class="line">
+              <input class="range" type="range" min="0" max="1" step="0.05" formControlName="transparency">
+              <div class="range-number">{{form.controls['transparency'].value | percent:'1.0-0'}}</div>
+            </div>
+          </div>
+          <div class="row-column">
+            <label class="label">Outline Opacity</label>
+            <div class="line">
+              <input class="range" type="range" min="0" max="1" step="0.05" formControlName="strokeTransparency">
+              <div class="range-number">{{form.controls['strokeTransparency'].value | percent:'1.0-0'}}</div>
+            </div>
+          </div>
+          <div class="row">
+            <label class="label">Outline</label>
+            <input type="color" formControlName="strokeColor">
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!showColourRamp; else ColorRampTemplate">
+          <div class="row">
+            <label class="label">Colour range</label>
+            <go-button button-flat *ngIf="oldGradient" type="icon" icon="refresh" title="Reset colour ramp"
+              (clicked)="onRestore()">
+            </go-button>
+            <go-button button-flat type="icon" icon="swap_vert" title="reverse" (clicked)="onReverse()">
+            </go-button>
+            <go-button button-flat class="px-0" (clicked)="onToggleColourRamp()" *ngIf="(colourRamps$ | async)?.length">
+              Colour ramp
+            </go-button>
+          </div>
+          <div class="row-control" *ngFor="let control of form.controls['gradient'].controls; let i = index">
+            <input type="color" [formControl]="control">
+            <go-button *ngIf="i !== 0" type="icon" icon="small-delete" (clicked)="removeColor(i)">
+            </go-button>
+          </div>
+          <div class="row-column">
+            <go-button button-toolbar icon="small-add" (clicked)="addColor()">Add Colour</go-button>
+          </div>
+        </ng-container>
+      </ng-template>
+    </div>
+    <div class="row-column" *ngIf="canCopyToTenant">
+      <go-button button-raised (clicked)="copyToTenant()" [disabled]="form.invalid">Copy to Tenant</go-button>
+    </div>
+
+    <div class="row-cta">
+      <go-button button-flat *ngIf="isCreate === false && (styleTemp.type | pipeFunction : canDelete:this)"
+        (clicked)="onDelete()">Delete
+      </go-button>
+      <div class="separator"></div>
+      <go-button button-flat (clicked)="onCancel()">Cancel</go-button>
+      <go-button button-raised *ngIf="isCreate === false" (clicked)="onUpdate()" [disabled]="form.invalid">Update
+      </go-button>
+      <go-button button-raised *ngIf="isCreate === true" (clicked)="onCreate()" [disabled]="form.invalid">Create
+      </go-button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #ColorRampTemplate>
+  <div class="row">
+    <label class="label">Choose a colour ramp</label>
+    <go-button button-flat (clicked)="onToggleColourRamp()">Colour range
+    </go-button>
+  </div>
+  <div class="row-column">
+    <ng-container *ngFor="let colourRamp of colourRamps$ | async">
+      <div class="row gradient-wrapper">
+        <div class="gradient" matRipple
+          [style.background]="sanitizer.bypassSecurityTrustStyle('linear-gradient(to right, ' + colourRamp?.colours?.join(',') + ')')"
+          (click)="onSelectColourRamp(colourRamp)">
+        </div>
+        <label class="label ">{{colourRamp?.name}}</label>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>

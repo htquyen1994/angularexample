@@ -1,0 +1,29 @@
+<go-button button-toolbar [icon]="showIcon ? 'label' : null" (clicked)="dropdown.toggle($event)" [disabled]="disabled"
+	title="{{activeStyle ? activeStyle.name : 'Pick a label style'}}">
+	<div class="overflow">{{activeStyle ? activeStyle.name : 'Label'}}</div>
+	<mat-icon [svgIcon]="'caret-down'" size="small" class="caret"></mat-icon>
+  <ps-overlaypanel dropdown #dropdown [styleClass]="'label-dropdown'">
+    <div class="dropdown-warp">
+			<div class="dropdown-item" (click)="onStyleSelect(); dropdown.toggle($event)">
+				<div class="dropdown-item-label">No Label</div>
+			</div>
+			<ng-container *ngFor="let style of style$ | async">
+				<div class="dropdown-item" (click)="onStyleSelect(style); dropdown.toggle($event)">
+					<div class="dropdown-item-label">{{style.name}}</div>
+					<div style="flex-grow: 1"></div>
+					<go-button [disabled]="!style?.isEditable" button-flat class="dropdown-item-button" type="icon" icon="small-edit" title="Edit Style"
+						(clicked)="onCreateForm(style);dropdown.toggle($event);">
+					</go-button>
+					<go-button [disabled]="!style?.isRemovable" class="dropdown-item-button" type="icon" icon="small-delete" title="Delete Style"
+						(clicked)="onDelete(style);dropdown.toggle($event);">
+					</go-button>
+				</div>
+			</ng-container>
+		</div>
+		<div class="dropdown-item-add">
+			<go-button button-raised (clicked)="onCreateForm(); dropdown.toggle($event);">
+				Add Style
+			</go-button>
+		</div>
+  </ps-overlaypanel>
+</go-button>

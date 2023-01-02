@@ -1,0 +1,74 @@
+@import 'shared-mixins';
+
+go-dropdown {
+	.shadow-overlay();
+	position: absolute;
+	flex-direction: column;
+	right: -10px;
+	display: none;
+	background-color: @color-inverted;
+	border-radius: 2px;
+	top: 50px;
+	z-index: 1000;
+	color: @color-text;
+	align-items: stretch;
+
+	min-width: 120px;
+
+	&:before {
+		border-bottom: 10px solid @color-inverted;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		content: "";
+		height: 0;
+		right: 15px;
+		position: absolute;
+		top: -10px;
+		width: 0;
+	}
+
+	&[position-left]:before {
+		border-bottom: 10px solid @color-inverted;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		content: "";
+		height: 0;
+		left: 15px;
+		position: absolute;
+		top: -10px;
+		width: 0;
+	}
+	&[position-top-right] {
+		bottom: 40px;
+		left: 0px;
+		top: unset;
+		right: unset;
+	}
+	&[position-top-right]:before {
+		border-bottom: 10px solid @color-inverted;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		content: "";
+		height: 0;
+		left: 15px;
+		position: absolute;
+		top: 100%;
+		width: 0;
+		transform: rotateX(180deg);
+	}
+
+
+	&[aria-expanded=true] {
+		display: flex;
+	}
+
+	A {
+		color: @color-text;
+		text-decoration: none;
+	}
+	.dropdown-content {
+		display: flex;
+		flex-direction: column;
+
+	}
+}

@@ -1,0 +1,53 @@
+ps-selection-button {
+  &.ellipsis-text{
+    overflow: hidden;
+    .p-button .p-button-text{
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+
+  &[aria-selected='true']:not([aria-disabled='true']) {
+    .ps-selectionbutton, button{
+      background: #8ac54b;
+      color: #fff;
+    }
+  }
+  &:first-child, &:first-child .ps-selectionbutton, &:first-child .ps-selectionbutton button {
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+  }
+  &:last-child, &:last-child .ps-selectionbutton, &:last-child .ps-selectionbutton button {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+  }
+  .ps-selectionbutton {
+    display: flex;
+    position: relative;
+    background-color: #f1f1f1;
+    button {
+      width: 100%;
+      background-color: #f1f1f1;
+      height: 27px;
+      font-weight: 400;
+      border-color: rgba(0, 0, 0, 0.1);
+      border-radius: 0;
+      color: #333333;
+      &.p-button:enabled:active {
+        color: #fff;
+        background-color: #8ac54b;
+        border-color: #8ac54b;
+      }
+      &.ps-selectionbutton-menubutton {
+        width: 20px;
+        font-size: 10px;
+        border-left-color: transparent;
+        .p-button.p-button-icon-only {
+          width: 20px;
+          font-size: 10px;
+        }
+      }
+    }
+  }
+}

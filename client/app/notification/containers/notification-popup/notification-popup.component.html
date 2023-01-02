@@ -1,0 +1,19 @@
+<go-dialog (close)="onDialogClose()" #dialog [isDrag]="true" [headerTemplate]="headerTemplate" [resize]="true">
+  <ng-template #headerTemplate>
+    <ng-container *ngIf="step === NotificationStep.DETAIL">
+      <go-button class="icon left" type="icon" icon="expand-left" (clicked)="goBack()"></go-button>
+    </ng-container>
+    <div class="title">
+      <div class="title-wrap">Notifications</div>
+    </div>
+    <go-button class="close right" type="icon" icon="close" (clicked)="onDialogClose()"></go-button>
+  </ng-template>
+  <div class="page-content">
+    <ng-container *ngIf="step === NotificationStep.DETAIL; else ListNotification">
+      <ps-notification-detail [item]="selectedItem"></ps-notification-detail>
+    </ng-container>
+    <ng-template #ListNotification>
+      <ps-notification-wrapper (selected)="onSelectedItem($event)"></ps-notification-wrapper>
+    </ng-template>
+  </div>
+</go-dialog>

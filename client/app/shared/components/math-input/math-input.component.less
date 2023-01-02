@@ -1,0 +1,59 @@
+@import 'shared-mixins';
+:host{
+    width: 100%;
+    position: relative;
+    margin-bottom: 37px;
+    &.ng-invalid {
+        & .math-input{
+            border-color: @color-error;
+        }
+    }
+}
+.dropdown{
+    right: unset;
+    top: 36px;
+    &:before{
+        content: unset;
+    }
+    &.dropdown-error{
+        background-color: transparent;
+        box-shadow: none;
+        & go-error-message{
+            background-color: transparent;
+        }
+    }
+}
+.math-input{
+    display: flex;
+    cursor: text;
+    min-height: 60px;
+    border: 1px solid #999;
+    width: 100%;
+    align-content: flex-start;
+    padding: 5px;
+    flex-wrap: wrap;
+    height: 100%;
+    & .math-input-cursor {
+        border-left: 1px solid black;
+        margin-left: -1px;
+        position: relative;
+        z-index: 1;
+        padding: 0;
+        display: -moz-inline-box;
+        display: inline-block;
+        height: 16px;
+        min-height: 16px;
+        &.math-input-blink { visibility: hidden; }
+    }
+    & .input-label{
+        &.invalid{
+            color: red !important;
+        }
+        &.input-label-boolean{
+            color: blue;
+        }
+    }
+}
+// .math-input-helptext{
+//     border: 1px solid #999;
+// }

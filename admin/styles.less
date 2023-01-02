@@ -1,0 +1,281 @@
+@import "shared-mixins";
+
+html,
+body {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+}
+
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/admin/assets/icons.woff) format('woff2');
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+.st0 {
+    fill: @color-primary;
+}
+
+//bootstrap
+.text-center {
+    text-align: center;
+}
+//end bootstrap
+.mat-dialog-container {
+	position: relative;
+	[mat-dialog-close] {
+		position: absolute;
+	    right: 0px;
+        top: 0px;
+	}
+}
+
+.mat-dialog-content {
+	.mat-form-field {
+		width: 100%;
+	}
+}
+
+.mat-dialog-actions {
+	justify-content: flex-end;
+}
+
+.page-body {
+    margin: 10px;
+
+    .page-body__header {
+        display: flex;
+        flex-direction: row;
+        padding: 8px 10px;
+        height: 48px;
+        align-items: center;
+
+        .page-body__header__page-title {
+            font-size: 24px;
+            font-weight: 600;
+            padding-right: 10px;
+        }
+    }
+
+    .page-body__content {
+        display: flex;
+        flex-direction: column;
+        padding: 0 10px;
+    }
+
+    .page-body__footer {
+        display: flex;
+        flex-direction: row;
+        padding: 0 10px;
+    }
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #bfbfbfb2;
+  }
+
+.ml-15 {
+    margin-left: 15px !important;
+}
+
+.mr-15 {
+    margin-right: 15px !important;
+}
+
+/*ngx Table */
+.datatable-header-cell {
+    border: 1px solid #c8c8c8;
+    font-weight: 700;
+    color: #333333;
+    background-color: #f4f4f4;
+    height: 40px;
+
+    & .datatable-header-cell-template-wrap {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+    }
+}
+
+.datatable-body-row {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.datatable-body-cell {
+    background-color: inherit;
+    border: 1px solid #c8c8c8;
+    height: 40px;
+    display: flex !important;
+    align-items: center;
+    padding: 5px;
+}
+
+.datatable-group-header {
+    background-color: inherit;
+    border: 1px solid #c8c8c8;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.datatable-group-header-toggle {
+    cursor: pointer;
+}
+
+.datatable-icon {
+    color: grey;
+    text-decoration: none;
+    display: inline-flex;
+}
+
+.datatable-header-cell-template-center {
+    margin: auto;
+    display: flex;
+    align-items: center;
+}
+
+.datatable-body-cell.center .datatable-body-cell-label {
+    margin: auto !important;
+}
+
+.ngx-datatable .empty-row {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ngx-datatable .datatable-footer {
+    border: 1px solid #c8c8c8;
+    background-color: #f4f4f4;
+    padding: 0 5px;
+}
+
+.ngx-datatable .datatable-footer .page-count {
+    line-height: 40px;
+    height: 40px;
+}
+
+.ngx-datatable .datatable-footer .datatable-pager {
+    margin: 0 10px;
+}
+
+.ngx-datatable .datatable-footer .datatable-pager li.disabled a {
+    color: rgba(0, 0, 0, .26) !important;
+    background-color: transparent !important;
+}
+
+.ngx-datatable .datatable-footer .datatable-pager li.active a {
+    .active-box-primary()
+}
+
+.ngx-datatable .datatable-footer .datatable-pager a {
+    height: 22px;
+    min-width: 24px;
+    line-height: 22px;
+    padding: 0 6px;
+    border-radius: 3px;
+    margin: 6px 3px;
+    text-align: center;
+    color: rgba(0, 0, 0, .54);
+    text-decoration: none;
+    vertical-align: bottom;
+}
+
+.ngx-datatable .datatable-footer .datatable-pager .datatable-icon-left,
+.ngx-datatable .datatable-footer .datatable-pager .datatable-icon-prev,
+.ngx-datatable .datatable-footer .datatable-pager .datatable-icon-right,
+.ngx-datatable .datatable-footer .datatable-pager .datatable-icon-skip {
+    font-size: 20px;
+    line-height: 20px;
+    padding: 0 3px;
+}
+
+/* You can add global styles to this file, and also import other style files */
+
+.action-column {
+    width: 100px;
+}
+.pre-wrap{
+    white-space: pre-wrap !important;
+}
+.mat-dialog-content{
+    min-height: 70px;
+}
+
+.password-list ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.password-list li {
+  padding-left: 0;
+  /*text-indent: -.7em;*/
+}
+
+.password-list li:before {
+    content: "• ";
+    font-size: 16px;
+}
+
+.bg-warning {
+  background-color: @color-warning;
+}
+
+.bg-error {
+  background-color: @color-error;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.mat-checkbox-indeterminate {
+  .mat-checkbox-background {
+    border: 2px solid #3a4766;
+    clip-path: polygon(20% 20%, 20% 80%, 80% 80%, 80% 20%);
+    padding: 30%;
+  }
+}

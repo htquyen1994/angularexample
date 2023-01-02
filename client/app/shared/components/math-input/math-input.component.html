@@ -1,0 +1,22 @@
+<div class="math-input" #mathInput>
+    <ng-template [ngIf]="model">
+        <ng-template ngFor let-item [ngForOf]="model.outputs" let-i="index">
+            <span class="input-label" 
+            [class.input-label-boolean]="item?.type === MathInputType.Boolean" 
+            [attr.data-index]="i" 
+            [class.invalid]="error?.error?.data?.indexs?.includes(i)">{{item?.value?.display}}</span>
+        </ng-template>
+    </ng-template>
+</div>
+<go-dropdown class="dropdown dropdown-error" [style.top.px]="mathInput.offsetHeight" [autoClose]="false" [isOpen]="!!error">
+    <go-error-message [error]="error"></go-error-message>
+</go-dropdown>
+<go-dropdown class="dropdown" [autoClose]="false" [isOpen]="isOpenedHelperInput" [style.top.px]="mathInput.offsetHeight">
+    <div class="math-input-helptext" #inputWrapper>
+        <!-- <span>&nbsp;{{funcionText}}{{string}}{{columnText}}</span> -->
+        <input autofocus type="text" *ngIf="funcionText != null" pInputText [ngModel]="funcionText" (ngModelChange)="onChangeInput($event)">
+        <input autofocus type="text" *ngIf="string != null" pInputText [ngModel]="string" (ngModelChange)="onChangeInput($event)">
+        <input autofocus type="text" *ngIf="columnText != null" pInputText [ngModel]="columnText" (ngModelChange)="onChangeInput($event)">
+    </div>
+   
+</go-dropdown>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ <g class="svg-icon__stroke svg-icon__fill">
+     <circle cx="12" cy="9" r="6"></circle>
+     <circle cx="9" cy="15" r="6"></circle>
+    <circle cx="15" cy="15" r="6"></circle>
+  </g>
+  <g fill="transparent" stroke-width="1" class="svg-icon__stroke-white">
+     <circle cx="12" cy="9" r="6"></circle>
+     <circle cx="9" cy="15" r="6"></circle>
+    <circle cx="15" cy="15" r="6"></circle>
+  </g>
+</svg>

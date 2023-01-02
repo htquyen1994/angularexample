@@ -1,0 +1,85 @@
+<go-dialog title="Manage Columns" #dialog (close)="onDialogClose()" resize="true" isDrag="true">
+    <go-spinner *ngIf="loading" class="spinner"></go-spinner>
+    <div class="page-row">
+        <div class="error-form">
+            <go-error-message *ngIf="error" [error]="error"></go-error-message>
+        </div>
+    </div>
+    <div class="drag-list" [class.is-dragging]="dragEl" #listEl>
+        <div class="group-list" (mousemove)="onDrag($event)" (mouseup)="onDrop($event)">
+            <ng-container *ngFor="let group of form?.get('groups')?.controls; let i = index">
+                <ng-template [ngIf]="(totalColumn(group) > 0 && !manageGroups) || manageGroups">
+                    <div class="line"></div>
+                    <div class="group-wrapper" [attr.data-index]="i">
+                        <div class="p-inputgroup p-inputgroup-group">
+                            <go-button *ngIf="group?.controls?.isCollapse?.value" type="icon" icon="chevron_right"
+                                title="Expand" (clicked)="onToggle(i)">
+                            </go-button>
+                            <go-button *ngIf="!group?.controls?.isCollapse?.value" type="icon" icon="expand_more"
+                                title="Collapse" (clicked)="onToggle(i)">
+                            </go-button>
+                            <ng-template [ngIf]="manageGroups">
+                                <input type="text" pInputText placeholder="Group name"
+                                    [formControl]="group?.controls?.name">
+                                <go-button [disabled]="isNotAllowDeleteGroup(group)" type="icon" icon="small-delete"
+                                    title="Delete Group" (clicked)="onDeleteGroup(i)">
+                                </go-button>
+                            </ng-template>
+                            <ng-template [ngIf]="!manageGroups">
+                                <div class="label-group" (click)="onToggle(i)">
+                                    <span>{{group?.controls?.name?.value}}</span>
+                                    <span>Columns: {{totalColumn(group)}}</span>
+                                </div>
+                            </ng-template>
+                        </div>
+                        <div class="page-row align-items-center" *ngIf="!group?.controls?.isCollapse?.value">
+                            <go-button-group *ngIf="!manageGroups">
+                                <go-button button-toolbar title="Add column" icon="small-add" (clicked)="onAddColumn(i)">
+                                    Add column
+                                </go-button>
+                            </go-button-group>
+                            <!-- <div>Total columns: {{totalColumn(group)}}</div> -->
+                        </div>
+                        <div class="column-list" *ngIf="!group?.controls?.isCollapse?.value">
+                            <ng-container *ngFor="let column of group?.get('columns')?.controls; let j = index">
+                                <div class="column-wrapper" [attr.data-index]="j" *ngIf="!column?.controls?.isNotAllowDelete?.value">
+                                    <div class="p-inputgroup">
+                                        <mat-icon svgIcon="small-drag" class="label-drag p-inputgroup-icon"
+                                            (mousedown)="onDragStart($event, group, i, column, j)"></mat-icon>
+                                        <input type="text" pInputText placeholder="Column name"
+                                            [formControl]="column?.controls?.name">
+                                        <ps-select [options]="columnTypeOptions" [formControl]="column?.controls?.type"
+                                          [placeholder]="'Select a column type'" [appendTo]="el.nativeElement">
+                                        </ps-select>
+                                        <go-button [ngStyle]="{'visibility': manageGroups ? 'hidden' : 'visible' }"
+                                            type="icon" icon="small-delete" title="Delete Column"
+                                            [disabled]="column?.controls?.isNotAllowDelete?.value"
+                                            (clicked)="onDeleteColumn(i, j)"></go-button>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-container>
+        </div>
+    </div>
+
+    <div footer class="page-row flex-space-between">
+        <go-button-group>
+          <go-button button-toolbar [selected]="manageGroups" (clicked)="onToggleManageGroups()">
+            Manage Column Groups
+          </go-button>
+            <go-button [disabled]="!manageGroups" button-toolbar title="Add Column Group" icon="small-add"
+                       (clicked)="onAddGroup()">Add Column Group</go-button>
+        </go-button-group>
+        <go-button-group>
+            <go-button button-toolbar (clicked)="onCancel()">
+                Cancel
+            </go-button>
+            <go-button button-raised (clicked)="onSubmit()" [disabled]="loading || form?.invalid">
+                Save
+            </go-button>
+        </go-button-group>
+    </div>
+</go-dialog>

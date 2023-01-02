@@ -1,0 +1,64 @@
+@import 'shared-mixins';
+
+go-documents {
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: @color-inverted;
+  .customer-sessions-warper {
+    display: flex;
+    height: 100%;
+    flex-wrap: wrap;
+    padding: 10px 0px;
+    .galleria-section,
+    .upload-section {
+      padding: 0 20px 0 20px;
+      height: 100%;
+      width: 100%;
+      flex: 1 1;
+    }
+    .galleria-section {
+      flex: 2 1;
+      overflow: auto;
+    }
+    .upload-section {
+      overflow: auto;
+      flex: 1 1;
+    }
+  }
+  .empty {
+    text-align: center;
+    font-weight: 400;
+    margin: 2em 0;
+    font-size: 20px;
+  }
+  .document-list{
+    display: flex;
+    justify-content: flex-start;
+    flex-flow: row wrap;
+  }
+  .document-item {
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+    min-width: 400px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    padding: 5px;
+    margin: 5px 5px 0 0;
+  }
+  .document-info {
+    flex: 2;
+    padding: 10px;
+  }
+  .document-action {
+    display: flex;
+    flex-direction: column;
+    a,a:hover,a:active{
+      color: @color-text;
+    }
+  }
+}

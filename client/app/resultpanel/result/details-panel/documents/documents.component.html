@@ -1,0 +1,33 @@
+<div class="customer-sessions-warper">
+  <div class="galleria-section">
+    <div class="document-list">
+      <div class="document-item" *ngFor="let file of files">
+        <div class="document-icon">
+          <img class="expand-image" [src]="file | pipeFunction : getUri:this" />
+        </div>
+        <div class="document-info">
+          <div class="expand-text"><b>File: </b>{{file.name}}</div>
+          <div class="document-text"><b>Added by: </b>{{file.addedBy}}</div>
+          <div class="document-text"><b>Added: </b>{{file.date}}</div>
+          <div class="document-text"><b>Description: </b>{{file.description}}</div>
+        </div>
+        <div class="document-action">
+          <a [href]="file.uri" target="_blank">
+            <go-button type="icon" icon="small-download" size="medium" title="Download file"></go-button>
+          </a>
+          <go-button type="icon" icon="small-delete" size="medium" title="Delete file" (clicked)="onDelete(file)"
+            [disabled]="!(file.addedBy === username || canDeleteDocuments)"></go-button>
+        </div>
+      </div>
+    </div>
+    <go-spinner *ngIf="loading$ | async"></go-spinner>
+    <div class="overlay" *ngIf="loading$ | async"></div>
+    <div class="empty" *ngIf="!(loading$ | async) && !files?.length">
+        No documents available
+    </div>
+  </div>
+  <div class="upload-section" *ngIf="openUpload">
+    <go-document-form [files]="files" [loading]="submitting" [error]="error" (save)="onSave($event)"
+      [showPreview]="false" (delete)="onDelete($event)" #documentForm></go-document-form>
+  </div>
+</div>

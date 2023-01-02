@@ -1,0 +1,35 @@
+@import 'shared-mixins';
+
+:host {
+	z-index: 1;
+}
+
+.row {
+	padding: 5px 0;
+}
+
+.separator {
+	flex-grow: 1;
+}
+
+.row-button {
+	margin-top: 30px;
+	display: flex;
+
+}
+
+.page-content {
+	max-height: ~"calc(100vh - 200px)";
+	overflow-x: hidden;
+	overflow-y: auto;
+	height: 200px;
+}
+
+.ng-invalid.ng-touched {
+	border-color: @color-error !important;
+}
+
+.error-message {
+	color: @color-error;
+	padding: 5px 0;
+}

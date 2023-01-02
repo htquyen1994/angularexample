@@ -1,0 +1,3 @@
+<go-spinner *ngIf="loading$ | async" class="spinner-block-ui"></go-spinner>
+<go-location-form [hasDelete]="false" [hasCancel]="false" [location]="location$ | async"
+  (onConfirm)="addLocation($event)"></go-location-form>

@@ -1,0 +1,63 @@
+<go-toolbar>
+  <form [formGroup]="findForm" class="matchit-form">
+    <go-button-group class="group-separator" *ngIf="stateView == FindState.PREVIEW">
+      <go-button button-raised icon-left icon="expand-left" title="Back to Weighting setup"
+        (clicked)="onBackwardWeightingSetup()">
+        Back
+      </go-button>
+    </go-button-group>
+    <go-button-group class="group-separator">
+      <div class="form-control">
+        <label>Shapes to find </label>
+        <input class="input w-70" type="number" pattern="[0-9]*" step="1" formControlName="desiredMatch">
+      </div>
+      <div class="form-control">
+        <label>Output size</label>
+        <ps-select [styleClass]="'ps-select'" [options]="H3_RESOLUTIONS" formControlName="resolution"
+          [placeholder]="'Select a output size'" [appendTo]="'body'">
+        </ps-select>
+      </div>
+      <go-button button-raised icon="playrun" (clicked)="reviewLayer()"
+      [disabled]="(isLoading$ | async) || findForm.invalid || !isWeighSetupValid">Run Find
+    </go-button>
+    </go-button-group>
+    <go-button-group class="group-separator" *ngIf="stateView == FindState.WEIGHTING_SETUP && (reviewData$ |async)">
+      <go-button button-raised icon-right icon="expand-right" title="Forward to Preview" (clicked)="onForwardPreview()">
+        Forward
+      </go-button>
+    </go-button-group>
+    <div class="group-push"></div>
+    <go-button-group class="group-separator" *ngIf="stateView == FindState.PREVIEW">
+      <go-button button-raised (clicked)="onSave()" [disabled]="(isLoading$ | async) || findForm.invalid">Save
+      </go-button>
+    </go-button-group>
+      <go-info-button *ngIf="stateView == FindState.WEIGHTING_SETUP">
+        <ol>
+          <li>
+            Enter your desired number of Matches into the "Find" box.
+          </li>
+          <li>
+            Select the approx. size of the shape the results will be displayed at
+          </li>
+          <li>
+            Select the layers and 'Match-able' columns
+          </li>
+          <li>
+            Adjust the sliders next to the 'Match-able' columns (not all columns will be Match-able),<br /> to set the
+        relative importance of each column. Set the slider to zero to ignore it when Matching.
+          </li>
+          <li>
+            Click "Run Find" to see your Match results.
+          </li>
+        </ol>
+      </go-info-button>
+  </form>
+</go-toolbar>
+<div class="grid-container" [hidden]="stateView == FindState.PREVIEW">
+  <go-spinner class="spinner" *ngIf="isLoading$ | async"></go-spinner>
+  <ps-weightings-setup #weightingSetupEl [hidden]="infoFilterMessage" [data$]="data$"
+    (statusChange)="onWeightingsSetupStatusChange($event)">
+  </ps-weightings-setup>
+</div>
+<go-match-it-review [hidden]="stateView != FindState.PREVIEW || infoFilterMessage" [reviewData]="reviewData$ |async"></go-match-it-review>
+<go-spinner *ngIf="isLoading$ | async" class="spinner-block-ui"></go-spinner>

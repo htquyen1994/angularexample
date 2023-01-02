@@ -1,0 +1,95 @@
+<go-spinner *ngIf="loading$ | async" class="spinner-block-ui"></go-spinner>
+<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+<div class="row">
+  <!-- <div class="label">Travel type</div> -->
+  <go-button-group class="group-separator">
+    <go-button button-toolbar type="icon" icon="move-car" title="Car" [selected]="model.mode === 'car'"
+      (clicked)="setMode('car')"></go-button>
+    <!--<go-button button-toolbar type="icon" icon="move-transport" title="Transport"
+                [selected]="model.mode === travelMode.TRANSIT" (click)="model.mode = travelMode.TRANSIT"></go-button>-->
+    <go-button button-toolbar type="icon" icon="move-walk" title="Walking" [selected]="model.mode === 'foot'"
+      (clicked)="setMode('foot')"></go-button>
+    <go-button button-toolbar type="icon" icon="move-bike" title="Bicycle" [selected]="model.mode === 'bike'"
+      (clicked)="setMode('bike')"></go-button>
+  </go-button-group>
+  <div class="divider"></div>
+  <go-button-group>
+    <go-button button-toolbar [selected]="model.type === travelType.DURATION"
+      (clicked)="onToggle('type', travelType.DURATION)">
+      Time
+    </go-button>
+    <go-button button-toolbar [selected]="model.type === travelType.DISTANCE"
+      (clicked)="onToggle('type', travelType.DISTANCE)">
+      Distance
+    </go-button>
+  </go-button-group>
+
+</div>
+<div class="row" [hidden]="model.type !== travelType.DURATION">
+  <input type="range" [min]="min_duration" [max]="model.isDetail | pipeFunction: maxDriveTime_slider: this"
+    class="range" step="1" [(ngModel)]="model.valueTime" />
+  <div class="range-input">
+    <input type="text" id="valueTime" name="valueTime" pInputText pKeyFilter="num" [(ngModel)]="model.valueTime"
+      #valueTime="ngModel"
+      [psCatchmentValueValidator]="[model.type, model.isDetail, isMetric] | pipeFunction : getCatchmentModel: this"
+      [maxValue]="model.isDetail | pipeFunction: maxDriveTime_slider: this" [minValue]="min_duration">
+    <div class="unit">mins</div>
+  </div>
+</div>
+
+<div class="row" [hidden]="model.type !== travelType.DISTANCE">
+  <input type="range" [min]="[isMetric] | pipeFunction: minDriveDistance_slider"
+    [max]="[isMetric, model.isDetail] | pipeFunction: maxDriveDistance_slider: this" class="range" step="0.1"
+    [(ngModel)]="model.valueDistance" />
+  <div class="range-input">
+    <input type="text" id="valueDistance" name="valueDistance" pInputText pKeyFilter="num"
+      [(ngModel)]="model.valueDistance" #valueDistance="ngModel"
+      [psCatchmentValueValidator]="[model.type, model.isDetail, isMetric] | pipeFunction : getCatchmentModel: this"
+      [maxValue]="[model.isDetail] | pipeFunction: maxDriveDistanceValue: this" [minValue]="min_distance">
+    <span class="unit">
+      <ng-container *ngIf="isMetric;else Miles">km</ng-container>
+      <ng-template #Miles>miles</ng-template>
+    </span>
+  </div>
+</div>
+
+<div class="row" *ngIf="hasAdvancedCatchments">
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [selected]="!model.isDetail" (clicked)="onToggle('isDetail', false)">
+      Low Res
+    </go-button>
+    <go-button button-toolbar [selected]="model.isDetail" (clicked)="onToggle('isDetail', true)">
+      High Res
+    </go-button>
+  </go-button-group>
+  <div class="group-separator text-nowrap">travelling </div>
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [selected]="!model.towardsOrigin" (clicked)="onToggle('towardsOrigin', false)">
+      From
+    </go-button>
+    <go-button button-toolbar [disabled]="!model.isDetail" [selected]="model.towardsOrigin"
+      (clicked)="onToggle('towardsOrigin', true)">
+      Towards
+    </go-button>
+  </go-button-group>
+  <div class="text-nowrap">the start</div>
+</div>
+
+<div class="row" *ngIf="hasTrafficWeightedCatchments && !model.isDetail && model.mode === 'car'">
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [selected]="!model.scenario" (clicked)="onToggle('scenario', '')">
+      Typical
+    </go-button>
+    <go-button button-toolbar [selected]="model.scenario === 'BEST'" (clicked)="onToggle('scenario', 'BEST')">
+      Off-Peak
+    </go-button>
+    <go-button button-toolbar [selected]="model.scenario === 'WORST'" (clicked)="onToggle('scenario', 'WORST')">
+      Peak
+    </go-button>
+  </go-button-group>
+
+</div>
+
+<div class="text-info">
+  <small>Please click on the map to create a catchment</small>
+</div>

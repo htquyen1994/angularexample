@@ -1,0 +1,65 @@
+<button mat-icon-button mat-dialog-close>
+	<mat-icon>close</mat-icon>
+</button>
+
+<h1 mat-dialog-title>Dependencies</h1>
+
+<form class="position-relative" mat-dialog-content [formGroup]="form">
+	<go-periscope-dropdown [options]="dependencyTypes" placeholder="Dependencies type" formControlName="type"
+		width="100%" [search]="false"></go-periscope-dropdown>
+	<div class="table-container">
+		<table>
+			<thead>
+				<tr>
+					<th rowspan="2">Tenant Name</th>
+					<th rowspan="2">Tenant View</th>
+					<th colspan="2">User View</th>
+				</tr>
+				<tr>
+					<th>User Name</th>
+					<th>View Name</th>
+				</tr>
+			</thead>
+			<tbody>
+				<ng-container *ngIf="(referencedInsightViews$ | async).length > 0; else noData">
+					<ng-container *ngFor="let view of referencedInsightViews$ | async">
+						<tr>
+							<td [attr.rowspan]="view.rowSpan">{{view.tenantName}}</td>
+							<td [attr.rowspan]="view.rowSpan">
+								<div *ngFor="let tView of view.tenantViews">{{tView}}</div>
+							</td>
+							<td [attr.rowspan]="view.userViews[0] ? view.userViews[0].rowSpan: 1">
+								{{view.userViews[0] ? view.userViews[0].userName : ''}}
+							</td>
+							<td>{{view.userViews[0] && view.userViews[0].viewNames[0] ?  view.userViews[0].viewNames[0] : ''}}
+							</td>
+						</tr>
+						<ng-container *ngFor="let uView of view.userViews; let i=index">
+							<tr *ngIf="i>0">
+								<td [attr.rowspan]="uView.rowSpan">{{uView.userName}}</td>
+								<ng-container *ngIf="uView.viewNames[0]">
+									<td>{{uView.viewNames[0]}}</td>
+								</ng-container>
+							</tr>
+							<ng-container *ngFor="let viewName of uView.viewNames; let j=index">
+								<tr *ngIf="j>0">
+									<td>{{viewName}}</td>
+								</tr>
+							</ng-container>
+						</ng-container>
+					</ng-container>
+				</ng-container>
+				<ng-template #noData>
+					<tr>
+						<td class="text-center" colspan="4">No Dependencies</td>
+					</tr>
+				</ng-template>
+			</tbody>
+		</table>
+	</div>
+</form>
+
+<div mat-dialog-actions>
+	<div class="separator"></div>
+	<button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
+</div>

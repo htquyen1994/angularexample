@@ -1,0 +1,88 @@
+<go-dialog [title]="!data ? 'Create View' :'Edit View'" #dialog [resize]="true" [isDrag]="true" [instructionsHTML]="infoHTML"
+  (close)="onDialogClose()" [wide]="true" [minHeight]="300">
+  <go-spinner class="spinner" *ngIf="(loading$ | async)"></go-spinner>
+  <go-error-message class="row" *ngIf="updateError$ | async" [error]="updateError$ | async"></go-error-message>
+  <div class="page" [formGroup]="form">
+    <div class="row">
+      <label class="row-label"><b>View Name *</b></label>
+      <div class="row-control">
+        <input type="text" formControlName="name">
+      </div>
+    </div>
+
+    <div class="row">
+      <label class="row-label"><b>Set as default</b></label>
+      <div class="row-control">
+        <input type="checkbox" class="checkbox" formControlName="isDefault">
+      </div>
+    </div>
+
+    <div class="row row-select-layer">
+      <label class="row-label"><b>Select Layer(s) *</b></label>
+      <div class="row-control">
+        <ps-select [styleClass]="'select'" [options]="layerGroupOptions$ | async" formControlName="selectedLayerId"
+          [placeholder]='"Select a layer then click \"Add Layer\" "' [appendTo]="'body'" [group]="true" [isFilter]="true">
+        </ps-select>
+        <small *ngIf="layers?.controls?.length === 0" class="error">Please add at least one layer.</small>
+        <div class="row-action">
+          <go-button button-toolbar [icon]="'small-add'" title="Add layer" (clicked)="addLayer()"
+            [disabled]="[form.get('selectedLayerId').value,layers.value] | pipeFunction: checkDisableAddLayer">Add Layer
+          </go-button>
+        </div>
+      </div>
+    </div>
+    <div class="row row-vertical flex-start">
+      <ps-divider></ps-divider>
+      <small>The following data will be available in the new view:</small>
+    </div>
+    <ng-container *ngIf="layers?.controls?.length">
+      <div class="row row-align-top row-child">
+        <div class="row-label">
+          <b>Layer Name</b>
+        </div>
+        <div class="row-control row-align-top">
+          <b>Columns</b>
+        </div>
+      </div>
+      <div class="scrollable-wrapper" #ScrollEl>
+        <ng-container formArrayName="layers">
+          <ng-container *ngFor="let layer of layers?.controls; let i=index">
+            <ng-container [formGroup]="layer">
+              <div class="row row-align-top row-child">
+                <div class="row-label">
+                  {{layer.get('layerName').value}}
+                </div>
+                <div class="row-control row-align-top">
+                  <ps-multi-select-filter class="multi-select-insight-view-layer"
+                  [options]="layer.get('layerId').value | pipeFunction : getColumnOptions : this"
+                  formControlName="columnIds" [group]="true" [appendTo]="'body'">
+                  </ps-multi-select-filter>
+                  <div class="row-action">
+                    <go-button type="icon" icon="small-delete" title="Remove Layer" (clicked)="removeLayer(i)">
+                    </go-button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+
+  <div footer class="row flex-space-between">
+    <go-button-group>
+      <go-button button-toolbar (clicked)="onOpenCatchmentDialog()" [selected]="!!catchments?.length">
+        Optional: Add/Edit Catchment
+      </go-button>
+    </go-button-group>
+    <go-button-group>
+      <go-button button-flat (clicked)="onCancel()">
+        Cancel
+      </go-button>
+      <go-button button-raised (clicked)="onSave()" [disabled]="form?.invalid">
+        {{!data ? 'Create' : 'Update'}}
+      </go-button>
+    </go-button-group>
+  </div>
+</go-dialog>

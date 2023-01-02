@@ -1,0 +1,71 @@
+<go-toolbar>
+  <form [formGroup]="matchItform" class="matchit-form">
+    <go-button-group class="group-separator">
+      <go-button button-raised icon="expand-left" title="Back to Insight"
+        (clicked)="onChangeState(EStateInsight.InsightView)" *ngIf="stateView == EStateInsight.FilterView">Back
+      </go-button>
+      <go-button button-raised icon="expand-left" title="Back to Match Weightings"
+        (clicked)="onChangeState(EStateInsight.FilterView)" *ngIf="stateView == EStateInsight.PreviewView">Back
+      </go-button>
+    </go-button-group>
+    <go-button-group class="group-separator">
+      <div class="form-control">
+        <label>Shapes to find </label>
+        <input class="input w-70" type="number" pattern="[0-9]*" step="1" formControlName="desiredMatch">
+      </div>
+      <div class="form-control">
+        <label>Output size</label>
+        <ps-select class="select w-120" [options]="resolutionOptions" formControlName="resolution"
+          [placeholder]="'Select a size'" [appendTo]="'body'">
+        </ps-select>
+      </div>
+      <div class="form-control slider-custom-color">
+        <label>with similar characteristics to the shape </label>
+        <ps-select class="select w-120" [options]="polygonOptions" formControlName="shape"
+          [placeholder]="'Select a shape'" [appendTo]="'body'">
+        </ps-select>
+      </div>
+    </go-button-group>
+    <go-button-group class="group-separator">
+      <go-button button-raised icon="playrun" (clicked)="onPreviewMatch()" [disabled]="disablePreviewMatch">Run Match
+      </go-button>
+    </go-button-group>
+    <go-button-group class="group-separator" *ngIf="showClearResult">
+      <go-button button-toolbar title="Clear results" (clicked)="clearResults_Match()">
+        Clear results
+      </go-button>
+    </go-button-group>
+    <go-button-group class="group-separator" *ngIf="stateView == EStateInsight.FilterView && previewData">
+      <go-button button-raised icon-right icon="expand-right" title="Previous Preview Match"
+        (clicked)="onChangeState(EStateInsight.PreviewView)">
+        Forward
+      </go-button>
+    </go-button-group>
+    <div class="group-push"></div>
+    <go-button-group class="group-separator" *ngIf="stateView == EStateInsight.PreviewView">
+      <go-button button-raised (clicked)="onNewLayerFromMatch()"
+        [disabled]="isLoading || matchItform.invalid || !previewData">Save
+        Match</go-button>
+    </go-button-group>
+    <go-info-button>
+      <ol>
+        <li>
+          Enter your desired number of Matches into the "Find" box.
+        </li>
+        <li>
+          Select the approx. size of the shape the results will be displayed at
+        </li>
+        <li>
+          Choose the input Shape you want to find Matches for
+        </li>
+        <li>
+          Adjust the sliders next to the 'Match-able' columns (not all columns will be Match-able),<br /> to set the
+          relative importance of each column. Set the slider to zero to ignore it when Matching.
+        </li>
+        <li>
+          Click "Run Match" to see your Match results.
+        </li>
+      </ol>
+    </go-info-button>
+  </form>
+</go-toolbar>

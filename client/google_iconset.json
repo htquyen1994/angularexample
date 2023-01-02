@@ -1,0 +1,25 @@
+{
+    "shape": {
+        "id": {
+            "separator": "--",
+            "pseudo": "~",
+            "generator": "google-%s"
+        },
+        "dimension": {
+            "maxWidth": 24,
+            "maxHeight": 24
+        },
+        "spacing": {
+            "padding": 0
+        }
+    },
+    "mode": {
+        "defs": {
+            "dest": "",
+            "sprite": "google_iconset.svg"
+        }
+    },
+    "svg": {
+        "namespaceClassnames": false
+    }
+}

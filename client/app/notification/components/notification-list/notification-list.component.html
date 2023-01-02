@@ -1,0 +1,4 @@
+<ng-container *ngFor="let item of items; let i = index">
+  <ps-notification-item [item]="item" (clicked)="onItemClick($event, i)" (markAsRead)="onMarkAsRead($event, i)"></ps-notification-item>
+</ng-container>
+

@@ -1,0 +1,30 @@
+  <mat-toolbar color="primary">
+    <button type="button" mat-icon-button class="navigation-menu" (click)="onToggle()">
+      <mat-icon aria-label="Menu">menu</mat-icon>
+    </button>
+    <div class="logo-header">
+      <a class="logo" href="https://newgrove.com/" target="_blank"></a>
+      Periscope - User Management Site
+    </div>
+    <button type="button" mat-icon-button class="navigation-account profile-button" [matMenuTriggerFor]="menuAccount">
+      <mat-icon aria-label="Account">account_circle</mat-icon>
+      <mat-menu #menuAccount="matMenu">
+        <button mat-menu-item>{{(account$ | async)?.fullName}}</button>
+        <button mat-menu-item>{{(account$ | async)?.userType}}</button>
+        <a mat-menu-item href="/Logout/Logout">Logout</a>
+      </mat-menu>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container>
+    <mat-sidenav [mode]="sideNavMode?.mode | async" [opened]="sideNavMode?.opened | async">
+      <mat-list *ngIf="(menuItem$ | async)">
+        <ng-container *ngFor="let item of menuItem$ | async; trackBy:item?.url">
+          <mat-list-item [routerLink]="'/'+item?.url">{{item?.menuText}}</mat-list-item>
+        </ng-container>
+      </mat-list>
+    </mat-sidenav>
+    <ng-container>
+      <router-outlet></router-outlet>
+    </ng-container>
+  </mat-sidenav-container>

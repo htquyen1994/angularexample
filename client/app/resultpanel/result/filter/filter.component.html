@@ -1,0 +1,275 @@
+<go-button *ngIf="layerInput" button-toolbar class="filter-button" [icon]="showIcon ? 'filter' : null" (clicked)="dropdown.toggle($event);doCheck()">
+  <div class="overflow" tooltipPosition="top"  [psTextOverflowTooltip]="filterInput?.name">{{filterInput?.name}}</div>
+  <mat-icon [svgIcon]="'caret-down'" size="small" class="caret"></mat-icon>
+  <ps-overlaypanel dropdown #dropdown [styleClass]="'filter-dropdown'">
+    <div class="dropdown-warp">
+      <div *ngFor="let filter of filterListInput" class="dropdown-item"
+        (click)="onFilterSelect(filter); dropdown.hide(); doCheck()">
+        <div class="dropdown-item-label" tooltipPosition="top"  [psTextOverflowTooltip]="filter.name" [textOverflowLength]="21">{{filter.name}}</div>
+        <div style="flex-grow: 1"></div>
+        <go-button button-flat class="dropdown-item-button" type="icon" icon="copy" size="small" title="Copy filter"
+          (clicked)="onCopy($event, filter, dropdown);"
+          [disabled]="!canEditFilter">
+        </go-button>
+        <go-button button-flat class="dropdown-item-button" type="icon" icon="small-edit" title="Edit filter"
+          (clicked)="onUpdateForm($event, filter, dropdown);"
+          [disabled]="!canEditFilter || (filter?.source === layerSource.CORPORATE)">
+        </go-button>
+        <go-button class="dropdown-item-button" type="icon" icon="small-delete" title="Delete filter"
+          (clicked)="ondeleteFilterConfirmOpen($event, filter, dropdown);"
+          [disabled]="!canEditFilter || (filter?.source === layerSource.CORPORATE)">
+        </go-button>
+        <go-button button-flat class="dropdown-item-button" *ngIf="canShareFilter" type="icon" icon="layer-share"
+          size="small" title="Share filter" (clicked)="onShare($event, filter, dropdown);"
+          [disabled]="!canEditFilter || (filter?.source === layerSource.CORPORATE) || (disableShare$ | async)">
+        </go-button>
+        <go-button button-flat class="dropdown-item-button" *ngIf="canCreateLayerFromFilter" type="icon" icon="add-layer" size="medium"
+          title="Create new layer from filter" (clicked)="onNewLayer($event, filter, dropdown);" [disabled]="!canCreateUserLayer">
+        </go-button>
+      </div>
+    </div>
+    <div class="dropdown-item-add">
+      <go-button button-raised (clicked)="dropdown.hide();onCreateForm();" [disabled]="!canEditFilter">Add
+        filter
+      </go-button>
+    </div>
+  </ps-overlaypanel>
+</go-button>
+
+<go-filter-share *ngIf="account" (close)="onCloseFilterShare()" [filterSource]="filterShareSource" [LayerSource]="layerShareSource"
+  #goFilterShare></go-filter-share>
+
+<div class="filter-grid" *ngIf="isFilterOpen">
+  <go-toolbar class="toolbar">
+    <div class="toolbar-title">{{isAddFilter?'Adding new filter':'Editing filter'}}</div>
+  </go-toolbar>
+
+  <div class="grid-container" [formGroup]="form">
+    <div class="form-container">
+      <div class="form-container-wrap">
+        <!-- <div class="form-heading">{{isAddFilter?'Adding new filter':'Editing filter'}}</div> -->
+        <div class="input-row">
+          <div class="input-row-label">Name</div>
+          <input type="text" class="input" formControlName="name">
+          <div>*</div>
+        </div>
+
+
+        <div class="input-row">
+          <div class="input-row-label">Sort by</div>
+          <ps-select class="select select-short" [options]="sortDirectionOptions" formControlName="sortDirection" [placeholder]="'Select a direction'"
+            [appendTo]="'body'">
+          </ps-select>
+          <ps-select class="select" [options]="groupsOptions" formControlName="sortColumn" [placeholder]="'Select a column'" [appendTo]="'body'" [group]="true">
+          </ps-select>
+        </div>
+        <div class="input-row">
+          <div class="input-row-label">Set as default</div>
+          <input class="checkbox" type="checkbox" [formControl]="form.controls['isDefault']">
+        </div>
+        <ng-template [ngIf]="canSpatialFilter">
+          <!-- <div class="input-row">
+            <div class="input-row-label"></div>
+            <div class="shape-text">
+              Click "Select Shape" and then select a shape on the map to use for this record.
+            </div>
+          </div> -->
+          <div class="input-row">
+            <div class="input-row-label">Shape filter</div>
+            <div class="bounds-text">
+              <go-button button-raised class="shape-button" [selected]="isSelectionActive" (clicked)="onShapeSelect()">
+                Select shape on map
+              </go-button>
+              <div class="selection" *ngIf="filterShape">
+                <ps-select [options]="operatorOptions" [formControl]="form.controls['shape'].get('operator')"
+                  [placeholder]="'Select an operator'" [appendTo]="'body'">
+                </ps-select>
+                <div>
+                  Selected polygon
+                </div>
+                <go-button title="delete shape filter" type="icon" icon="small-delete"
+                  (clicked)="onShapeFilterDelete()">
+                </go-button>
+              </div>
+              <go-button *ngIf="gettingShape" [type]="'icon'" [isLoading]="true">
+              </go-button>
+            </div>
+          </div>
+        </ng-template>
+        <div class="error-message"
+          [style.visibility]="form.controls['groups']?.hasError('emptySelection') ? 'visible' : 'hidden'">
+          You have to select at least 1 column.
+        </div>
+        <div class="filter-table-container">
+          <ng-template ngFor let-group let-index="index" [ngForOf]="groupsControls">
+            <div class="filter-table-group" *ngIf="group.controls['columns'].controls.length !== 0"
+              [attr.aria-expanded]="true">
+
+              <div class="filter-table-group-label" (click)="onToggle(index)">
+                <div class="filter-table-group-text">
+                  <span *ngIf="groupCollapse[index]" class="d-flex mr-5px">
+                    <mat-icon svgIcon="chevron_right" size="medium"></mat-icon>
+                  </span>
+                  <span *ngIf="!groupCollapse[index]" class="d-flex mr-5px">
+                    <mat-icon svgIcon="expand_more" size="medium"></mat-icon>
+                  </span>
+                  {{group.controls['name'].value}}
+                </div>
+                <div class="filter-table-group-action">
+                  Select
+                  <go-button button-flat (clicked)="$event.stopPropagation();onSelectColumn(group, true)">All
+                  </go-button>
+                  /
+                  <go-button button-flat (clicked)="$event.stopPropagation();onSelectColumn(group, false)">None
+                  </go-button>
+                </div>
+              </div>
+
+              <div *ngIf="!groupCollapse[index]">
+                <div class="filter-table-child" *ngFor="let column of group.controls['columns'].controls; let j = index"
+                  [attr.aria-expanded]="true">
+                  <!--[attr.no-filter]="column.controls['notFilterable'].value"-->
+
+                  <div class="filter-table-child-label">
+                    <!--[attr.no-filter]="column.controls['notFilterable'].value"-->
+
+                    <input type="checkbox" class="checkbox" [formControl]="column.controls['isVisible']" />
+
+                    <div class="filter-table-child-label-text">{{column.controls['name'].value}}</div>
+
+                    <div>
+                      <go-button
+                        [disabled]="column.controls['isPicklist'].value && column.controls['filters'].controls.length !== 0"
+                        button-toolbar icon="small-add" class="add-filter-button" (clicked)="addPartialFilter(column)">
+                        Add filter
+                      </go-button>
+                    </div>
+                  </div>
+
+                  <div class="d-flex"
+                    *ngIf="!column.controls['isPicklist'].value && column.controls['filters'].controls.length > 0
+                    && column.controls['type'].value !== columnType.DATE && column.controls['type'].value !== columnType.STRING && !column.controls['isIdentifier'].value && column.controls['type'].value !== columnType.BOOLEAN">
+                    <go-slider-info [layerId]="layerInput.id" [float]="false" [columnId]="column.controls['id'].value">
+                    </go-slider-info>
+                  </div>
+
+                  <ng-template let-k="index" ngFor let-filter [ngForOf]="column.controls['filters'].controls">
+
+                    <div class="filter-form">
+                      <div class="d-flex filter-junction"
+                        *ngIf="!column.controls['isPicklist'].value && column.controls['filters'].controls.length > 0">
+                        <ng-template [ngIf]="k==0">
+                          <go-button button-toolbar
+                            [selected]="column.controls['junctions'].value === filterJunction.AND"
+                            (clicked)="column.controls['junctions'].setValue(filterJunction.AND)">
+                            And
+                          </go-button>
+                          <go-button button-toolbar
+                            [selected]="column.controls['junctions'].value === filterJunction.OR"
+                            (clicked)="column.controls['junctions'].setValue(filterJunction.OR)">
+                            Or
+                          </go-button>
+                        </ng-template>
+                        <ng-template [ngIf]="k!=0">
+                          <div class="text" *ngIf="column.controls['junctions'].value === filterJunction.AND">And</div>
+                          <div class="text" *ngIf="column.controls['junctions'].value === filterJunction.OR">Or</div>
+                        </ng-template>
+                      </div>
+                      <div class="filter-picklist" *ngIf="column.controls['isPicklist'].value">
+                        <go-multi-select [layerId]="layerInput.id"
+                          [parentGroup]="treeParentGroups[column.controls['id'].value]"
+                          [columnId]="column.controls['id'].value" [required]="column.controls['required'].value"
+                          [formControl]="filter.controls['value']"></go-multi-select>
+                      </div>
+
+                      <ng-template [ngIf]="!column.controls['isPicklist'].value">
+                        <ng-template [ngIf]="column.controls['type'].value === columnType.BOOLEAN">
+                          <input class="checkbox" type="checkbox" [formControl]="filter.controls['value']">
+                        </ng-template>
+
+                        <ng-template [ngIf]="column.controls['type'].value === columnType.NUMBER">
+                          <ps-select class="input-short" [options]="filterOperatorOptions" [formControl]="filter.controls['operator']"
+                            [placeholder]="'Select an operator'" [appendTo]="'body'">
+                          </ps-select>
+                          <div class="input-wrapper">
+                            <go-filter-input *ngIf="filter.controls['operator'].value !== 'NullabilityOperator.IsNull'"
+                              [formControl]="filter.controls['value']" [layerId]="layerInput.id" [float]="false"
+                              [value]="filter.controls['value'].value" [columnId]="column.controls['id'].value"
+                              [range]="filter.controls['operator'].value === 'BinaryOperator.Between'">
+                            </go-filter-input>
+                          </div>
+                        </ng-template>
+
+                        <ng-template [ngIf]="column.controls['type'].value === columnType.FLOAT">
+                          <ps-select class="input-short" [options]="filterOperatorOptions" [formControl]="filter.controls['operator']"
+                            [placeholder]="'Select an operator'" [appendTo]="'body'">
+                          </ps-select>
+                          <div class="input-wrapper">
+                            <go-filter-input *ngIf="filter.controls['operator'].value !== 'NullabilityOperator.IsNull'"
+                              [formControl]="filter.controls['value']" [layerId]="layerInput.id" [float]="false"
+                              [value]="filter.controls['value'].value" [columnId]="column.controls['id'].value"
+                              [range]="filter.controls['operator'].value === 'BinaryOperator.Between'">
+                            </go-filter-input>
+                          </div>
+                        </ng-template>
+
+                        <ng-template [ngIf]="column.controls['type'].value === columnType.DATE">
+                          <ps-select class="input-short" [options]="filterOperatorDateOptions" [formControl]="filter.controls['operator']"
+                            [placeholder]="'Select an operator'" [appendTo]="'body'">
+                          </ps-select>
+                          <div class="input-wrapper">
+                            <input *ngIf="filter.controls['operator'].value !== 'NullabilityOperator.IsNull'"
+                              class="input  input-short" type="date" [formControl]="filter.controls['value']">
+                          </div>
+                        </ng-template>
+
+                        <ng-template [ngIf]="column.controls['type'].value === columnType.STRING">
+                          <ps-select class="input-short" [options]="filterOperatorStringOptions" [formControl]="filter.controls['operator']"
+                            [placeholder]="'Select an operator'" [appendTo]="'body'">
+                          </ps-select>
+                          <div class="input-wrapper">
+                            <input *ngIf="filter.controls['operator'].value !== 'NullabilityOperator.IsNull'"
+                              class="input  input-short " type="text" [formControl]="filter.controls['value']">
+                          </div>
+                        </ng-template>
+                      </ng-template>
+
+                      <go-button class="delete-filter" type="icon" icon="small-delete" title="Delete filter"
+                        (clicked)="deletePartialFilter(column, k)"></go-button>
+
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-container">
+      <div class="separator"></div>
+      <div class="separator"></div>
+      <go-button button-raised [disabled]="form.invalid" (clicked)="onMoveToTenant()" *ngIf="canCopyToTenant">Copy To Tenant
+      </go-button>
+      <go-button button-flat (clicked)="onCancel()">Cancel</go-button>
+      <go-button *ngIf="isAddFilter" button-raised (clicked)="onCreate()" [disabled]="form.invalid">Create
+      </go-button>
+      <go-button *ngIf="!isAddFilter" button-raised (clicked)="onUpdate()" [disabled]="form.invalid">Update
+      </go-button>
+    </div>
+  </div>
+</div>
+
+<go-dialog title="Delete filter confirmation" #deleteFilterConfirm>
+  <div class="page-content">
+    <div class="row">
+      Are you sure you want to delete this filter: {{deletedConfirmFilter?.name}}?
+    </div>
+  </div>
+  <div class="row-button">
+    <div class="separator"></div>
+    <go-button button-flat (clicked)="onDeleteFilterConfirmClose()">Cancel</go-button>
+    <go-button button-raised (clicked)="onDelete(deletedConfirmFilter)">Delete</go-button>
+  </div>
+</go-dialog>

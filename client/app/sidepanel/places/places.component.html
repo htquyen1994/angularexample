@@ -1,0 +1,106 @@
+<div class="locate-container-wrap">
+  <div class="locate-type">
+    <go-button-group *ngIf="groupButtons.length">
+      <ng-container *ngFor="let group of groupButtons; let i = index">
+        <ps-selection-button [ngStyle]="group.styles" [class.ellipsis-text]="group.id == ILocationSearchType.GAZETTEER" [model]="group.list" (clicked)="onActiveTab($event, group.id)"
+          (selected)="onSelected($event, group.id)" [active]="activeButtonGroup == group.id"
+          [menuStyleClass]="'places-menu'"></ps-selection-button>
+      </ng-container>
+    </go-button-group>
+  </div>
+  <div class="locate-wrap">
+    <div class="locate-container">
+      <mat-icon class="icon-search" [svgIcon]="'search'"></mat-icon>
+      <input type="text" class="locate-input" [placeholder]="placeHolderText" [formControl]="searchControl" #term
+        (keyup)="onKeyDown($event, -1)" />
+      <go-button type="icon" icon="close" (clicked)="searchControl.reset()" [style.opacity]="!searchControl.value ? 0: 1"
+        tabindex="-1"></go-button>
+    </div>
+    <!--
+		<go-button type="icon" icon="directions" title="Show route to point"
+		           [selected]="false"></go-button>
+-->
+  </div>
+</div>
+<div class="result-wrap">
+  <div class="result-container">
+    <!--[class.active-record]="i === activeResult"-->
+    <ng-contaier *ngIf="!(isWaiting$ | async)">
+      <ng-container *ngFor="let item of items; let i = index" >
+        <ng-container *ngIf="(activeButtonGroup == ILocationSearchType.GAZETTEER && isPostOffice) || activeButtonGroup == ILocationSearchType.LOCATION || activeButtonGroup == ILocationSearchType.NEAREST; else listNormal">
+          <div class="result-container-item" goPlacesItem tabindex="0" (keyup)="onKeyDown($event, i)"  [class.active-record]="i === activeResult">
+            <div class="result result-enhance" *ngIf="('new-' + i) !== editLocationId"
+              (click)="goToResult($event, i);">
+              <!-- <img *ngIf="item.icon;else PeriscopeIcons" class="result-icon" [attr.src]="item.icon | pipeFunction : getIcon : this" width="16" height="16"> -->
+              <!-- <ng-template #PeriscopeIcons> -->
+                <mat-icon class="result-icon" [svgIcon]="item?.icon | lowercase" size="medium"></mat-icon>
+              <!-- </ng-template> -->
+              <div class="result-label">
+                <div class="text-content" [attr.title]="item.name">{{item.name}}</div>
+                <div class="small-detail">
+                  <ng-container *ngFor="let detail of item?.details">
+                    <div class="text-content" [attr.title]="detail">{{detail}}</div>
+                  </ng-container>
+                  <go-button button-flat class="action-icon" (clicked)="editLocation($event, 'new-' + i)" tabindex="-1">
+                    Save
+                  </go-button>
+                </div>
+              </div>
+            </div>
+            <go-location-form class="location-form" [hasDelete]="false" [location]="item"
+              *ngIf="('new-' + i) === editLocationId" (onOpen)="onOpen()" (onConfirm)="addLocation($event)">
+            </go-location-form>
+          </div>
+        </ng-container>
+        <ng-template #listNormal>
+          <div class="result-container-item" goPlacesItem tabindex="0" (keyup)="onKeyDown($event, i)" [class.active-record]="i === activeResult">
+            <div class="result" *ngIf="('new-' + i) !== editLocationId" (click)="goToResult($event, i);">
+
+              <mat-icon class="result-icon" [svgIcon]="item?.icon | lowercase" size="medium"></mat-icon>
+              <div class="result-label">
+                <div class="text-content" [att.title]="item.name">{{item.name}}</div>
+              </div>
+              <go-button button-flat class="action-icon" (clicked)="editLocation($event, 'new-' + i)" tabindex="-1">Save
+              </go-button>
+            </div>
+            <go-location-form class="location-form" [hasDelete]="false" [location]="item"
+              *ngIf="('new-' + i) === editLocationId" (onOpen)="onOpen()" (onConfirm)="addLocation($event)">
+            </go-location-form>
+          </div>
+        </ng-template>
+      </ng-container>
+    </ng-contaier>
+
+    <div class="result-message" *ngIf="searchControl.value && items.length === 0 && (isWaiting$ | async) === false">
+      <mat-icon class="result-icon" svgIcon="warning" size="medium"></mat-icon>
+      No results for query '<i>{{searchControl.value}}</i>'
+    </div>
+    <div class="result-message loading-wrapper" *ngIf="isWaiting$ | async">
+      <go-spinner [type]="'ELLIPSIS'" [withoutWrapper]="true"></go-spinner>
+    </div>
+  </div>
+
+  <div class="result-container">
+    <div class="home-title">
+      Saved Locations
+    </div>
+    <div *ngFor="let location of locations$ | async; let i = index">
+
+      <div class="result" *ngIf="location.id !== editLocationId" (click)="showLocation(location)">
+        <mat-icon class="result-icon" [svgIcon]="location?.icon | lowercase" size="medium"></mat-icon>
+        <div class="result-label">
+          <div class="text-content" title="{{location.name}}">{{location.name}}</div>
+          <mat-icon *ngIf="location.isDefault" svgIcon="home" size="medium" class="home-icon"></mat-icon>
+        </div>
+        <go-button [disabled]="location.source === layerSource.CORPORATE" title="Edit location" class="action-icon"
+          type="icon" icon="small-edit" (clicked)="editLocation($event, location.id)">
+        </go-button>
+      </div>
+
+      <go-location-form class="location-form" [hasDelete]="true" [location]="location"
+        *ngIf="location.id === editLocationId" (onOpen)="onOpen($event)" (onConfirm)="updateLocation($event)">
+      </go-location-form>
+
+    </div>
+  </div>
+</div>

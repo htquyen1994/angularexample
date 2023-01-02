@@ -1,0 +1,64 @@
+@import 'context-menu';
+@import 'tooltip';
+
+@opaque-white: rgba(255, 255, 255, 0.4);
+@node-measure-text: #333333;
+.measure-tool-svg-overlay {
+  position: absolute;
+  top: -4000px;
+  left: -4000px;
+  width: 8000px;
+  height: 8000px;
+}
+
+.dragging-circle,
+.cover-circle {
+  fill: white;
+  stroke: black;
+  stroke-width: 2.5px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.grey-circle {
+  fill: rgb(252, 252, 252);
+  stroke: rgb(100, 100, 100);
+  stroke-width: 2.5px;
+  pointer-events: none;
+  //&:hover {
+  //  cursor: pointer;
+  //}
+}
+
+.base-line {
+  fill: none;
+  stroke: black;
+  stroke-width: 2.5px;
+}
+
+.aux-line {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 8px;
+  cursor: pointer;
+}
+
+.segment-measure-text {
+  font: 14px Roboto;
+  text-shadow: 0 0 10px #fff, 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff,
+    0 0 6px #fff;
+  pointer-events: none;
+}
+
+.node-measure-text {
+  font: 14px Roboto;
+  color: black;
+  font-weight: bolder;
+  text-shadow: 0 0 10px #fff, 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff, 0 0 6px #fff;
+  pointer-events: none;
+
+  &.head-text {
+    visibility: hidden;
+  }
+}

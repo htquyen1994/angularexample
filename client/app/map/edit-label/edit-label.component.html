@@ -1,0 +1,6 @@
+<div #wrapper class="radius-wrap" [formGroup]="form" [class.radius-hidden]="form?.disabled" title="" [class.right]="isRight">
+	<mat-icon class="radius-icon" [svgIcon]="'radius'" title="Change circle radius"></mat-icon>
+	<input type="text" class="input radius-input" formControlName="value" (keyup.enter)="onComplete()">
+	<div class="radius-unit">{{accountService?.accountStore?.isMetric? 'km' : 'mi'}}</div>
+	<go-button button-raised (clicked)="onComplete()" [disabled]="form?.invalid">Update</go-button>
+</div>

@@ -1,0 +1,6 @@
+<ng-template ngFor let-message [ngForOf]="messages" let-i="index">
+	<div class="message message-{{message.type}}" [@messageState]="messageState[i]">
+		<div class="message-text">{{message.value}}</div>
+		<go-button type="icon" icon="delete" size="medium" title="Remove message" (clicked)="onRemove(message)"></go-button>
+	</div>
+</ng-template>

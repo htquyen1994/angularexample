@@ -1,0 +1,39 @@
+<periscope-table [sorted]="true" [data]="data" [rowTemplate_withoutWrapper]="rowTemplate"
+  [groupTemplate]="groupTemplate" [isGroup]="true" [groupRowsBy]="'category'" [loading]="loading">
+  <ng-container *goTableHeader>
+    <div class="rTableHeading">
+      <div class="rTableHead" style="width: 100%;">
+        Functions
+      </div>
+      <ng-container *ngFor="let claim of claims">
+        <div class="rTableHead align-center">
+          <div class="text-truncate" [matTooltip]="claim.name">
+            {{claim.name}}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+  <ng-template #groupTemplate let-group>
+    <b>{{ group?.groupName }}</b>
+  </ng-template>
+  <ng-template #rowTemplate let-row>
+    <div class="rTableRow" [hidden]="row.collapsed">
+      <div class="rTableCell" style="width: 100%;">
+        <div class="child">
+          {{ row?.name }} {{row?.description ? '('+row?.description+')' : ''}}
+          <span class="icons">
+            <ng-container *ngFor="let icon of row.icons">
+              <mat-icon class="icon" [svgIcon]="icon" [attr.size]="'medium'"></mat-icon>
+            </ng-container>
+          </span>
+        </div>
+      </div>
+      <ng-container *ngFor="let claim of claims">
+        <div class="rTableCell align-center" [ngClass]="row?.hasAccess[claim.id] ? 'yes': 'no'">
+          {{row?.hasAccess[claim.id] ? 'Y': 'N'}}
+        </div>
+      </ng-container>
+    </div>
+  </ng-template>
+</periscope-table>

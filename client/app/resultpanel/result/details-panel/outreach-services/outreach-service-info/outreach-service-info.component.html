@@ -1,0 +1,76 @@
+<div class="info-container">
+  <div class="tool-bar">
+    <go-button-group class="travel-mode-group">
+      <go-button button-toolbar [selected]="(selectedTravelMode$ | async) === TravelMode.DRIVING"
+        (clicked)="onSelected(TravelMode.DRIVING)" title="Driving" type="icon" icon="move-car">
+      </go-button>
+      <go-button button-toolbar [selected]="(selectedTravelMode$ | async) === TravelMode.WALKING"
+        (clicked)="onSelected(TravelMode.WALKING)" title="Walking"  type="icon" icon="move-walk">
+      </go-button>
+      <go-button button-toolbar [selected]="(selectedTravelMode$ | async) === TravelMode.TRANSIT"
+        (clicked)="onSelected(TravelMode.TRANSIT)" title="Transit" type="icon" icon="move-transport">
+      </go-button>
+      <go-button button-toolbar [selected]="(selectedTravelMode$ | async) === TravelMode.BICYCLING"
+        (clicked)="onSelected(TravelMode.BICYCLING)" title="Bike" type="icon" icon="move-bike">
+      </go-button>
+    </go-button-group>
+    <div class="group-push"></div>
+    <go-button-group>
+      <go-button *ngIf="showReverse" [selected]="reverseDirection$ | async" type="icon" icon="swap_vert"
+        (clicked)="onReverse()" title="Reverse Directions">
+      </go-button>
+      <go-button *ngIf="showClipboard" type="icon" icon="copy" title="Copy Directions" (clicked)="copyDirections()">
+      </go-button>
+    </go-button-group>
+  </div>
+  <div class="info-container--routes">
+    <ng-container *ngFor="let route of selectedRouteData$ | async">
+      <div class="info-wrapper">
+        <div class="info-row w-50">
+          <div class="info-title">
+            Distance
+          </div>
+          <div class="info-content">
+            {{route?.routes[0]?.legs[0]?.distance?.value | distancePipe: unit }}
+          </div>
+        </div>
+        <div class="info-row w-50">
+          <div class="info-title">
+            Duration
+          </div>
+          <div class="info-content">
+            {{route?.routes[0]?.legs[0]?.duration?.text}}
+          </div>
+        </div>
+        <div class="line"></div>
+        <div #directionContent>
+          <div class="info-row w-100">
+            <div class="info-title">
+              Start
+            </div>
+            <div class="info-content">
+              {{route?.routes[0]?.legs[0]?.start_address}}
+            </div>
+          </div>
+          <div class="line"></div>
+          <div class="info-row w-100">
+            <div class="info-content">
+              <ng-container *ngFor="let step of route?.routes[0]?.legs[0]?.steps">
+                <div [innerHTML]="step.instructions | pipeFunction : bypassSecurityTrustHtml: this"></div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="line"></div>
+          <div class="info-row w-100">
+            <div class="info-title">
+              End
+            </div>
+            <div class="info-content">
+              {{route?.routes[0]?.legs[0]?.end_address}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

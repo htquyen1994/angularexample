@@ -1,0 +1,23 @@
+<go-dialog title="Delete Layer '{{activeLayer?.name}}'" (close)="onClose($event)" #dialog>
+	<go-spinner *ngIf="isLoading"></go-spinner>
+	<div class="page">
+		<form>
+			<div class="page-content">
+				<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+        <div class="row">
+          Do you want to delete layer '{{activeLayer?.name}}'?
+        </div>
+        <div class="row" *ngIf="sharedCount > 0 && isLayerOwner">
+          User layer is shared to {{sharedCount}} users.
+          Deleting the layer will also delete it from their accounts.
+          Do you wish to proceed?
+        </div>
+			</div>
+		</form>
+		<div class="row-button">
+			<div class="separator"></div>
+			<go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+			<go-button button-raised [disabled]="isLoading" (clicked)="onComplete()">Delete Layer</go-button>
+		</div>
+	</div>
+</go-dialog>

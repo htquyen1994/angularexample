@@ -1,0 +1,23 @@
+@import "shared-mixins";
+
+:host {
+  .table{
+    display: flex;
+    flex-direction: column;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    .table-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+  }
+  .error{
+    color: @color-error;
+  }
+  .success {
+    color: @color-success;
+  }
+}

@@ -1,0 +1,398 @@
+<go-spinner *ngIf="isLoading"></go-spinner>
+<go-toolbar class="toolbar">
+    <div class="toolbar-title">
+        {{isViewMode?'View record':isAddRow?'Adding new record ':isBatchEdit ? 'Batch editing records' : 'Editing record'}}
+        <span class="toolbar-title--sub">- Layer: {{activeLayer.name}}</span>
+    </div>
+    <div class="group-push"></div>
+    <ng-container *ngIf="isRetailerLayer">
+      <go-button-group class="group-separator">
+        <go-button button-toolbar [icon]="'streetview'" title="Show in street view" [disabled]="!shapeId"
+        (clicked)="onStreetView()">
+      </go-button>
+    </go-button-group>
+    </ng-container>
+    <ng-container *ngIf="isCustomLogicLayer">
+        <go-button-group class="group-separator">
+            <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.Information"
+                (clicked)="onSelectTab(EDetailPanelTabs.Information)">
+                Information
+            </go-button>
+            <ng-container *ngIf="shapeId">
+              <go-button button-toolbar [selected]="activeTab == EDetailPanelTabs.Images"
+                (clicked)="onSelectTab(EDetailPanelTabs.Images)">
+                Images
+              </go-button>
+              <go-button *ngIf="shapeId && hasPOLSecurity" button-toolbar [selected]="activeTab == EDetailPanelTabs.Security"
+                (clicked)="onSelectTab(EDetailPanelTabs.Security)">
+                Security
+              </go-button>
+            </ng-container>
+        </go-button-group>
+        <go-button-group class="group-separator">
+            <go-button button-toolbar [selected]="isExcludingZone" (clicked)="onExclusionZone()">
+                Exclusion Zone
+            </go-button>
+        </go-button-group>
+    </ng-container>
+</go-toolbar>
+<div class="page" *ngIf="formGroup">
+    <ng-container *ngIf="isBatchEdit; else editRecord">
+        <go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+        <div class="form-container-wrap">
+            <div class="filter-table-container">
+                <ng-container *ngFor="let group of activeLayer.columnGroups; let index = index">
+                    <div class="filter-table-group" *ngIf="group.children?.length !== 0" [attr.aria-expanded]="true">
+                        <div class="filter-table-group-label" (click)="onToggle(index)">
+                            <div class="filter-table-group-text">
+                                <span *ngIf="groupCollapse[index]" class="d-flex mr-5px">
+                                    <mat-icon svgIcon="chevron_right" size="medium"></mat-icon>
+                                </span>
+                                <span *ngIf="!groupCollapse[index]" class="d-flex mr-5px">
+                                    <mat-icon svgIcon="expand_more" size="medium"></mat-icon>
+                                </span>
+                                {{group?.Name}}
+                            </div>
+                            <div class="filter-table-group-action">
+                                Select
+                                <go-button button-flat (clicked)="$event.stopPropagation();onSelectColumn(group, true)">
+                                    All
+                                </go-button>
+                                /
+                                <go-button button-flat
+                                    (clicked)="$event.stopPropagation();onSelectColumn(group, false)">None
+                                </go-button>
+                            </div>
+                        </div>
+                        <div *ngIf="!groupCollapse[index]">
+                            <div class="filter-table-child" *ngFor="let column of group.children; let j = index"
+                                [attr.aria-expanded]="true">
+                                <div class="filter-table-child-label">
+                                    <input type="checkbox" class="checkbox" [(ngModel)]="column.checked" />
+                                    <div class="filter-table-child-label-text">{{column.name}}
+                                        <span *ngIf="column.required">*</span>
+                                    </div>
+                                    <div class="field">
+                                        <ng-container *ngIf="column.checked">
+                                            <ng-container *ngIf="!column.isPicklist; else pickListTemplate">
+                                                <ng-container
+                                                    *ngIf="[columnType.NUMBER, columnType.FLOAT].includes(column.type)">
+                                                    <input type="number" goOnlyNumber class="form-control"
+                                                        [formControl]="formGroup.get(column.id)" [name]="column.id"
+                                                        [id]="column.id">
+                                                </ng-container>
+
+                                                <input type="text" class="form-control"
+                                                    [formControl]="formGroup.get(column.id)" [name]="column.id"
+                                                    [id]="column.id"
+                                                    *ngIf="[columnType.STRING].includes(column.type) && !column.isTextarea">
+
+                                                <textarea class="form-control" [formControl]="formGroup.get(column.id)"
+                                                    [name]="column.id" [id]="column.id"
+                                                    *ngIf="[columnType.STRING].includes(column.type) && column.isTextarea"></textarea>
+
+                                                <input type="checkbox" class="form-control"
+                                                    [formControl]="formGroup.get(column.id)" [name]="column.id"
+                                                    [id]="column.id"
+                                                    *ngIf="[columnType.BOOLEAN].includes(column.type)" />
+
+                                                <ng-container *ngIf="[columnType.DATE].includes(column.type)">
+                                                    <input class="date-input" type="text" [matDatepicker]="picker"
+                                                        [formControl]="formGroup.get(column.id)">
+                                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #picker></mat-datepicker>
+                                                </ng-container>
+                                            </ng-container>
+                                            <ng-template #pickListTemplate>
+                                                <div class="field-picklist">
+                                                  <ps-select class="form-control"
+                                                  [options]="(column.options | async)"  [formControl]="formGroup.get(column.id)"
+                                                  [placeholder]="'Pick an option'" [appendTo]="'body'">
+                                                  </ps-select>
+                                                    <ng-container
+                                                        *ngIf="!(column.readOnly || isViewMode || !column.isEditablePicklist)">
+                                                        <go-button type="icon" icon="new" title="Add picklist record"
+                                                            (clicked)="onPicklistDialogOpen(column, true)"></go-button>
+                                                        <go-button [disabled]="!formGroup.controls[column.id].value"
+                                                            type="icon" icon="geo-edit" title="Edit picklist record"
+                                                            (clicked)="onPicklistDialogOpen(column, false)"></go-button>
+                                                        <go-button [disabled]="!formGroup.controls[column.id].value"
+                                                            type="icon" icon="geo-delete-all"
+                                                            title="Delete picklist record"
+                                                            (clicked)="onPicklistConfirmOpen(column)"></go-button>
+                                                    </ng-container>
+                                                </div>
+                                            </ng-template>
+                                        </ng-container>
+                                    </div>
+                                    <div class="error-position" *ngIf="formGroup.controls[column.id]?.invalid">
+                                        <div class="error" *ngIf="formGroup.controls[column.id].hasError('required')">
+                                            A value must be entered for this column
+                                        </div>
+                                        <div class="error" *ngIf="formGroup.controls[column.id].hasError('maxlength')">
+                                            Value can not be longer than
+                                            {{formGroup.controls[column.id].errors['maxlength'].requiredLength}}
+                                            characters
+                                        </div>
+                                        <div class="error" *ngIf="formGroup.controls[column.id].hasError('minlength')">
+                                            Value can not be less than
+                                            {{formGroup.controls[column.id].errors['minlength'].requiredLength}}
+                                            characters
+                                        </div>
+                                        <div class="error" *ngIf="formGroup.controls[column.id].hasError('maxvalue')">
+                                            Value can not be greater than
+                                            {{formGroup.controls[column.id].errors['maxvalue'].requiredValue}}
+                                        </div>
+                                        <div class="error" *ngIf="formGroup.controls[column.id].hasError('minvalue')">
+                                            Value can not be less than
+                                            {{formGroup.controls[column.id].errors['minvalue'].requiredValue}}
+                                        </div>
+                                        <div class="error"
+                                            *ngIf="formGroup.controls[column.id].hasError('errorMessage')">
+                                            {{formGroup.controls[column.id].errors['errorMessage']}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #editRecord>
+        <form class="form" [formGroup]="formGroup"
+            [hidden]="isCustomLogicLayer && activeTab !== EDetailPanelTabs.Information">
+            <go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+            <ng-container *ngFor="let group of activeLayer.columnGroups">
+                <div *ngIf="group?.children?.length !== 0">
+                    <div class="group-label">{{group?.Name}}</div>
+
+                    <div class="row">
+                        <ng-template ngFor let-column [ngForOf]="group?.children" let-i="index">
+                            <div class="field"
+                                [class.field-textarea]="column.isTextarea || [columnType.SHAPE].includes(column.type)"
+                                *ngIf="(column.isIdentifier && isAddRow && column.readOnly === true) === false">
+                                <label [attr.for]="column.id" class="label">
+                                    {{column.name}}
+                                    <span *ngIf="column.required">*</span>
+                                </label>
+                                <div *ngIf="formGroup.controls[column.id]?.invalid">
+                                    <div class="error" *ngIf="formGroup.controls[column.id].hasError('required')">
+                                        A value must be entered for this column
+                                    </div>
+                                    <div class="error" *ngIf="formGroup.controls[column.id].hasError('maxlength')">
+                                        Value can not be longer than
+                                        {{formGroup.controls[column.id].errors['maxlength'].requiredLength}}
+                                        characters
+                                    </div>
+                                    <div class="error" *ngIf="formGroup.controls[column.id].hasError('minlength')">
+                                        Value can not be less than
+                                        {{formGroup.controls[column.id].errors['minlength'].requiredLength}}
+                                        characters
+                                    </div>
+                                    <div class="error" *ngIf="formGroup.controls[column.id].hasError('maxvalue')">
+                                        Value can not be greater than
+                                        {{formGroup.controls[column.id].errors['maxvalue'].requiredValue}}
+                                    </div>
+                                    <div class="error" *ngIf="formGroup.controls[column.id].hasError('minvalue')">
+                                        Value can not be less than
+                                        {{formGroup.controls[column.id].errors['minvalue'].requiredValue}}
+                                    </div>
+                                    <div class="error" *ngIf="formGroup.controls[column.id].hasError('errorMessage')">
+                                        {{formGroup.controls[column.id].errors['errorMessage']}}
+                                    </div>
+                                </div>
+                                <ng-template [ngIf]="!column.isPicklist">
+                                    <ng-template [ngIf]="[columnType.NUMBER, columnType.FLOAT].includes(column.type)">
+                                        <ng-template
+                                            [ngIf]="formGroup.get(column.id).disabled && column.formatPipe && column.format">
+                                            <input type="text" class="form-control"
+                                                [value]="formGroup.get(column.id).value | dynamicPipe:column.formatPipe:column._format"
+                                                [name]="column.id" [id]="column.id" disabled="true">
+                                        </ng-template>
+                                        <ng-template
+                                            [ngIf]="!(formGroup.get(column.id).disabled && column.formatPipe && column.format)">
+                                            <input type="number" goOnlyNumber class="form-control"
+                                                [formControlName]="column.id" [name]="column.id" [id]="column.id">
+                                        </ng-template>
+                                    </ng-template>
+
+                                    <input type="text" class="form-control" [formControlName]="column.id"
+                                        [name]="column.id" [id]="column.id"
+                                        *ngIf="[columnType.STRING].includes(column.type) && !column.isTextarea">
+
+                                    <textarea class="form-control" [formControlName]="column.id" [name]="column.id"
+                                        [id]="column.id"
+                                        *ngIf="[columnType.STRING].includes(column.type) && column.isTextarea"></textarea>
+
+
+                                    <input type="checkbox" class="form-control" [formControlName]="column.id"
+                                        [name]="column.id" [id]="column.id"
+                                        *ngIf="[columnType.BOOLEAN].includes(column.type)" />
+
+                                    <!--
+                                                                    <input type="date"
+                                                                           [formControlName]="column.id"
+                                                                           [name]="column.id"
+                                                                           [id]="column.id"
+                                                                           *ngIf="[columnType.DATE].includes(column.type)" />
+                                        -->
+                                    <ng-container *ngIf="[columnType.DATE].includes(column.type)">
+                                        <ng-container *ngIf="column.readOnly || isViewMode">
+                                            <input class="date-input" type="text" [formControlName]="column.id">
+                                            <mat-datepicker-toggle matSuffix [disabled]="true">
+                                            </mat-datepicker-toggle>
+                                        </ng-container>
+                                        <ng-container *ngIf="!(column.readOnly || isViewMode)">
+                                            <input class="date-input" type="text" [matDatepicker]="picker"
+                                                [formControlName]="column.id">
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <div *ngIf="[columnType.SHAPE].includes(column.type) && !isViewMode">
+
+                                        <input type="hidden" [formControlName]="column.id" [name]="column.id"
+                                            [id]="column.id" />
+
+                                        <div class="shape-text error-message" *ngIf="selectionError">
+                                            {{selectionError}}
+                                        </div>
+
+                                        <div class="shape-text" *ngIf="isAddRow">
+                                            Click "Select Shape" and then select a shape on the map
+                                            to use for this
+                                            record.
+                                        </div>
+                                        <div class="shape-text" *ngIf="!isAddRow">
+                                            Move the shape on the map to a new location OR click
+                                            "Select Shape" and then
+                                            select a new shape on the map to use for this record.
+                                        </div>
+                                        <div>
+                                            <go-button button-raised class="shape-button"
+                                                [disabled]="column.readOnly || isViewMode"
+                                                [selected]="isSelectionEnabled && selectionType === toolType.SELECT_EDIT_SHAPE"
+                                                (clicked)="setSelectionType(toolType.SELECT_EDIT_SHAPE)">
+                                                {{selectionType !== toolType.SELECT_EDIT_SHAPE ? 'Select Shape' : 'Shape Selection Active'}}
+                                            </go-button>
+
+                                        </div>
+                                        <ng-container *ngIf="selectionType === toolType.SELECT_EDIT_SHAPE">
+                                            <div class="shape-text">
+                                                Selected shape:
+                                                <b>
+                                                    {{shapeLastRef?shapeTypes[overlayShapeType[shapeLastRef.type]]:'not selected'}}
+                                                </b>
+                                            </div>
+                                            <div class="shape-text"
+                                                *ngIf="shapeLastRef?.type === overlayShapeType.Point">
+                                                Coordinates: {{shapeLastRef.mapRef[0].getPosition().lat() |
+                                                        number: '1.5-5'}} /
+                                                {{shapeLastRef.mapRef[0].getPosition().lng() | number:
+                                                        '1.5-5'}}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                </ng-template>
+
+                                <div class="field-picklist" *ngIf="column.isPicklist">
+                                    <ps-select class="form-control" [options]="(column.options | async)" [formControlName]="column.id"
+                                      [placeholder]="'Pick an option'" [appendTo]="'body'">
+                                    </ps-select>
+                                    <ng-container
+                                        *ngIf="!(column.readOnly || isViewMode || !column.isEditablePicklist)">
+                                        <go-button type="icon" icon="new" title="Add picklist record"
+                                            (clicked)="onPicklistDialogOpen(column, true)"></go-button>
+                                        <go-button [disabled]="!formGroup.controls[column.id].value" type="icon"
+                                            icon="geo-edit" title="Edit picklist record"
+                                            (clicked)="onPicklistDialogOpen(column, false)"></go-button>
+                                        <go-button [disabled]="!formGroup.controls[column.id].value" type="icon"
+                                            icon="geo-delete-all" title="Delete picklist record"
+                                            (clicked)="onPicklistConfirmOpen(column)"></go-button>
+                                    </ng-container>
+                                </div>
+
+                                <div class="text-block" *ngIf="textBlock[column.id]">
+                                    {{textBlock[column.id]}}
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+        </form>
+        <ng-container *ngIf="isCustomLogicLayer &&  retailerNo">
+            <go-images [layer]="activeLayer" [id]="retailerNo" [hidden]="activeTab !== EDetailPanelTabs.Images"
+                [openUpload]="!isViewMode" [type]="TypeOfImage.RetailerImages">
+            </go-images>
+            <go-security  [id]="shapeId" [hidden]="activeTab !== EDetailPanelTabs.Security" [isRetailer]="true"
+            [active]="activeTab === EDetailPanelTabs.Security"></go-security>
+        </ng-container>
+    </ng-template>
+</div>
+
+<div class="cta-wrap" *ngIf="formGroup">
+    <div class="cta-inner" *ngIf="isViewMode">
+        <go-button button-raised [disabled]="!hasCreatePermission || isLoading" (clicked)="onEdit()">Edit
+        </go-button>
+        <div class="separator"></div>
+        <go-button button-flat (clicked)="closeEdit()">Close</go-button>
+        <go-button button-raised [disabled]="currentIndex === 0" (clicked)="onRecord(-1)">Previous
+        </go-button>
+        <go-button button-raised [disabled]="currentIndex >= maxIndex -1" (clicked)="onRecord(1)">
+            Next
+        </go-button>
+    </div>
+    <div class="cta-inner" *ngIf="!isViewMode">
+        <go-button button-flat (clicked)="closeEdit()">Cancel</go-button>
+        <go-button button-raised (clicked)="onSubmit()"
+            [disabled]="formGroup.invalid || isLoading || (isBatchEdit && !checkBatchEditValid())">
+            Save
+        </go-button>
+    </div>
+</div>
+
+<go-dialog [title]="isPicklistAdd? 'Add picklist entry':'Update picklist entry'" (close)="onPicklistDialogClose()"
+    #picklistDialog isDrag="true">
+    <go-spinner *ngIf="isPicklistLoading"></go-spinner>
+    <div class="page" *ngIf="isPicklistForm">
+        <form [formGroup]="isPicklistForm">
+            <div class="page-content">
+                <go-error-message class="row" *ngIf="isPicklistError" [error]="isPicklistError"></go-error-message>
+                <div class="row">
+                    <label>Picklist value</label>
+                    <input type="text" formControlName="entry" />
+                </div>
+            </div>
+        </form>
+        <div class="row-button">
+            <div class="separator"></div>
+            <go-button button-flat (clicked)="onPicklistDialogClose(true)">Cancel</go-button>
+            <go-button button-raised [disabled]="isPicklistForm.invalid || isPicklistLoading"
+                (clicked)="onPicklistEdit()">
+                {{isPicklistAdd? 'Add entry': 'Update entry'}}
+            </go-button>
+        </div>
+    </div>
+</go-dialog>
+
+<go-dialog title="Delete picklist entry" (close)="onPicklistConfirmClose()" #picklistConfirm>
+    <go-spinner *ngIf="isPicklistLoading"></go-spinner>
+    <div class="page">
+        <div class="page-content">
+            <div class="row">
+                Are you sure you want to delete this picklist entry?
+            </div>
+        </div>
+    </div>
+    <div class="row-button">
+        <div class="separator"></div>
+        <go-button button-flat (clicked)="onPicklistConfirmClose(true)">Cancel</go-button>
+        <go-button button-raised [disabled]="isPicklistLoading" (clicked)="onPicklistDelete()">Delete</go-button>
+    </div>
+</go-dialog>

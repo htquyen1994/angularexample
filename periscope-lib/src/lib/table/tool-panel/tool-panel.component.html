@@ -1,0 +1,38 @@
+<div class="table-tool-panel-bar">
+<div class="table-tool-panel-buttons">
+    <div class="table-tool-panel-button" [attr.aria-selected]="selectedTool == ToolPanelButtons.COLUMNS" (click)="onSelectedTool(ToolPanelButtons.COLUMNS)">
+      <span class="table-tool-panel-button-label">
+        Groups
+      </span>
+    </div>
+</div>
+<div class="table-tool-panel-wrapper" [attr.aria-active]="selectedTool === ToolPanelButtons.COLUMNS">
+    <div class="table-tool-panel">
+        <div class="table-tool-panel-searchbox">
+            <div class="table-tool-panel-row">
+                <div class="table-tool-panel-checkbox">
+                    <mat-checkbox color="primary" [(ngModel)]="checkedAll" (ngModelChange)="onCheckAll($event)">
+                    </mat-checkbox>
+                </div>
+                <div class="table-tool-panel-label">
+                    <input matInput type="text" placeholder="Search" [(ngModel)]="search" (ngModelChange)="onSearch($event)"/>
+                </div>
+            </div>
+        </div>
+        <div class="table-tool-panel-content">
+            <ng-container *ngFor="let col of _filtered; let i=index">
+                <div class="table-tool-panel-row" >
+                    <div class="table-tool-panel-checkbox">
+                        <mat-checkbox color="primary" [(ngModel)]="col.visible"
+                        (ngModelChange)="onCheckedColumn($event, i)">
+                        </mat-checkbox>
+                    </div>
+                    <div class="table-tool-panel-label">
+                        {{col?.name}}
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+</div>

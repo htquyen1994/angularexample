@@ -1,0 +1,7 @@
+<div class="error" *ngIf="error?.error?.message">{{error?.error?.message}}</div>
+<div class="error" *ngIf="error?.error?.error?.message">{{error?.error?.error?.message}}</div>
+<ng-template [ngIf]="error?.error?.details">
+	<ul class="error_list" *ngFor="let detail of error.error.details">
+		<li class="error">{{detail.message}}</li>
+	</ul>
+</ng-template>

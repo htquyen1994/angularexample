@@ -1,0 +1,140 @@
+<go-dialog #dialog [title]="'Catchment Settings'" [wide]="hasAdvancedCatchments$ | async" [instructionsHTML]="infoHTML" (close)="onDialogClose()">
+  <div class="page">
+    <table class="table">
+      <tr>
+        <div>
+          Your Insight View will automatically create the following catchments around any points you choose:
+        </div>
+      </tr>
+      <ng-container *ngIf="catchmentsValue && catchmentsValue.length;else EmptyTemplate">
+        <ng-container *ngFor="let catchment of catchmentsValue; let i=index; trackBy: trackByIndex">
+          <ng-container *ngIf="i !== editingIndex; else EditRow">
+            <tr class="row">
+              <td>
+                {{catchment.mode | pipeFunction: getCatchmentMode: this}}
+              </td>
+              <td>
+                {{catchment.type === TravelType.DISTANCE ? 'Distance' : 'Time'}}
+              </td>
+              <ng-container *ngIf="catchment.type === TravelType.DISTANCE; else Duration">
+                <td>
+                  {{(catchment.value | distanceValuePipe: catchment.unit: (isMetric$ | async) ? TravelUnit.KILOMETER :TravelUnit.MILE) | number: '1.0-3'}}
+                </td>
+                <td>
+                  {{(isMetric$ | async) ? 'km' :'miles'}}
+                </td>
+              </ng-container>
+              <ng-template #Duration>
+                <td>
+                  {{catchment.value}}
+                </td>
+                <td>
+                  mins
+                </td>
+              </ng-template>
+              <ng-container *ngIf="hasAdvancedCatchments$ | async">
+                <td>
+                  {{catchment.toOrigin === null || catchment.mode == TravelMode.CIRCLE ? '' :catchment.toOrigin? 'Toward': 'From'}}
+                </td>
+                <td>
+                  {{catchment.isDetail === null || catchment.mode == TravelMode.CIRCLE ? '':catchment.isDetail? 'High Res': 'Low Res'}}
+                </td>
+              </ng-container>
+
+              <td>
+                <go-button-group>
+                  <go-button type="icon" icon="small-edit" title="Edit catchment" (clicked)="onEdit(i)"
+                    [disabled]="editingIndex != null">
+                  </go-button>
+                  <go-button type="icon" icon="small-delete" title="Remove catchment" (clicked)="onDeleteCatchment(i)"
+                    [disabled]="editingIndex != null">
+                  </go-button>
+                </go-button-group>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </table>
+  </div>
+
+  <div footer class="page-row flex-space-between">
+    <go-button-group>
+      <go-button button-raised (clicked)="onAddCatchment()" [disabled]="editingIndex != null || catchments.length > 4">
+        New
+      </go-button>
+    </go-button-group>
+    <go-button-group>
+      <!--<go-button button-flat (clicked)="onCancel()">
+        Cancel
+      </go-button>-->
+      <go-button button-raised (clicked)="onSave()" [disabled]="catchments.invalid">
+        Close
+      </go-button>
+    </go-button-group>
+  </div>
+</go-dialog>
+
+<ng-template #EditRow>
+  <tr [formGroup]="catchmentForm" class="form-control-row row">
+    <td>
+      <ps-selection-button [selectedId]="catchmentForm.get('mode').value" [model]="travelModes"
+        (selected)="onTravelModeSelected($event)" [active]="true" [activeMode]="false" [menuStyleClass]="'places-menu'">
+      </ps-selection-button>
+    </td>
+    <td>
+      <ps-selection-button [selectedId]="catchmentForm.get('type').value" (selected)="onTravelTypeSelected($event)"
+        [model]="travelTypes" [active]="true" [activeMode]="false" [menuStyleClass]="'places-menu'"></ps-selection-button>
+    </td>
+    <td>
+      <input class="range-value" type="text" pInputText pKeyFilter="num" formControlName="value"
+        [class.ng-invalid]="isInvalid$ | async">
+    </td>
+    <td>
+      <ng-container *ngIf="catchmentForm.get('type').value === TravelType.DISTANCE; else DurationSuffix">
+        <div>{{(isMetric$ | async) ? 'km' :'miles'}}</div>
+      </ng-container>
+      <ng-template #DurationSuffix>
+        <div>mins</div>
+      </ng-template>
+    </td>
+    <ng-container *ngIf="hasAdvancedCatchments$ | async">
+      <td>
+        <ps-selection-button
+          [selectedId]="catchmentForm.get('toOrigin').value ? travelDirectionType.TOWARD: travelDirectionType.FROM"
+          [model]="directionTypes" (selected)="onTravelDirectionTypeSelected($event)" [active]="true" [activeMode]="false"
+          [menuStyleClass]="'places-menu'" [disabled]="catchmentForm.get('mode').value === TravelMode.CIRCLE"></ps-selection-button>
+      </td>
+      <td>
+        <ps-selection-button
+          [selectedId]="catchmentForm.get('isDetail').value ? travelRevolution.DETAILED: travelRevolution.SMOOTH"
+          [model]="outputs" (selected)="onOutputChange($event)" [active]="true" [activeMode]="false" [menuStyleClass]="'places-menu'"
+          [disabled]="catchmentForm.get('mode').value === TravelMode.CIRCLE">
+        </ps-selection-button>
+      </td>
+    </ng-container>
+    <td>
+      <go-button-group>
+        <go-button button-raised [icon]="'small-add'" (clicked)="onSaveCatchment()"
+          [disabled]="catchmentForm.invalid">Save
+        </go-button>
+        <go-button type="icon" icon="close" (clicked)="onCancelAdd()">
+        </go-button>
+      </go-button-group>
+    </td>
+  </tr>
+  <tr class="error-row">
+    <td></td>
+    <td></td>
+    <td colspan="5" class="error">
+      <small *ngIf="(isInvalid$ | async) && catchmentForm?.errors?.errorMessage">{{catchmentForm?.errors?.errorMessage}}.</small>
+    </td>
+  </tr>
+</ng-template>
+<ng-template #EmptyTemplate>
+  <tr>
+    <div class="empty-selection">
+      No catchments
+    </div>
+  </tr>
+</ng-template>

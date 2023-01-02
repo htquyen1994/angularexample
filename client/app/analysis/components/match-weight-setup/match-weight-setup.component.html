@@ -1,0 +1,292 @@
+<go-spinner class="spinner" *ngIf="loading"></go-spinner>
+<div class="grid" [class.table-percentage]="!showPercentage">
+  <div class="header-body">
+    <div class="header" [style.left.px]="scrollLeft">
+      <div class="header-cell">
+      </div>
+
+      <div class="header-cell">
+        <div class="cell-content-title">
+          <div class="cell-content-div cell-label">Dataset</div>
+        </div>
+        <div class="cell-content-wrap">
+          <div class="cell-content-half text-right">Total</div>
+          <div class="cell-content-half text-right" *ngIf="showDensity">Density</div>
+          <div class="cell-content-half text-right" *ngIf="showPercentage">%</div>
+        </div>
+      </div>
+      <ng-container *ngFor="let col of polygons; let i = index">
+        <ng-container *ngIf="i === selectedPolygonIndex">
+          <div class="header-cell">
+            <div class="cell-content-title">
+              <div class="cell-content-div">
+                <div class="cell-content-div--label">{{col.label}}</div>
+              </div>
+              <go-button-group class="cell-content--button-group">
+                <go-button button-toolbar class="button-toolbar--transparent" size="medium" type="icon" icon="locate"
+                  title="Locate shape" (clicked)="onLocate(i)"></go-button>
+              </go-button-group>
+            </div>
+            <div class="cell-content-wrap">
+              <div class="cell-content-half text-right">Total</div>
+              <div class="cell-content-half text-right" *ngIf="showDensity">Density</div>
+              <div class="cell-content-half text-right" *ngIf="showPercentage">%</div>
+            </div>
+          </div>
+          <div class="header-cell comparison-header-cell" *ngIf="showComparison">
+            <div class="cell-content-title">
+              <div class="cell-content-div">Indices {{col.label}}</div>
+            </div>
+            <div class="cell-content-wrap">
+              <div class="cell-content-half cell-content-comparison text-right">Z-Score</div>
+              <div class="cell-content-half cell-content-comparison text-right">Index</div>
+            </div>
+          </div>
+          <div class="header-cell match-header-cell">
+            <div class="cell-content-title">
+              <div class="cell-content-div">Match Weightings</div>
+            </div>
+            <div class="cell-content-wrap">
+              <div class="cell-content-half cell-content-match-dentity text-right" [innerHTML]="'Density km&sup2;'"></div>
+              <div class="cell-content-half cell-content-match-weight">Low to High Importance</div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-body" (scroll)="scrollLeft = -1 * $event.target.scrollLeft">
+      <div class="table" [style.width.px]="950 + (showComparison ? 200  : 0)">
+        <ng-container *ngFor="let layer of results">
+          <div class="data-row data-row-layer">
+            <div class="data-cell data-cell-layer">
+              <div class="cell-content-group">{{findGroup(layer.layer)?.name}} / {{layer.layer.name}}</div>
+            </div>
+          </div>
+          <ng-container *ngFor="let group of layer.data">
+            <ng-container *ngIf="group">
+              <div class="data-row">
+                <div class="data-cell data-cell-header" title="{{group?.name}}">
+                  <div class="cell-content">{{group?.name}}</div>
+                  <mat-slide-toggle (change)="onGroupSlideToggleChange($event, layer.layer.id, group.children)"></mat-slide-toggle>
+                </div>
+              </div>
+              <ng-container *ngFor="let row of group?.children">
+                <ng-container *ngIf="!row.values[0].list else RowList">
+                  <div class="data-row">
+                    <div class="data-cell" title="{{row.label}}">
+                      <div class="cell-content">{{row.label}}</div>
+                    </div>
+                    <div class="data-cell" title="{{row.unit}}">
+                      <div class="cell-content cell-content-right">
+                        {{row.averageCount | number:'1.0-0'}}
+                      </div>
+                    </div>
+                    <!--Density-->
+                    <div class="data-cell" *ngIf="showDensity">
+                      <div class="cell-content cell-content-right">
+                        {{row.ukAvgDensity | number:'1.6-6'}}
+                      </div>
+                    </div>
+                    <div class="data-cell" *ngIf="showPercentage">
+                      <div class="cell-content cell-content-right">
+                        {{row.average | percent:'1.1-1'}}
+                      </div>
+                    </div>
+                    <ng-container *ngFor="let column of row.values; let indexShapeValue=index">
+                      <ng-container *ngIf="indexShapeValue === selectedPolygonIndex">
+                        <div class="data-cell" title="{{row.unit}}">
+                          <div class="cell-content cell-content-right">
+                            {{column.count | number:'1.0-0' }}
+                          </div>
+                        </div>
+                        <!--Density-->
+                        <div class="data-cell" *ngIf="showDensity">
+                          <div class="cell-content cell-content-right"
+                            [attr.compare]="column.density > row.ukAvgDensity ? 'bigger': column.density < row.ukAvgDensity ? 'smaller' : ''">
+                            {{column.density | number:'1.6-6'}}
+                          </div>
+                        </div>
+                        <div class="data-cell" *ngIf="showPercentage">
+                          <div class="cell-content cell-content-right" title="{{row.unit}}"
+                            [attr.compare]="column.percent > row.average? 'bigger':column.percent < row.average?'smaller':''">
+                            {{column.percent | percent:'1.1-1'}}
+                          </div>
+                        </div>
+                        <ng-container *ngIf="showComparison">
+                          <div class="data-cell data-cell-100 cell-content-comparison">
+                            <div class="cell-content cell-content-right" [ngClass]="{
+                                    'zscore-color-less': column.zscore < -1.96,
+                                    'zscore-color-better': column.zscore > 1.96,
+                                    'zscore-color': column.zscore >= -1.96 && column.zscore <= 1.96
+                                  }">
+                              {{column.zscore | number:'1.2-2'}}
+                            </div>
+                          </div>
+                          <div class="data-cell data-cell-100 cell-content-comparison"
+                            [style.background]="getBackground(column.index, group.maxIndex)">
+                            <div class="cell-content cell-content-right">
+                              {{column.index | number:'1.0-0' }}
+                            </div>
+                          </div>
+                        </ng-container>
+                        <!-- MatchIt filter -->
+                        <ng-container *ngIf="densityValues[selectedPolygonIndex] && densityValues[selectedPolygonIndex][layer.layer.id] && densityValues[selectedPolygonIndex][layer.layer.id][row.columnId] != undefined">
+                          <div class="data-cell data-cell-200 cell-content-match-dentity">
+                            <div class="cell-content cell-content-right">
+                              {{densityValues[selectedPolygonIndex][layer.layer.id][row.columnId]['density'] | number:'1.0-0'}}
+                            </div>
+                          </div>
+                          <div class="data-cell data-filter cell-content-match-weight">
+                            <go-slider-custom [(ngModel)]="densityValues[selectedPolygonIndex][layer.layer.id][row.columnId]['weight']" (ngModelChange)="onFilterChange($event)" class="filter-slider" step="0.1"></go-slider-custom>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-template #RowList>
+                  <div class="data-row data-row-parent">
+                    <div class="data-cell border-right-0" title="{{row.label}}">
+                      <div class="cell-content">{{row.label}}</div>
+                    </div>
+                    <!-- blank -->
+                    <div class="data-cell border-right-0">
+                      <div class="cell-content"></div>
+                    </div>
+                    <!-- blank -->
+                    <div class="data-cell border-right-0" *ngIf="showPercentage">
+                      <div class="cell-content"></div>
+                    </div>
+                    <ng-container *ngFor="let column of row.values; let indexShapeValue=index">
+                      <ng-container *ngIf="indexShapeValue=== selectedPolygonIndex">
+                        <!-- blank -->
+                        <div class="data-cell border-right-0">
+                          <div class="cell-content"></div>
+                        </div>
+                        <!-- blank -->
+                        <div class="data-cell border-right-0" *ngIf="showPercentage">
+                          <div class="cell-content"></div>
+                        </div>
+                        <ng-container *ngIf="showComparison">
+                          <div class="data-cell data-cell-100 cell-content-comparison border-right-0">
+                          </div>
+                          <div class="data-cell data-cell-100 cell-content-comparison border-right-0">
+                          </div>
+                        </ng-container>
+                        <!-- Match -->
+                        <ng-container *ngIf="densityValues[selectedPolygonIndex]">
+                          <!-- blank -->
+                          <div class="data-cell data-cell-200 cell-content-match-dentity border-right-0">
+                            <div class="cell-content"></div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+
+                    </ng-container>
+
+                  </div>
+                  <ng-container *ngFor="let x of row.values[0].list; let i=index">
+                    <ng-container *ngIf="row.valuesCompact[i] || !showCompactView">
+                      <div class="data-row data-row-child" [class.bold]="x.key === 'Subtotal'">
+                        <div class="data-cell">
+                          <div class="cell-content cell-list-label" [class.italic]="x.key === null">
+                            {{x.key === null ? 'Unknown': x.key}}</div>
+                        </div>
+                        <div class="data-cell">
+                          <div class="cell-content cell-content-right">
+                            {{x.totalCount | number:'1.0-0'}}
+                          </div>
+                        </div>
+                        <div class="data-cell" *ngIf="showPercentage">
+                          <div class="cell-content cell-content-right">
+                            {{x.totalPercent | percent:'1.1-1'}}
+                          </div>
+                        </div>
+                        <ng-container *ngFor="let column of row.values; let indexShapeValue=index">
+                          <ng-container *ngIf="indexShapeValue=== selectedPolygonIndex">
+                            <div class="data-cell">
+                              <div class="cell-content cell-content-right">
+                                {{column.list[i]?.count | number:'1.0-0'}}
+                              </div>
+                            </div>
+                            <div class="data-cell" *ngIf="showPercentage">
+                              <div class="cell-content">
+                                <div class="cell-content cell-content-right"
+                                  [attr.compare]="column.list[i]?.percent > column.list[i]?.totalPercent ? 'bigger': column.list[i]?.percent < column.list[i]?.totalPercent ? 'smaller' : ''">
+                                  {{column.list[i]?.percent | percent:'1.1-1'}}
+                                </div>
+                              </div>
+                            </div>
+                            <ng-container *ngIf="showComparison">
+                              <div class="data-cell data-cell-100 cell-content-comparison">
+                              </div>
+                              <div class="data-cell data-cell-100 cell-content-comparison">
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                        <!-- MatchIt filter -->
+                        <ng-container *ngIf="x.key !== 'Subtotal' && densityValues[selectedPolygonIndex] && densityValues[selectedPolygonIndex][layer.layer.id] && densityValues[selectedPolygonIndex][layer.layer.id][row.columnId] != undefined">
+                          <ng-container *ngIf="densityValues[selectedPolygonIndex][layer.layer.id][row.columnId][x.key] != undefined; else densityValuesEmpty">
+                            <div class="data-cell data-cell-200 cell-content-match-dentity">
+                              <div class="cell-content cell-content-right">
+                                {{densityValues[selectedPolygonIndex][layer.layer.id][row.columnId][x.key]['density'] | number:'1.0-0'}}
+                              </div>
+                            </div>
+                            <div class="data-cell data-filter cell-content-match-weight">
+                              <go-slider-custom [(ngModel)]="densityValues[selectedPolygonIndex][layer.layer.id][row.columnId][x.key]['weight']" (ngModelChange)="onFilterChange($event)"
+                               class="filter-slider" step="0.1"></go-slider-custom>
+                            </div>
+                          </ng-container>
+
+                        </ng-container>
+                      </div>
+                    </ng-container>
+                  </ng-container>
+                </ng-template>
+              </ng-container>
+              <ng-container *ngIf="group.HasTotal">
+                <div class="data-row">
+                  <div class="data-cell" title="Total">
+                    <div class="data-content"><b>Total</b></div>
+                  </div>
+                  <ng-container *ngFor="let x of group.total; let i=index">
+                    <div class="data-cell" *ngIf="i == 0">
+                      <div class="data-content cell-content-right"><b>{{group?.averageCount[i] | number:'1.0-0'}}</b>
+                      </div>
+                    </div>
+                    <div class="data-cell" *ngIf="showPercentage && i == 0">
+                      <div class="data-content cell-content-right"><b>{{group?.average[i] | percent:'1.1-1'}}</b></div>
+                    </div>
+                    <ng-container *ngIf="i === selectedPolygonIndex">
+                      <div class="data-cell">
+                        <div class="cell-content cell-content-right"><b>{{x | number:'1.0-0'}}</b></div>
+                      </div>
+                      <div class="data-cell" *ngIf="showPercentage">
+                        <div class="data-content cell-content-right"><b>{{group?.percent[i] | percent:'1.1-1'}}</b>
+                        </div>
+                      </div>
+                      <ng-container *ngIf="showComparison">
+                        <div class="data-cell data-cell-100 cell-content-comparison">
+                        </div>
+                        <div class="data-cell data-cell-100 cell-content-comparison">
+                        </div>
+                    </ng-container>
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #densityValuesEmpty>
+  <div class="data-cell data-cell-200 cell-content-match-dentity">
+  </div>
+</ng-template>

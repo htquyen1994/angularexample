@@ -1,0 +1,30 @@
+<go-dialog [title]="'Change resources used (CPU/RAM)'" (close)="onDialogClose()" #confirmDialog>
+  <div class="page-content">
+    <div class="row">
+      <p><b>WARNING!</b></p>
+      <p>Changing this setting will effect the amount of resources your computer dedicates to running Periscope. Dedicating
+        more resources to Periscope will reduce the amount of resources available to other applications on your computer.</p>
+
+      <p>In general, the more resources dedicated to Periscope the faster it will run.</p>
+
+      <p>In most instances, e.g. when using a typical business laptop or desktop PC, the default setting of 'Medium' is
+        advised.</p>
+
+      <p>If you are using an older computer then you might consider moving to the 'Low' setting.</p>
+
+      <p>If you are using a modern powerful computer with plenty of RAM then switching to the 'High' setting will dedicate
+        more resources to Periscope and hence the application will typically run faster.</p>
+    </div>
+  </div>
+  <div class="row-button">
+    <div class="row-control">
+      <go-checkbox
+      [state]="notShowMeAgain ? 2 : 0"
+      (change)="onSelection($event === 2)"></go-checkbox>
+      Do not ask me again
+    </div>
+    <div class="separator"></div>
+    <go-button button-flat (clicked)="onCancel()">Cancel</go-button>
+    <go-button button-raised (clicked)="onConfirm()">Confirm</go-button>
+  </div>
+</go-dialog>

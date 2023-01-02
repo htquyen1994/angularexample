@@ -1,0 +1,18 @@
+<div class="page-body">
+  <div class="page-body__header">
+    <div class="page-body__header__page-title">
+      Functionality User Groups
+    </div>
+    <div class="separator"></div>
+  </div>
+  <div class="page-body__content">
+    <ps-functionality-filter [filterData]="filter$ | async" [tenantOptions]="tenantOptions$ |async"
+      [tenantLoading]="tenantLoading$ | async" [disabledDownload]="(downloading$ | async) || !(filter$ | async).tenantId"
+      [loadingDownload]="downloading$ | async"
+      (changed)="onChangeFilter($event)" (download)="onDownload()" >
+    </ps-functionality-filter>
+    <ps-functionality-list [data]="data$ | async" [claims]="claims$ |async" [loading]="loading$ | async"></ps-functionality-list>
+  </div>
+  <div class="page-body__footer">
+  </div>
+</div>

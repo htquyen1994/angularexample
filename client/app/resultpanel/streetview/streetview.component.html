@@ -1,0 +1,30 @@
+<go-toolbar class="toolbar">
+	<go-button-group class="group-separator">
+		<go-button button-toolbar icon="locate" title="Locate streetview" (clicked)="onLocate()">
+			Locate
+		</go-button>
+	<go-button-group class="group-separator">
+	</go-button-group>
+		<go-button [disabled]="!hasUpdatePermission || !markerOptions || !isMarkerChanged" button-raised title="Save Streetview" (clicked)="dialog.onHide(false); error = null">
+            Save Street View
+		</go-button>
+	</go-button-group>
+</go-toolbar>
+<!--<div class="toolbar"></div>-->
+<div class="message" *ngIf="hasLocation === false">
+	No street view for current map center location
+</div>
+<div class="streetview" #streetView></div>
+
+<go-dialog title="Save Streetview" #dialog>
+	<go-spinner *ngIf="isLoading"></go-spinner>
+	<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+	<div class="dialog-body">
+		<p>Do you want to update the Street View camera angle for the selected row in {{markerOptions?.layerLabel}}?</p>
+	</div>
+
+	<div class="dialog-button">
+		<go-button button-flat (clicked)="dialog.onHide(true)">Cancel</go-button>
+		<go-button button-raised (clicked)="onUpdate()" [disabled]="isLoading">Save Streetview</go-button>
+	</div>
+</go-dialog>

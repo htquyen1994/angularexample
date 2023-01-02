@@ -1,0 +1,17 @@
+<go-dialog [title]="model?.title" (close)="onDialogClose()" #dynamicConfirmDialog>
+    <div class="page-content">
+      <div class="row">
+        <ng-template [ngIf]="model?.innerHtml">
+          <div [innerHtml]="model?.innerHtml"></div>
+        </ng-template>
+        <ng-template [ngIf]="model?.content">
+          {{model?.content}}
+        </ng-template>
+      </div>
+    </div>
+    <div class="row-button">
+      <div class="separator"></div>
+      <go-button button-flat (clicked)="onNo()">{{model.noButton}}</go-button>
+      <go-button button-raised (clicked)="onYes()">{{model.yesButton}}</go-button>
+    </div>
+  </go-dialog>

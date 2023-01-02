@@ -1,0 +1,99 @@
+<go-spinner *ngIf="isLoading"></go-spinner>
+
+<div class="message" *ngIf="layerInput && records?.results?.length === 0">
+  0 results
+</div>
+
+<div class="message" *ngIf="layerInput === null">
+  <div class="message-text">Select a layer to see data</div>
+
+</div>
+
+<div  #tableWrapper [hidden]="!(records?.results?.length !== 0 && records && layerInput && filterInput && !(settingWidth$ |async) )" class="grid">
+  <div class="header-body" [style.height.px]="isShowGroup ? '56' : '28'" [style.left.px]="scrollLeft">
+    <table class="table-wrap table-wrap_header" [style.margin-top.px]="isShowGroup ? '0' : '-28'">
+      <thead class="table-body">
+        <tr class="data-row">
+          <th class="header-cell"></th>
+          <th class="header-cell" *ngFor="let group of groupDef, let i = index" [attr.colspan]="group.columns.length">{{group?.name}}</th>
+        </tr>
+        <tr class="data-row">
+          <th></th>
+          <th *ngFor="let column of columnDef,let i = index" (click)="onSortColumn(column)">
+            <div class="header-cell" [attr.data-type]="column.align">
+              <div class="cell-content" title="{{column.name}}">
+                {{column.name}}
+              </div>
+              <mat-icon *ngIf="sortColumnId === column.id" class="caret"
+              [svgIcon]="sortDirectionASC? 'caret-down' :'caret-up'" size="small"></mat-icon>
+            </div>
+          </th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div #tableWrapScroll class="table-wrap-scroll" (scroll)="onScroll($event.target.scrollLeft)">
+    <table class="table-wrap table-wrap_body">
+      <tbody class="table-body">
+        <tr class="data-row" *ngFor="let row of records?.results; let j = index" (click)="onRowSelect(row)"
+          [attr.aria-selected]="rowSelected.has(row[identifierColumn])"
+          [attr.aria-active]="rowActive === row[identifierColumn]">
+
+          <td>
+            <div class="data-cell data-cell_first">
+              <go-checkbox class="row-checkbox" [state]="rowSelected.has(row[identifierColumn])? 2 : 0"
+              (change)="onRowSelect(row)"></go-checkbox>
+            <go-button type="icon" icon="preview" size="medium" title="view record" class="data-cell_view"
+              (clicked)="viewRecord(row)"></go-button>
+            </div>
+          </td>
+          <td *ngFor="let column of columnDef; let i = index"
+            [attr.data-columnId]="column.id">
+            <div class="data-cell" [attr.data-type]="column.align">
+              <ng-container *ngIf="column.formatPipe;else NotHaveFormat">
+                <ng-container *ngIf="column.formatPipe === 'innerHTML'; else normalFormat">
+                  <div class="cell-content">
+                    <a target="_blank" [attr.href]="row[column.id]" (click)="$event.stopPropagation()">{{row[column.id]}}</a>
+                  </div>
+                </ng-container>
+                <ng-template #normalFormat>
+                  <div class="cell-content" title="{{row[column.id]}}">
+                    {{row[column.id] | dynamicPipe:column.formatPipe:column.format}}
+                  </div>
+                </ng-template>
+              </ng-container>
+              <ng-template #NotHaveFormat>
+                <div class="cell-content" title="{{row[column.id]}}">{{row[column.id]}}
+                </div>
+              </ng-template>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <div class="results">Records:
+      <ng-container *ngIf="!(countLoading$ | async); else SpinnerTemplate">
+        {{count | number}}
+      </ng-container>
+    </div>
+    <div class="results" *ngIf="selectedSum !== null">Selected sum: {{selectedSum | number}}</div>
+    <div class="results">Selected: {{rowSelected.size}}</div>
+    <div class="pager">Page {{pageNumber + 1}} of {{maxPages | number}}</div>
+    <go-button-group>
+      <go-button button-raised [disabled]="pageNumber === 0 || isLoading" icon="expand-left" (clicked)="onPreviousPage()">
+        Previous
+      </go-button>
+      <go-button button-raised [disabled]="maxPages < pageNumberNext || isLoading" icon-right icon="expand-right"
+        (clicked)="onNextPage()">Go to page
+      </go-button>
+      <input class="input-number" type="number" min="1" [max]="maxPages" [(ngModel)]="pageNumberNext"
+        [disabled]="maxPages === 0">
+    </go-button-group>
+  </div>
+</div>
+
+<ng-template #SpinnerTemplate>
+  <go-spinner [type]="'ELLIPSIS'" [withoutWrapper]="true"></go-spinner>
+</ng-template>

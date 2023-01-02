@@ -1,0 +1,67 @@
+@import 'shared-mixins';
+ps-outreach-services {
+  .customer-sessions-warper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 100%;
+    .main-section,
+    .info-section {
+      padding: 20px;
+      height: 100%;
+      width: 100%;
+    }
+    .main-section {
+      flex: 2 1;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      go-button {
+        &[button-toolbar] {
+          &[type='icon'] {
+            height: 25px !important;
+            width: 25px;
+          }
+        }
+      }
+    }
+    .info-section {
+      overflow: auto;
+      flex: 1 1;
+    }
+  }
+  .group-label {
+    max-width: 1040px;
+  }
+  .groups-container .group-detail {
+    max-width: 1040px;
+  }
+  .group-content {
+    position: relative;
+  }
+  .outreach-services-table {
+    padding-top: 5px;
+    height: 100%;
+    overflow: auto;
+    position: relative;
+  }
+  .groups-container .detail-text {
+    flex: 4 0;
+  }
+  periscope-table {
+    .rTableCell {
+      padding: 1px 15px;
+      &.text-truncate{
+        & div:first-child{
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+  .action-column {
+    justify-content: center;
+  }
+}

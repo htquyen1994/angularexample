@@ -1,0 +1,10 @@
+<ng-template [ngIf]="isLoading">
+	<div class="loading-block">..Loading</div>
+</ng-template>
+<ng-template [ngIf]="!isLoading">
+	<div #chart class="histogram"></div>
+	<div class="value-min">{{percent ? (min/100 | percent:'1.1-1') : (min | number)}}</div>
+	<div class="value-max">{{percent ? (max/100 | percent:'1.1-1') : (max | number)}}</div>
+	<div class="info-text info-text-min">Min</div>
+	<div class="info-text info-text-max">Max</div>
+</ng-template>

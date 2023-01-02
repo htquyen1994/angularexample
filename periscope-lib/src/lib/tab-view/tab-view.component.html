@@ -1,0 +1,12 @@
+<div class="tabs">
+    <ng-container *ngFor="let tab of tabs; let i=index">
+        <div class="tabs-item" (click)="open($event, tab, i)" [attr.aria-selected]="tab.selected"
+            [attr.aria-disabled]="tab.disabled">
+            {{tab.header}}
+        </div>
+    </ng-container>
+</div>
+
+<div class="content-wrapper">
+    <ng-content></ng-content>
+</div>

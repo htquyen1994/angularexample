@@ -1,0 +1,17 @@
+<div class="page-list">
+  <ng-container *ngFor="let indicator of indicators$ | async" [ngSwitch]="indicator.type">
+    <button mat-raised-button type="button" *ngSwitchCase="'page'"
+      [class.active]="indicator.page === currentPage" class="page-symbol" (click)="changeSelectedPage(indicator.page)">
+      {{ indicator.page }}
+    </button>
+    <div class="page-symbol more" *ngSwitchCase="'more'">&#8230;</div>
+  </ng-container>
+</div>
+
+<ng-container *ngIf="(indicators$ | async).length > 0">
+  <div class="page-input">
+    <input matInput type="number" (keydown.enter)="goToPage()" [(ngModel)]="selectedPage" />
+  </div>
+
+  <button mat-raised-button color="primary" type="button" class="page-action" (click)="goToPage()">Go</button>
+</ng-container>

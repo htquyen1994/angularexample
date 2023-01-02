@@ -1,0 +1,36 @@
+<go-dialog title="Share Filter" #shareFilterDialog isDrag="true">
+  <go-spinner *ngIf="isLoading"></go-spinner>
+  <div class="page" *ngIf="form">
+    <form [formGroup]="form">
+      <div class="page-content">
+        <div class="row">
+            Filter: {{filter?.name}}
+        </div>
+        <div class="row" *ngFor="let user of usersControls; let i = index">
+          <div>{{optionsTable[user.controls.userId.value]}}</div>
+          <div class="separator"></div>
+          <go-button type="icon" icon="delete" (clicked)="deleteUser(i)"></go-button>
+        </div>
+        <div class="row">
+          <mat-form-field class="full-width">
+            <input class="autocomplete" type="text" placeholder="Enter user"  matInput [formControl]="form.controls.autocomplete" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let option of filteredOptions | async" [value]="option.name">
+                {{option.name}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <go-button [disabled]="isValidAdd === false" button-flat (clicked)="addUserFromAutocomplete()">Add
+          </go-button>
+        </div>
+      </div>
+      <div class="row-button">
+        <div class="separator"></div>
+        <go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+        <go-button button-raised (clicked)="onComplete()" [disabled]="form.invalid || !userAddedOrRemoved">
+          Share filter
+        </go-button>
+      </div>
+    </form>
+  </div>
+</go-dialog>

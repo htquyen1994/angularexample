@@ -1,0 +1,27 @@
+@import 'shared-mixins';
+
+ps-nearest-map-tool {
+  width: 500px;
+  .row{
+    padding: 5px 0;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    .row-label{
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+  }
+  .text-info {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  go-error-message.row {
+    top: unset;
+  }
+
+  .error {
+    color: @color-error;
+  }
+}

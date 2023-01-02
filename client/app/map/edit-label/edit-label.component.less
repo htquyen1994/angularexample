@@ -1,0 +1,79 @@
+@import 'shared-mixins';
+
+:host {
+	// z-index: 1;
+}
+
+.row {
+	padding: 5px 0;
+}
+
+.separator {
+	flex-grow: 1;
+}
+
+.row-button {
+	margin-top: 30px;
+	display: flex;
+
+}
+
+.page-content {
+	max-height: ~"calc(100vh - 200px)";
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.ng-invalid.ng-touched {
+	border-color: @color-error !important;
+}
+
+.error-message {
+	color: @color-error;
+	padding: 5px 0;
+}
+
+
+.radius-wrap {
+	cursor: default;
+	position: absolute;
+	top: 54px;
+	left: 0;
+	display: flex;
+	background-color: #fff;
+	padding: 3px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  &.right{
+    left: unset;
+    right: 0px;
+  }
+}
+
+.radius-icon {
+	color: @color-text;
+	margin: 3px;
+}
+
+.radius-hidden {
+	display: none;
+}
+
+.radius-input {
+	height: 27px;
+	line-height: 27px;
+	margin: 1px;
+	padding-right: 25px;
+}
+
+.radius-unit {
+	width: 0;
+	position: relative;
+	left: -25px;
+	top: 7px;
+	font-weight: 500;
+	color: @color-text;
+}
+
+.radius-input {
+	width: 100px;
+}

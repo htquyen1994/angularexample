@@ -1,0 +1,15 @@
+<ng-container *ngIf="isIcon">
+  <mat-icon class="icon" svgIcon="map-{{item.icon}}" [style.color]="item.fillColor" [style.stroke]="item.strokeColor"
+    [style.stroke-width]="isShowStroke ? item.strokeWeight: 0"></mat-icon>
+</ng-container>
+
+<ng-container *ngIf="!isIcon">
+  <img class="icon" src="/client/assets/{{item.icon}}.png" width="24" height="24">
+</ng-container>
+
+<div>{{item.name}}</div>
+<ng-container *ngIf="isShowHiddenIcon">
+  <go-button class="ml-auto legend-item-icon" [title]="item.hidden? 'show': 'hide'" type="icon"
+    [icon]="item.hidden ? 'visibility_off':'visibility'" [size]="'small'" (clicked)="onToggle()">
+  </go-button>
+</ng-container>

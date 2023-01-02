@@ -1,0 +1,511 @@
+<go-dialog title="My Settings" button="Close" #dialog isDrag="true" [styleClass]="{'account-setting-dialog': true}" (close)="onDialogClose()">
+  <go-spinner *ngIf="isLoading" class="spinner-block-ui"></go-spinner>
+  <div class="dialog-wrap">
+    <div class="link-container link-container-border">
+      <div class="row-action row-label" (click)="onToggle('globalsettings')">
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="!collapses?.globalsettings" [size]="medium"
+          type="icon" icon="chevron_right" title="Expand" (clicked)="onToggle('globalsettings')">
+        </go-button>
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="collapses?.globalsettings" [size]="medium"
+          type="icon" icon="expand_more" title="Collapse" (clicked)="onToggle('globalsettings')">
+        </go-button>
+        Global Settings
+      </div>
+      <ng-template [ngIf]="collapses?.globalsettings">
+        <div class="row-action">
+          <div class="row-action-label">Units</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.isMetric" (clicked)="setValue('isMetric',true)" title="Metric">
+              Metric
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.isMetric" (clicked)="setValue('isMetric',false)"
+                       title="Imperial">
+              Imperial
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action" *ngIf="!isMorrison">
+          <div class="row-action-label">Non-overlapping labels</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.nonOverlapLabelMode"
+                       (clicked)="setValue('nonOverlappingLabelMode',true)">
+              On
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.nonOverlapLabelMode"
+                       (clicked)="setValue('nonOverlappingLabelMode',false)">
+              Off
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action" *ngIf="account?.isDevMode">
+          <div class="row-action-label">Vector mode</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.vectorMode"
+              (clicked)="toggleToRefresh('vectorMode', true)">
+              On
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.vectorMode"
+              (clicked)="toggleToRefresh('vectorMode',false)">
+              Off
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action">
+          <div class="row-action-label">Map Type</div>
+          <go-button-group>
+            <go-button button-toolbar type="icon" icon="geo-road" [selected]="account?.mapType === 'roadmap'"
+                       (clicked)="setValue('mapType','roadmap')" title="Road"></go-button>
+            <go-button button-toolbar type="icon" icon="geo-road-bw" [selected]="account?.mapType === 'roadmap_bw'"
+                       (clicked)="setValue('mapType','roadmap_bw')" title="Road greyscale"></go-button>
+            <go-button button-toolbar type="icon" icon="geo-terrain" [selected]="account?.mapType === 'terrain'"
+                       (clicked)="setValue('mapType','terrain')" title="Terrain"></go-button>
+            <go-button button-toolbar type="icon" icon="geo-aerial" [selected]="account?.mapType === 'hybrid'"
+                       (clicked)="setValue('mapType','hybrid')" title="Aerial"></go-button>
+            <go-button button-toolbar type="icon" icon="geo-terrain-bw" [selected]="account?.mapType === 'simple_map'"
+                       (clicked)="setValue('mapType','simple_map')" title="Simple"></go-button>
+            <go-button *ngIf="account?.hasOSMap" button-toolbar type="icon" icon="geo-terrain-os"
+                       [selected]="account?.mapType === 'OS'" (clicked)="setValue('mapType','OS')" title="OS"></go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">Search Type</div>
+          <go-button-group>
+            <ng-container *ngFor="let group of placesSearchGroups">
+              <go-button *ngIf="group.list[0]?.label" button-toolbar [selected]="account?.defaultSearchType === group.id" (clicked)="setValue('defaultSearchType',group.id)" [title]="group.list[0].label + ' Search'">
+                {{group.list[0].label}}
+              </go-button>
+            </ng-container>
+          </go-button-group>
+        </div>
+      </ng-template>
+    </div>
+    <div class="link-container link-container-border">
+      <div class="row-action row-label" (click)="onToggle('layerrecords')">
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="!collapses?.layerrecords" [size]="medium"
+          type="icon" icon="chevron_right" title="Expand" (clicked)="onToggle('layerrecords')">
+        </go-button>
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="collapses?.layerrecords" [size]="medium"
+          type="icon" icon="expand_more" title="Collapse" (clicked)="onToggle('layerrecords')">
+        </go-button>
+        Layer Data
+      </div>
+      <ng-template [ngIf]="collapses?.layerrecords">
+        <div class="row-action">
+          <div class="row-action-label">Column Groups</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showColumnGroups"
+              (clicked)="setValue('showColumnGroups',true)">
+              On
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showColumnGroups"
+              (click)="setValue('showColumnGroups',false)">
+              Off
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">Pin Selected</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.pinSelected" (clicked)="setValue('pinSelected',true)">
+              On
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.pinSelected" (clicked)="setValue('pinSelected',false)">
+              Off
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">Filter by Map</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.filterByMap" (clicked)="setValue('filterByMap',true)">
+              On
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.filterByMap" (clicked)="setValue('filterByMap',false)">
+              Off
+            </go-button>
+          </go-button-group>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="link-container link-container-border">
+      <div class="row-action row-label" (click)="onToggle('insight')">
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="!collapses?.insight" [size]="medium"
+          type="icon" icon="chevron_right" title="Expand" (clicked)="onToggle('insight')">
+        </go-button>
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="collapses?.insight" [size]="medium"
+          type="icon" icon="expand_more" title="Collapse" (clicked)="onToggle('insight')">
+        </go-button>
+        Insight
+      </div>
+      <ng-template [ngIf]="collapses?.insight">
+        <div class="row-action">
+          <div class="row-action-label">Autorun</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.insightAutoRun" (clicked)="setValue('insightAutoRun',true)">
+              On
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.insightAutoRun" (clicked)="setValue('insightAutoRun',false)">
+              Off
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">%</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showInsightPercentages"
+                       (clicked)="setValue('showInsightPercentages',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showInsightPercentages"
+                       (clicked)="setValue('showInsightPercentages',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">Compact</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showInsightCompact"
+                       (clicked)="setValue('showInsightCompact',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showInsightCompact"
+                       (clicked)="setValue('showInsightCompact',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">Indices</div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showInsightIndices"
+                       (clicked)="setValue('showInsightIndices',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showInsightIndices"
+                       (clicked)="setValue('showInsightIndices',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="link-container link-container-border">
+      <div class="row-action row-label" (click)="onToggle('maptools')">
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="!collapses?.maptools" [size]="medium"
+          type="icon" icon="chevron_right" title="Expand" (clicked)="onToggle('maptools')">
+        </go-button>
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="collapses?.maptools" [size]="medium"
+          type="icon" icon="expand_more" title="Collapse" (clicked)="onToggle('maptools')">
+        </go-button>
+        Map Tools
+      </div>
+      <ng-template [ngIf]="collapses?.maptools">
+        <div class="row-action">
+          <div class="row-action-label">
+            Places Tools
+            <mat-icon class="icon" svgIcon="home" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="home-add" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="locate" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showLocationTools"
+                       (clicked)="setValue('showLocationTools',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showLocationTools"
+                       (clicked)="setValue('showLocationTools',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account?.hasRouteWithDirections">
+          <div class="row-action-label">
+            Route and Directions
+            <mat-icon class="icon" svgIcon="road-route-map" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showRouteWithDirections"
+                       (clicked)="setValue('showRouteWithDirections',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showRouteWithDirections"
+                       (clicked)="setValue('showRouteWithDirections',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">
+            Drawing Tools
+            <mat-icon class="icon" svgIcon="geo-point" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="geo-polyline" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="geo-circle" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="geo-rectangle" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="geo-polygon" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="isogram" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showDrawingTools"
+                       (clicked)="setValue('showDrawingTools',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showDrawingTools"
+                       (clicked)="setValue('showDrawingTools',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">
+            Selection Tools
+            <mat-icon class="icon" svgIcon="selection-map" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="selection-polygon" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="selection-add" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="selection-remove" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="selection-remove-all" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showSelectionTools"
+                       (clicked)="setValue('showSelectionTools',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showSelectionTools"
+                       (clicked)="setValue('showSelectionTools',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">
+            Show Information
+            <mat-icon class="icon" svgIcon="selection-info" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showInformation" (clicked)="setValue('showInformation',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showInformation"
+                       (clicked)="setValue('showInformation',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account?.advancedReporting">
+          <div class="row-action-label">
+            Reporting
+            <mat-icon class="icon" svgIcon="report" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showEnhancedReportingTool"
+                       (clicked)="setValue('showEnhancedReportingTool',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showEnhancedReportingTool"
+                       (clicked)="setValue('showEnhancedReportingTool',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account?.canIntersect">
+          <div class="row-action-label">
+            Intersection / Union Tools
+            <mat-icon class="icon" svgIcon="intersection" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="union" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showIntersectionTool"
+                       (clicked)="setValue('showIntersectionTool',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showIntersectionTool"
+                       (clicked)="setValue('showIntersectionTool',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action" *ngIf="account?.viewInsight">
+          <div class="row-action-label">
+            Insight
+            <mat-icon class="icon" svgIcon="insights" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showInsights" (clicked)="setValue('showInsights',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showInsights" (clicked)="setValue('showInsights',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action" *ngIf="account?.viewNearest">
+          <div class="row-action-label">
+            Nearest
+            <mat-icon class="icon" svgIcon="nearest-tool" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showNearest" (clicked)="setValue('showNearest',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showNearest" (clicked)="setValue('showNearest',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action" *ngIf="account?.canSplit">
+          <div class="row-action-label">
+            Split shape
+            <mat-icon class="icon" svgIcon="geo-split" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showSplitShape" (clicked)="setValue('showSplitShape',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showSplitShape" (clicked)="setValue('showSplitShape',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account?.canPrint">
+          <div class="row-action-label">
+            Print Tool
+            <mat-icon class="icon" svgIcon="print" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showPrintTool" (clicked)="setValue('showPrintTool',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showPrintTool" (clicked)="setValue('showPrintTool',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account?.canQuickEdit">
+          <div class="row-action-label">
+            Quick Edit
+            <mat-icon class="icon" svgIcon="quick-edit" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showQuickEdit" (clicked)="setValue('showQuickEdit',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showQuickEdit" (clicked)="setValue('showQuickEdit',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <!--RH SIDE-->
+        <div class="row-action">
+          <div class="row-action-label">
+            My Location
+            <mat-icon class="icon" svgIcon="map-locate" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showMyLocationTool"
+                       (clicked)="setValue('showMyLocationTool',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showMyLocationTool"
+                       (clicked)="setValue('showMyLocationTool',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+
+        <div class="row-action" *ngIf="account?.hasFollowLocation">
+          <div class="row-action-label">
+            Follow Me
+            <mat-icon class="icon" svgIcon="locate" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showFollowMeTool"
+                       (clicked)="setValue('showFollowMeTool',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showFollowMeTool"
+                       (clicked)="setValue('showFollowMeTool',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">
+            Zoom Level Indicator
+            <div class="icon-number-value icon-number-value-horizontal">{{zoomLevel}}</div>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showZoomLevelIndicator"
+                       (clicked)="setValue('showZoomLevelIndicator',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showZoomLevelIndicator"
+                       (clicked)="setValue('showZoomLevelIndicator',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+        <div class="row-action">
+          <div class="row-action-label">
+            Points of Interest / Traffic
+            <mat-icon class="icon" svgIcon="geo-traffic" [attr.size]="'medium'"></mat-icon>
+            <mat-icon class="icon" svgIcon="geo-poi" [attr.size]="'medium'"></mat-icon>
+          </div>
+          <go-button-group>
+            <go-button button-toolbar [selected]="account?.showPointOfInterest"
+                       (clicked)="setValue('showPointOfInterest',true)">
+              Visible
+            </go-button>
+            <go-button button-toolbar [selected]="!account?.showPointOfInterest"
+                       (clicked)="setValue('showPointOfInterest',false)">
+              Hidden
+            </go-button>
+          </go-button-group>
+        </div>
+      </ng-template>
+    </div>
+    <div class="link-container link-container-border">
+      <div class="row-action row-label" (click)="onToggle('drawingSettings')">
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="!collapses?.drawingSettings"
+          [size]="medium" type="icon" icon="chevron_right" title="Expand" (clicked)="onToggle('drawingSettings')">
+        </go-button>
+        <go-button button-toolbar class="button-toolbar--transparent" *ngIf="collapses?.drawingSettings" [size]="medium"
+          type="icon" icon="expand_more" title="Collapse" (clicked)="onToggle('drawingSettings')">
+        </go-button>
+        Drawing Settings
+      </div>
+      <ng-template [ngIf]="collapses?.drawingSettings">
+        <div class="row-action" *ngIf="account">
+          <div class="row-action-label">Draw Shape Fill Colour</div>
+          <go-button-group>
+            <input type="color" [(ngModel)]="drawShapeFillColour" (focusout)="onChangeColour('drawShapeFillColour')">
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account">
+          <div class="row-action-label">Draw Shape Outline Colour</div>
+          <go-button-group>
+            <input type="color" [(ngModel)]="drawShapeStrokeColour"
+              (focusout)="onChangeColour('drawShapeStrokeColour')">
+          </go-button-group>
+        </div>
+        <div class="row-action" *ngIf="account">
+          <div class="row-action-label">Draw Shape Opacity</div>
+          <go-button-group>
+            <input class="range" type="range" min="0" max="1" step="0.1" [(ngModel)]="drawShapeOpacity"
+              (mouseup)="onChangeSlider('drawShapeOpacity',drawShapeOpacity)">
+            <div class="range-number">{{drawShapeOpacity | percent:'1.0-0'}}</div>
+          </go-button-group>
+        </div>
+      </ng-template>
+
+    </div>
+  </div>
+</go-dialog>

@@ -1,0 +1,16 @@
+<ps-tabview (change)="onTabChange($event)" *ngIf="data">
+  <ps-tabpanel header="Security View">
+    <ps-security-view [data]="data.securityView"></ps-security-view>
+  </ps-tabpanel>
+  <ps-tabpanel header="Crime Statistics & Calculated Data">
+    <ps-security-statistics [data]="data.securityStatistics"></ps-security-statistics>
+  </ps-tabpanel>
+  <ps-tabpanel header="Security Enhanced Risk Assessment">
+    <ps-security-risk-assessment [data]="data.securityRiskAssessment"></ps-security-risk-assessment>
+  </ps-tabpanel>
+</ps-tabview>
+<go-spinner *ngIf="loading$ | async"></go-spinner>
+<div class="overlay" *ngIf="loading$ | async"></div>
+<div class="empty" *ngIf="!(loading$ | async) && !data && isInit">
+  No Security Data
+</div>

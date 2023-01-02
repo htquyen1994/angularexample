@@ -1,0 +1,8 @@
+<ng-container [ngSwitch]="type">
+    <ng-container *ngSwitchCase="'COLOR'">
+        <input type="color" [ngModel]="innerValue" (ngModelChange)="onChangeValue($event)" [disabled]="disabled">
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+        <div>Not implemented</div>
+    </ng-container>
+</ng-container>

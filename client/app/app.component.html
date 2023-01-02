@@ -1,0 +1,11 @@
+<div class="drawer-left" [class.drawer-left_closed]="sidepanelState">
+  <go-sidepanel></go-sidepanel>
+</div>
+<div class="drawer-right" [attr.state]="resultPanelState$ | async" #drawerRight>
+  <go-message-area class="message-area" [@messageAreaState]="resultPanelState$ | async"></go-message-area>
+  <go-map class="drawer-right-top" [attr.state]="resultPanelState$ | async" [attr.collapsed]="(resultPanelState$ | async) === ResultPanelCollapseState.FULL_SCREEN"></go-map>
+  <go-account class="account-container" [attr.state]="resultPanelState$ | async" ></go-account>
+  <div class="drawer-right-bottom">
+    <go-resultpanel [attr.state]="resultPanelState$ | async" [state]="resultPanelState$ | async"></go-resultpanel>
+  </div>
+</div>

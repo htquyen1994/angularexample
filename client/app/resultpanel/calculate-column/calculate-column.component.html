@@ -1,0 +1,129 @@
+<go-dialog title="Column Calculator" #dialog (close)="onDialogClose()" isDrag="true">
+    <go-spinner *ngIf="loading" class="spinner"></go-spinner>
+    <div class="page-row">
+        <div class="error-form">
+            <go-error-message *ngIf="error" [error]="error"></go-error-message>
+        </div>
+    </div>
+
+    <form class="form" *ngIf="form" [formGroup]="form">
+        <div class="p-inputgroup">
+            <div class="label">Select column: </div>
+            <ps-select class="select" formControlName="columnId" [options]="columnGroupOptions" [placeholder]="'Pick a column'"
+              [appendTo]="'body'" [group]="true">
+            </ps-select>
+        </div>
+        <div class="p-inputgroup">
+            <div class="label">Update : </div>
+            <ps-select class="select" formControlName="updateFor" [options]="updateForSelection"
+              [appendTo]="'body'">
+            </ps-select>
+        </div>
+        <ng-container *ngIf="columnSelection">
+            <div class="p-inputgroup">
+                <div class="label">
+                    <strong style="padding-right: 10px;">{{columnSelection}}</strong> =
+                </div>
+                <ng-container *ngIf="columnDataAttribute?.Colour ; else normalTemplate">
+                    <ps-input [type]="'COLOR'" formControlName="color"></ps-input>
+                </ng-container>
+                <ng-template #normalTemplate>
+                    <div class="ml-auto">
+                        <mat-icon svgIcon="help" (mouseenter)="helpoverlay.show($event)" (mouseleave)="helpoverlay.hide()">
+                        </mat-icon>
+                        <p-overlayPanel styleClass="overlay-helper" appendTo="body" #helpoverlay>
+                            <div>
+                                <ul>
+                                    <li>
+                                        Press key <strong>'</strong> to put value as a text.
+                                    </li>
+                                    <li>
+                                        Press key <strong>[</strong> or use <strong>Column tab</strong> to put value as a
+                                        column
+                                    </li>
+                                    <li>
+                                        Press key <strong>\</strong> or use <strong>Function tab</strong> to put value as a
+                                        function
+                                    </li>
+                                </ul>
+                            </div>
+                        </p-overlayPanel>
+                    </div>
+                </ng-template>
+            </div>
+            <ng-container  *ngIf="!columnDataAttribute?.Colour">
+                <div class="p-inputgroup">
+                    <!-- <textarea cols="30" rows="10" #calculateTextBox formControlName="calculator"></textarea> -->
+                    <go-math-input [error]="calculatorError" [listColumns]="listColumns" [listFunctions]="listFunctions"
+                        [listOperatorFunctions]="listOperatorFunctions" formControlName="calculator"
+                        (search)="onSearch($event)"></go-math-input>
+                </div>
+                <div class="calculator-help-wrapper">
+                    <div class="calculator-help-tabs">
+                        <go-button-group>
+                            <go-button button-toolbar [selected]="selectedTab == CalculatorTab.Columns"
+                                (clicked)="onSelectTab(CalculatorTab.Columns)">
+                                Columns
+                            </go-button>
+                            <go-button button-toolbar [selected]="selectedTab == CalculatorTab.Function"
+                                (clicked)="onSelectTab(CalculatorTab.Function)">
+                                Functions
+                            </go-button>
+                        </go-button-group>
+                        <go-button-group>
+                            <ng-template ngFor let-function [ngForOf]="listOperatorFunctions">
+                                <go-button button-toolbar (clicked)="onClickOperator(function)">
+                                    {{function?.name}}
+                                </go-button>
+                            </ng-template>
+                            <ng-template [ngIf]="columnDataType == operandType.string">
+                                <go-button button-toolbar (clicked)="onClickNull()">
+                                    BLANK
+                                </go-button>
+                            </ng-template>
+                            <ng-template [ngIf]="columnDataType == operandType.boolean">
+                                <go-button button-toolbar (clicked)="onClickBoolean(1)">
+                                    TRUE
+                                </go-button>
+                                <go-button button-toolbar (clicked)="onClickBoolean(0)">
+                                    FALSE
+                                </go-button>
+                            </ng-template>
+                            <ng-template [ngIf]="columnDataType == operandType.datetime">
+                                <input #dateInput matInput style="width: 0;" [matDatepicker]="picker"
+                                    placeholder="Choose a date" (dateChange)="onDateChange($event)">
+                                <go-button button-toolbar type="icon" icon="calendar" title="Date picker"
+                                    (clicked)="picker.open()">
+                                </go-button>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </ng-template>
+                        </go-button-group>
+                    </div>
+                    <div class="calculator-help-container">
+                        <ng-template [ngIf]="selectedTab == 0">
+                            <go-order-list [list]="listColumns" [searchString]="searchStringColumn"
+                                (onChanged)="onChangeColumn($event)">
+                            </go-order-list>
+                        </ng-template>
+                        <ng-template [ngIf]="selectedTab == 1">
+                            <go-order-list [list]="listFunctions" [searchString]="searchStringFunction"
+                                (onChanged)="onChangeFunction($event)">
+                            </go-order-list>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    </form>
+
+    <div footer class="page-row">
+        <go-button-group>
+            <go-button button-toolbar (clicked)="onCancel()">
+                Cancel
+            </go-button>
+            <go-button button-raised (clicked)="onSubmit()" [disabled]="loading || form?.invalid">
+                Save
+            </go-button>
+        </go-button-group>
+    </div>
+</go-dialog>

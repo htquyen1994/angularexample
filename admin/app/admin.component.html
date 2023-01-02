@@ -1,0 +1,4 @@
+<!--<go-login *ngIf="!account"></go-login>-->
+<go-spinner *ngIf="!(account$ | async)"></go-spinner>
+<router-outlet></router-outlet>
+<go-message-area></go-message-area>

@@ -1,0 +1,69 @@
+ps-insight-view-management {
+  .page{
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    min-height: 150px;
+    height: 100%;
+  }
+  .scrollable-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+  .row {
+    display: flex;
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+    align-items: center;
+    &.row-vertical {
+      flex-direction: column;
+    }
+    &.row-select-layer {
+      margin-bottom: 20px;
+    }
+    .row-label {
+      flex: 1;
+      padding-right: 10px;
+      min-width: 200px;
+    }
+    .row-control {
+      flex: 10;
+      display: flex;
+      align-items: center;
+      ps-select {
+        width: 100%;
+      }
+    }
+    .row-action {
+      margin-left: 10px;
+    }
+    small.error {
+      position: absolute;
+      bottom: -15px;
+    }
+    &.flex-start {
+      align-items: flex-start;
+    }
+  }
+  .row-fieldset{
+    margin-top: 5px;
+  }
+  .multi-select-insight-view-layer{
+    width: 100%;
+  }
+  .row-align-top {
+    align-items: flex-start !important;
+  }
+//   .break-line {
+//   display: block;
+//   width: 100%;
+//   margin: 0;
+//   padding: 0;
+//   border-bottom-style: solid;
+//   height: 1px;
+// }
+}

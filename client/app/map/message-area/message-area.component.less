@@ -1,0 +1,44 @@
+@import 'shared-mixins';
+
+:host {
+	display: block;
+	@media print {
+		display: none;
+	}
+}
+
+.message {
+	background: @color-inverted;
+	color: @color-text;
+	padding: 5px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	width: 250px;
+	display: flex;
+	align-items: center;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	border-left: 5px solid transparent;
+}
+
+.message-0 {
+	border-color: @color-active;
+}
+
+.message-1 {
+	border-color: @color-warning;
+}
+
+.message-2 {
+	border-color: @color-error;
+}
+
+.message-3 {
+	border-color: @color-success;
+}
+
+.message-text {
+	flex-grow: 1;
+	padding: 0 10px;
+}
+
+

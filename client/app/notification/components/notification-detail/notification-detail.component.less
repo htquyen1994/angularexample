@@ -1,0 +1,36 @@
+ps-notification-detail {
+  .notification-detail-wrapper {
+    position: relative;
+    height: 100%;
+  }
+  .notification-detail-header {
+    display: flex;
+    align-items: center;
+    .title {
+      flex-grow: 1;
+      font-size: 17px;
+      align-items: center;
+    }
+    .icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 35px;
+      height: 40px;
+      margin-right: 10px;
+    }
+    .logo {
+      display: block;
+      height: 26px;
+      width: 21px;
+      background-image: url(/client/assets/logo_blue.png);
+      background-size: 20px;
+      background-repeat: no-repeat;
+    }
+  }
+  .notification-detail-content {
+    overflow: auto;
+    height: calc(100% - 40px);
+    position: relative;
+  }
+}

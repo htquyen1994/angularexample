@@ -1,0 +1,25 @@
+<div class="notification-wrapper" *ngIf="filter$ | async as filter">
+  <div class="notification-wrapper-header">
+    <div class="left">
+      <mat-slide-toggle [checked]="filter?.hideRead" (change)="onToggleHideRead($event)">Hide Read
+      </mat-slide-toggle>
+    </div>
+    <div class="right">
+      <a tabindex="0" class="link" (click)="onMarkAllAsRead()">Mark all as Read</a>
+    </div>
+  </div>
+  <go-spinner *ngIf="loading$ | async" class="spinner"></go-spinner>
+  <ng-container *ngIf="notifications$ | async as notifications">
+    <ng-container *ngIf="notifications?.length; else Empty">
+
+      <div class="notification-wrapper-content" infinite-scroll (scrolled)="onScrollDown(filter?.page)" [scrollWindow]="false">
+          <ps-notification-item *ngFor="let item of notifications; let i = index" [item]="item" (clicked)="onItemSelect($event)" (markAsRead)="onMarkAsRead($event)"></ps-notification-item>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+<ng-template #Empty>
+  <div class="empty" *ngIf="!(loading$| async)">
+    You have no unread notifications
+  </div>
+</ng-template>

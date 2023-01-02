@@ -1,0 +1,53 @@
+<div class="customer-sessions-warper">
+    <div class="galleria-section">
+        <p-galleria #galleria [value]="files" [(activeIndex)]="activeIndex" [numVisible]="5"
+            [containerClass]="galleriaClass()" [showThumbnails]="showThumbnails" [showItemNavigators]="true"
+            [showItemNavigatorsOnHover]="true" [circular]="true" [autoPlay]="false" [transitionInterval]="5000"
+            thumbnailsPosition="bottom" (activeIndexChange)="onActiveItemChange($event)">
+            <ng-template pTemplate="item" let-item>
+                <div class="preview-image" [defaultImage]="'client/assets/loading.gif'" [lazyLoad]="item | pipeFunction : getUrl" [ngStyle]="{ 'width': !fullscreen ? '100%' : '',
+                    'display': !fullscreen ? 'block' : ''}">
+                </div>
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-item>
+                <div class="p-grid p-nogutter p-justify-center">
+                    <img [src]="item.uri" />
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer" let-item>
+                <div class="custom-galleria-footer">
+                    <a class="white-icon">
+                        <go-button type="icon" icon="format_list" size="big" title="Show thumbnails"
+                            (clicked)="onThumbnailButtonClick()"></go-button>
+                    </a>
+                    <span *ngIf="files" class="title-container">
+                        <span>{{activeIndex + 1}}/{{files.length}}</span>
+                        <span class="title">{{files[activeIndex].name}}</span>
+                        <span>{{files[activeIndex].description}}</span>
+                    </span>
+                    <a [href]="files[activeIndex].uri" target="_blank" class="ml-auto white-icon">
+                        <go-button type="icon" icon="small-download" size="medium" title="Download file"></go-button>
+                    </a>
+                    <a class="white-icon" *ngIf="openUpload">
+                        <go-button (clicked)="onDelete(files[activeIndex])"
+                            [disabled]="!(files[activeIndex].addedBy === username || canDeleteDocuments)" type="icon" icon="small-delete"
+                            size="big" title="Delete file"></go-button>
+                    </a>
+                    <a class="white-icon">
+                        <go-button (clicked)="toggleFullScreen()" type="icon" [icon]="fullScreenIcon()"
+                            size="big" title="Fullscreen"></go-button>
+                    </a>
+                </div>
+            </ng-template>
+        </p-galleria>
+        <go-spinner *ngIf="loading$ | async"></go-spinner>
+        <div class="overlay" *ngIf="loading$ | async"></div>
+        <div class="empty" *ngIf="!(loading$ | async) && !files?.length">
+            No images available
+        </div>
+    </div>
+    <div class="upload-section" *ngIf="openUpload">
+        <go-document-form [files]="files" [loading]="submitting" [allowDocuments]="false" [allowImages]="true" [showPreview]="false"
+            (save)="onSave($event)" (delete)="onDelete($event)" #documentForm></go-document-form>
+    </div>
+</div>

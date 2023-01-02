@@ -1,0 +1,87 @@
+<div class="container" [formGroup]="form">
+  <div class="row">
+    <label class="row-label">Find Layers</label>
+    <div class="row-inline">
+      <ps-select [styleClass]="'ps-select'" [options]="layerGroupOptions" formControlName="selectedLayerId"
+        [placeholder]="'Select a layer'" [appendTo]="'body'" [group]="true">
+      </ps-select>
+      <div class="button-wrap">
+        <go-button button-toolbar
+          [disabled]="!form.controls['selectedLayerId'].value || ([layersControl.value] | pipeFunction: checkAddLayerAvailable: this)"
+          (clicked)="addLayerControl(form.controls['selectedLayerId'].value)">Add Layer
+        </go-button>
+      </div>
+    </div>
+  </div>
+  <div class="row row-table-header">
+    <div class="table">
+      <div class="table-row table-header">
+        <div class="table-cell"></div>
+        <div class="table-cell" left>Find Weightings</div>
+        <div class="table-cell" left>Most</div>
+        <div class="table-cell action"></div>
+      </div>
+    </div>
+  </div>
+  <div class="layers-container">
+    <ng-container *ngFor="let layer of layersControl?.controls; let i = index">
+      <ng-container [formGroup]="layer">
+        <div class="row row-layer">
+          <div class="row-header">
+            <div class="row-title">
+              <!-- layer name -->
+              {{layer.get('name').value}}
+            </div>
+            <div class="group-push"></div>
+            <div class="row-action">
+              <!-- remove layer button -->
+              <go-button button-toolbar [icon]="'small-delete'" title="Remove layer" (clicked)="onRemoveLayer(i)">
+                Remove layer
+              </go-button>
+            </div>
+          </div>
+          <div class="row-header--sub">
+            <div class="row-action">
+              <go-button button-toolbar [icon]="'small-add'" title="Add column"
+                [disabled]="[layer.get('columns').value, layer.get('id').value] | pipeFunction: checkAddColumnAvailable: this"
+                (clicked)="onAddColumn(i, layer.get('id').value)">
+                Add column
+              </go-button>
+              <!-- add colum button -->
+            </div>
+            <div class="group-push"></div>
+            <div class="row-action">
+              <!-- toggle -->
+              <mat-slide-toggle (change)="onLayerSlideToggleChange($event, i)"></mat-slide-toggle>
+            </div>
+          </div>
+          <div class="table">
+            <ng-container formArrayName="columns"
+              *ngFor="let column of layer.get('columns')['controls']; let columnIndex = index;">
+              <div class="table-row" [formGroupName]="columnIndex">
+                <div class="table-cell">
+                  <ps-select class="column-select" [styleClass]="'ps-select'" [options]="columnGroupOptions[layer.get('id').value]" formControlName="id"
+                    [placeholder]="'Select a layer'" [appendTo]="'body'" [group]="true">
+                  </ps-select>
+                </div>
+                <div class="table-cell">
+                  <go-slider-custom formControlName="weight" class="filter-slider"
+                    step="0.1" [min]="0" [max]="1">
+                  </go-slider-custom>
+                </div>
+                <div class="table-cell">
+                  <mat-slide-toggle formControlName="findMost"></mat-slide-toggle>
+                </div>
+                <div class="table-cell action">
+                  <go-button class="dropdown-item-button" type="icon" icon="small-delete" title="Remove Column"
+                    (clicked)="onRemoveColumn(i, columnIndex);">
+                  </go-button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

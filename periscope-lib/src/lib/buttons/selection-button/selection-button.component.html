@@ -1,0 +1,11 @@
+<div *ngIf="model" #container [ngClass]="'ps-selectionbutton p-component'" [ngStyle]="style" [class]="styleClass">
+  <!-- <button #defaultbtn type="button" pButton [label]="_selected?.label"></button> -->
+  <button #defaultbtn [class]="'ps-selectionbutton-defaultbutton'" pButton type="button" [pTooltip]="_selected?.tooltip ? _selected?.tooltip : _selected?.label" [tooltipPosition]="tooltipPosition"
+    [icon]="menuModel && menuModel.length ? 'pi pi-chevron-down': null" iconPos="right" [label]="_selected?.label"
+    (click)="onDefaultButtonClick($event)" [disabled]="disabled"></button>
+  <ng-container *ngIf="menuModel && menuModel.length">
+    <!-- <button type="button" pButton class="ps-selectionbutton-menubutton" icon="pi pi-chevron-down" (click)="onDropdownButtonClick($event)" [disabled]="disabled"></button> -->
+    <p-menu #menu [popup]="true" [model]="menuModel" [style]="menuStyle" [styleClass]="menuStyleClass"
+      [appendTo]="'body'" [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'"></p-menu>
+  </ng-container>
+</div>

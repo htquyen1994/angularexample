@@ -1,0 +1,110 @@
+<!-- <div class="button-close-wrap">
+  <go-button class="button-close" button-flat (clicked)="onClose()">Close</go-button>
+</div> -->
+
+
+<div class="row">
+  <div class="">Report:</div>
+  <div class="divider"></div>
+  <ps-select class="select" style="width: 250px;" [options]="reportOptions" [(ngModel)]="reportParams.reportId" (ngModelChange)="onReportSelect()"
+  [placeholder]="'Select a report type'">
+</ps-select>
+</div>
+<!--<p>
+  <ng-container [ngSwitch]="reportSelected?.reportType">
+    <ng-container *ngSwitchCase="ReportType.SELECTCLUB">Please select a club</ng-container>
+    <ng-container *ngSwitchCase="ReportType.SELECTPOINT">Select a point shape</ng-container>
+    <ng-container *ngSwitchCase="ReportType.SELECTPOLYGONUNION">Select a polygon shape</ng-container>
+    <ng-container *ngSwitchCase="ReportType.SELECTPOLYGON">Select a polygon shape</ng-container>
+    <ng-container *ngSwitchDefault>Select a shape on the map</ng-container>
+  </ng-container>
+</p>-->
+<!-- <div class="row">
+  <go-button-group *ngIf="reportSelected?.reportType == ReportType.SELECTCLUB">
+    <go-button button-toolbar type="icon" icon="pointer" title="Select shape" [selected]="activeMapTool === null"
+      (click)="onTool(null)"></go-button>
+  </go-button-group>
+  <go-button-group *ngIf="reportSelected?.reportType == ReportType.SELECTPOINT">
+    <go-button button-toolbar type="icon" icon="geo-point" title="Draw point"
+      [selected]="activeMapTool === mapToolType.MARKER" (clicked)="onTool(mapToolType.MARKER)"></go-button>
+  </go-button-group>
+  <go-button-group
+    *ngIf="reportSelected?.reportType == ReportType.DEFAULT || reportSelected?.reportType == ReportType.SELECTPOLYGONUNION || reportSelected?.reportType == ReportType.SELECTPOLYGON">
+    <go-button button-toolbar type="icon" icon="geo-circle" title="Draw circle"
+      [selected]="activeMapTool === mapToolType.CIRCLE" (click)="onTool(mapToolType.CIRCLE)"></go-button>
+    <go-button button-toolbar type="icon" icon="geo-rectangle" title="Draw rectangle"
+      [selected]="activeMapTool === mapToolType.RECTANGLE" (click)="onTool(mapToolType.RECTANGLE)"></go-button>
+    <go-button button-toolbar type="icon" icon="geo-polygon" title="Draw polygon"
+      [selected]="activeMapTool === mapToolType.POLYGON" (click)="onTool(mapToolType.POLYGON)"></go-button>
+    <go-button button-toolbar type="icon" icon="isogram" title="Create catchment"
+      [selected]="activeMapTool === mapToolType.REPORTS" (click)="onTool(mapToolType.REPORTS)" [isLoading]="_isLoading">
+    </go-button>
+  </go-button-group>
+</div> -->
+<!-- <ng-container *ngIf="isCatchment">
+  <hr />
+  <div class="row">
+    <go-button button-toolbar type="icon" icon="move-car" title="Car" [selected]="model.mode === 'car'"
+      (click)="setMode('car')"></go-button>
+    <go-button button-toolbar type="icon" icon="move-walk" title="Walking" [selected]="model.mode === 'foot'"
+      (click)="setMode('foot')"></go-button>
+    <go-button button-toolbar type="icon" icon="move-bike" title="Bicycle" [selected]="model.mode === 'bike'"
+      (click)="setMode('bike')"></go-button>
+  </div>
+  <div class="row">
+    <input class="checkbox" type="checkbox" [(ngModel)]="model.towardsOrigin"
+      (ngModelChange)="localModelChanged($event)" />
+    <div>Travel direction towards origin</div>
+  </div>
+  <div class="row">
+    <go-button button-toolbar [selected]="model.type === travelType.DURATION"
+      (click)="setTravelType(travelType.DURATION)">
+      Time
+    </go-button>
+    <go-button button-toolbar [selected]="model.type === travelType.DISTANCE"
+      (click)="setTravelType(travelType.DISTANCE)">
+      Distance
+    </go-button>
+  </div>
+  <div class="row" *ngIf="model.type === travelType.DURATION">
+    <input type="range" min="1" max="{{maxDriveTime}}" class="range" step="1" [(ngModel)]="model.valueTime"
+      (ngModelChange)="localModelChanged($event)" />
+    <div class="unit">{{model.valueTime}} minutes</div>
+  </div>
+  <div class="row" *ngIf="model.type === travelType.DISTANCE">
+    <input type="range" min="1" max="{{maxDriveDistance}}" class="range" step="0.1" [(ngModel)]="model.valueDistance"
+      (ngModelChange)="localModelChanged($event)" />
+    <div class="unit" *ngIf="isMetric">{{model.valueDistance}} km</div>
+    <div class="unit" *ngIf="!isMetric">{{format(model.valueDistance / 1.60934)}} miles</div>
+  </div>
+  <div class="row">
+    Please click on the map to create a catchment
+  </div>
+</ng-container> -->
+
+<div class="row justify-content-between">
+  <go-button-group>
+    <go-button button-toolbar [selected]="reportParams.reportFormat === reportFormat.EXCEL"
+      (clicked)="setReportFormat(reportFormat.EXCEL)">EXCEL</go-button>
+    <go-button button-toolbar *ngIf="reportParams?.reportId !== ''"
+      [selected]="reportParams.reportFormat === reportFormat.PDF" (clicked)="setReportFormat(reportFormat.PDF)">PDF
+    </go-button>
+  </go-button-group>
+
+  <go-button-group>
+    <go-button button-raised [disabled]="reportParams.reportId == '' || loading || _isLoading"  [spinnerbtn]="loading || _isLoading"
+      (clicked)="onDownload()">Download
+    </go-button>
+  </go-button-group>
+</div>
+<div class="text-info">
+  <small>
+    <ng-container [ngSwitch]="reportSelected?.reportType">
+      <ng-container *ngSwitchCase="ReportType.SELECTCLUB">Please select a club to Download</ng-container>
+      <ng-container *ngSwitchCase="ReportType.SELECTPOINT">Select a point shape to Download</ng-container>
+      <ng-container *ngSwitchCase="ReportType.SELECTPOLYGONUNION">Select a polygon shape to Download</ng-container>
+      <ng-container *ngSwitchCase="ReportType.SELECTPOLYGON">Select a polygon shape to Download</ng-container>
+      <ng-container *ngSwitchDefault>Select or draw a shape to Download</ng-container>
+    </ng-container>
+  </small>
+</div>

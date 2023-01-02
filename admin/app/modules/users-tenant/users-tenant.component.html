@@ -1,0 +1,74 @@
+<div class="page-body">
+	<div class="page-body__header">
+		<div class="page-body__header__page-title">Users</div>
+	</div>
+	<div class="page-body__content">
+		<div class="row" [formGroup]="searchGroup">
+			<mat-form-field>
+				<input matInput type="text" placeholder="Search by username" aria-label="Number"
+					formControlName="search">
+			</mat-form-field>
+			<div class="separator"></div>
+      <mat-slide-toggle formControlName="showLockedUser">Show locked users</mat-slide-toggle>
+      <button class="ml-15" type="button" mat-raised-button color="accent" (click)="downloadUser()"
+      [disabled]="searchGroup?.invalid" [spinnerbtn]="isDownload$ | async">Download</button>
+			<button class="ml-15" type="button" mat-raised-button color="accent" (click)="openDialog()"
+			 [disabled]="searchGroup?.invalid">Create user</button>
+		</div>
+		<!-- <go-user-grid></go-user-grid> -->
+		<periscope-table [columns]="headers" [data]="datas$ | async"
+			[rowTemplate]="rowTemplate" [sorted]="true" [isClientPaging]="true" [loading]="loading$ | async"
+			[pageSize]="pageSize" [identifier]="'id'">
+			<ng-template #rowTemplate let-row>
+				<div class="rTableCell" [ngClass]="headers[0].class">
+					<div class="text-truncate">
+						{{row[headers[0].trackBy]}}
+					</div>
+				</div>
+				<div class="rTableCell" [ngClass]="headers[1].class">
+					<div class="text-truncate">
+						{{row[headers[1].trackBy]}}
+					</div>
+				</div>
+				<div class="rTableCell" [ngClass]="headers[2].class">
+					<div class="text-truncate">
+						{{row[headers[2].trackBy]}}
+					</div>
+				</div>
+				<div class="rTableCell" [ngClass]="headers[3].class">
+					<div class="text-truncate">
+						{{row[headers[3].trackBy]}}
+					</div>
+				</div>
+				<div class="rTableCell" [ngClass]="headers[4].class">
+					<div>
+						{{row[headers[4].trackBy]}}
+					</div>
+				</div>
+				<div class="rTableCell" [ngClass]="headers[5].class">
+					<mat-checkbox color="accent"
+						[checked]="row['isEnabled']" (change)="onUpdateStatus($event, row)">
+						{{row['isEnabled'] ? 'Locked': 'Unlocked'}}
+					</mat-checkbox>
+				</div>
+				<div class="rTableCell" [ngClass]="headers[6].class" [innerHTML]="row[headers[6].trackBy]">
+				</div>
+				<div class="rTableCell" [ngClass]="headers[7].class" [innerHTML]="row[headers[7].trackBy]">
+				</div>
+				<div class="rTableCell" [ngClass]="headers[8].class" [innerHTML]="row[headers[8].trackBy]">
+				</div>
+				<div class="rTableCell" [ngClass]="headers[9].class">
+					<button mat-icon-button (click)="openDialog(row['id'])">
+						<mat-icon aria-label="Edit">edit</mat-icon>
+					</button>
+					<button mat-icon-button (click)="openPermissions(row['id'])">
+						<mat-icon aria-label="Permissions">assignment_turned_in</mat-icon>
+          </button>
+          <!--<button mat-icon-button (click)="changePassword(row['id'])" title="Change Password">
+						<mat-icon aria-label="lock" [svgIcon]="'reset-password'"></mat-icon>
+					</button>-->
+				</div>
+			</ng-template>
+		</periscope-table>
+	</div>
+</div>

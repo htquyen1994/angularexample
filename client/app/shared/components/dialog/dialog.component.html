@@ -1,0 +1,24 @@
+<div class="window" role="dialog" [class.wide]="wide" #dialog [ngClass]="styleClass" [ngStyle]="styles">
+  <div class="header" [class.drag-handle]="isDrag" #dragHandle>
+    <ng-container *ngIf="headerTemplate; else NormalHeaderTemplate" [ngTemplateOutlet]="headerTemplate"></ng-container>
+  </div>
+  <div class="content">
+    <ng-content></ng-content>
+  </div>
+  <div class="footer">
+    <div class="title" *ngIf="footerText">
+      <div class="title-wrap">{{footerText}}</div>
+    </div>
+    <ng-content select="[footer]"></ng-content>
+  </div>
+</div>
+<ng-template #NormalHeaderTemplate>
+  <div class="title">
+    <div class="title-wrap">{{title}}</div>
+  </div>
+  <go-info-button *ngIf="instructionsHTML" class="close right instructions">
+    <div [innerHTML]="instructionsHTML"></div>
+  </go-info-button>
+  <go-button *ngIf="iconClose" class="close right" type="icon" icon="close"
+    (clicked)="$event.stopImmediatePropagation();onHide(true)"></go-button>
+</ng-template>

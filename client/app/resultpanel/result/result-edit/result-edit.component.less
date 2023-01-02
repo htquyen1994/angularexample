@@ -1,0 +1,172 @@
+@import 'shared-mixins';
+
+:host {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	background-color: @color-inverted;
+	overflow-y: hidden;
+}
+
+.separator {
+	flex-grow: 1;
+}
+
+.date-input {
+	width: ~"calc(100% - 45px)";
+}
+.toolbar {
+	z-index: 2;
+	height: 41px;
+}
+
+.page {
+	overflow-x: hidden;
+	overflow-y: auto;
+	flex-grow: 1;
+}
+
+.form {
+	padding: 20px;
+	max-width: 1040px;
+}
+form > div:nth-child(1) > div.group-label{
+	margin-top: 0px;
+}
+
+.row {
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+}
+
+.field {
+	width: 250px;
+	padding: 0 10px;
+}
+.field-picklist {
+    display: flex;
+    ps-select {
+      width: 100%;
+    }
+}
+
+.field-textarea {
+	width: 100%;
+}
+
+.group-label {
+	font-weight: 500;
+	background-color: @color-background-stressed;
+	border: 1px solid @color-item-border;
+	padding: 10px;
+	margin-top: 40px;
+}
+
+.cta-wrap {
+	z-index: 1;
+	flex-shrink: 0;
+	box-shadow: 0 -3px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cta-inner {
+	display: flex;
+	justify-content: flex-end;
+	padding: 10px;
+}
+
+.label {
+	padding: 15px 0 2px 0px;
+	display: block;
+}
+
+.error {
+	padding: 5px;
+	color: @color-error;
+}
+
+[required] {
+	border: 1px solid darkgreen;
+}
+
+[disabled] {
+	background-color: rgb(235, 235, 228);
+}
+
+.ng-invalid {
+	border: 1px solid @color-error;
+}
+
+form.ng-invalid {
+	border-width: 0;
+}
+
+
+.text-block {
+	padding-top: 10px;
+	padding-left: 5px;
+	font-weight: 600;
+}
+
+.shape-button {
+	margin: 10px 0 0 10px;
+	width: 200px;
+}
+
+.shape-text {
+	margin: 10px 0 0 10px;
+}
+
+
+.error-message {
+	color: @color-error;
+	padding: 5px 0;
+}
+
+.message-select{
+	padding-left:10px;
+}
+
+
+/* *** */
+.page-content {
+    min-height: 200px
+}
+
+.row-button {
+    display: flex;
+}
+
+
+.separator {
+    flex-grow: 1;
+}
+
+
+.toolbar-title{
+	font-size: 20px;
+	font-weight: 600;
+	margin-left: 10px;
+}
+
+.toolbar-title--sub{
+	font-weight: 400;
+	font-size: 18px;
+}
+.toolbar-edit{
+  height: 41px;
+}
+
+.checkbox {
+	height: 15px;
+	width: 16px;
+	margin: 0 5px;
+	flex-shrink: 0;
+}
+.error-position{
+	position: absolute;
+	left: 800px;
+	white-space: nowrap;
+}

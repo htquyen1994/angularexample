@@ -1,0 +1,91 @@
+@import 'variables';
+@import 'mixins';
+
+ps-tool-panel {
+  .table-tool-panel-bar {
+    display: flex;
+    flex-direction: row-reverse;
+    border: 1px solid #babfc7;
+    position: relative;
+    height: 100%;
+    .table-tool-panel-buttons {
+      width: 30px;
+      position: relative;
+      overflow: hidden;
+      padding: 5px 10px;
+      .table-tool-panel-button {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 500;
+        user-select: none;
+        padding: 3px 10px;
+        &:hover {
+          color: @primary-color;
+        }
+        &[aria-selected='true'] {
+          box-shadow: -5px 0 0px 0px @primary-color;
+          opacity: 1;
+        }
+
+        // &[aria-disabled="true"] {
+        //     color: @color-disabled;
+        //     cursor: unset;
+        // }
+        .table-tool-panel-button-label{
+            writing-mode: vertical-lr;
+        }
+      }
+    }
+    .table-tool-panel-wrapper {
+        border-right: 1px solid #babfc7;
+        overflow-y: auto;
+        overflow-x: hidden;
+        cursor: default;
+        width: 200px;
+        &[aria-active='true']{
+            display: flex;
+        }
+        &[aria-active='false']{
+            display: none;
+        }
+        .table-tool-panel{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow: auto;
+            .table-tool-panel-searchbox{
+                display: flex;
+                border-bottom: 1px solid #babfc7;
+                min-height: 40px;
+            }
+            .table-tool-panel-content{
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                height: 100%;
+            }
+            .table-tool-panel-row{
+                display: flex;
+                flex-direction: row;
+                padding: 5px;
+                align-items: center;
+                .table-tool-panel-collapse{
+                    flex: 0 0 auto;
+                }
+                .table-tool-panel-checkbox{
+                    flex: 0 0 auto;
+                }
+                .table-tool-panel-label{
+                    flex: 1 1 auto;
+                    padding: 0px 10px;
+                    & input{
+                        border: 1px solid #babfc7;
+                        padding: 5px;
+                    }
+                }
+            }
+        }
+    }
+  }
+}

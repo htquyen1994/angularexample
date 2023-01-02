@@ -1,0 +1,40 @@
+<go-spinner class="spinner" *ngIf="(loading$ | async) || (insightViewLoading$ | async)"></go-spinner>
+<go-error-message class="row" *ngIf="error$ | async" [error]="error$ | async"></go-error-message>
+<div class="row" [formGroup]="formGroup">
+  <div class="row-label">View:</div>
+  <ps-select class="select view-select" [options]="selectViewOptions$ | async" formControlName="selectedView"
+    [placeholder]="'Select a view'" [appendTo]="'body'">
+  </ps-select>
+  <div class="divider"></div>
+  <go-button-group>
+    <go-button [disabled]="disableEdit$ |async" type="icon" icon="copy" size="small"  title="Copy View" class="icon-small" (clicked)="onViewActionClick('copy')">
+    </go-button>
+    <go-button [disabled]="disableEdit$ |async" type="icon" icon="small-edit" title="Edit View" class="icon-small" (clicked)="onViewActionClick('edit')">
+    </go-button>
+    <go-button [disabled]="disableEdit$ |async" type="icon" icon="small-delete" title="Delete View" class="icon-small" (clicked)="onViewActionClick('delete')">
+    </go-button>
+    <go-button [disabled]="disableEdit$ |async" title="Share view" type="icon" icon="layer-share" size="small" class="icon-small" (clicked)="onViewActionClick('share')">
+    </go-button>
+  </go-button-group>
+</div>
+<div class="row">
+  <go-button-group class="group-separator" *ngIf="!hideAddInsightView">
+    <go-button class="button-block-width" button-raised title="New view" (clicked)="onViewActionClick('add')">
+      New View
+    </go-button>
+  </go-button-group>
+  <div class="divider"></div>
+  <ng-container *ngIf="!(loading$ | async); else CancelButton">
+    <go-button class="button-block-width" button-raised title="Run Insight" icon="playrun" (clicked)="onRun()"
+    [disabled]="(selectedShapes$ | async) < 1 || (selectedShapes$ | async) > 5 || formGroup?.invalid">Run</go-button>
+  </ng-container>
+  <ng-template #CancelButton>
+    <go-button-group>
+      <go-button class="button-block-width" button-toolbar title="Cancel Insight" icon="cancel" (clicked)="onCancel()">Cancel</go-button>
+    </go-button-group>
+  </ng-template>
+</div>
+<div class="text-info">
+  <small *ngIf="(selectedShapes$ | async) < 6">Select or draw a shape to run Insight</small>
+  <small class="error" *ngIf="(selectedShapes$ | async) > 5">A maximum of 5 shapes is supported in this version</small>
+</div>

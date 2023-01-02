@@ -1,0 +1,115 @@
+go-reference-data {
+  periscope-table{
+    .rTable-container {
+      flex-direction: row-reverse;
+    }
+  }
+  ps-tool-panel {
+    .table-tool-panel-bar {
+      flex-direction: row;
+    }
+    .table-tool-panel-bar {
+      .table-tool-panel-buttons .table-tool-panel-button {
+        transform: rotate(180deg);
+        box-shadow: -5px 0px 0px 0px #3a4766;
+      }
+      .table-tool-panel-wrapper{
+        border-left: 1px solid #babfc7;
+        border-right: unset;
+      }
+    }
+  }
+  .header-container {
+    display: flex;
+    position: relative;
+  }
+  .tenants_wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .w-10--fixed {
+    min-width: 10px;
+    width: 10px;
+    &.tenant-access {
+      padding: 5px 10px;
+    }
+  }
+
+  .w-20--fixed {
+    min-width: 20px;
+    width: 20px;
+  }
+
+  .w-50--fixed {
+    min-width: 50px;
+    width: 50px;
+  }
+
+  .w-100--fixed {
+    min-width: 100px;
+    width: 100px;
+  }
+
+  .w-150--fixed {
+    min-width: 150px;
+    width: 150px;
+  }
+
+  .w-200--fixed {
+    min-width: 200px;
+    width: 200px;
+  }
+
+  .w-250--fixed {
+    min-width: 250px;
+    width: 250px;
+  }
+
+  .tenant-display {
+    writing-mode: vertical-rl;
+    min-height: 150px;
+    max-height: 150px;
+    font-size: 12px;
+  }
+
+  .yes {
+    color: green;
+    font-weight: bolder;
+  }
+
+  .no {
+    color: rgb(191, 191, 191);
+    /*font-weight: bolder;*/
+  }
+
+  periscope-table {
+    .rTable {
+      overflow: hidden;
+
+      .table-content {
+        max-height: calc(100vh - 462px);
+      }
+
+      .header {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+
+        .header-wrapper {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+
+      .header-wrapper {
+        &:not(:last-child) {
+          .rTableHeading {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

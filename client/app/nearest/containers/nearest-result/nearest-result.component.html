@@ -1,0 +1,14 @@
+<ps-nearest-tool-bar
+  [canDownload]="results$ | async"
+  [loading]="downloading$ | async"
+  (download)="onDownload()"
+  (zoomAll)="onZoomAll()"
+></ps-nearest-tool-bar>
+
+<ps-nearest-list
+  [isMetric]="isMetric$ | async"
+  [columns]="columns$ | async"
+  [results]="results$ | async"
+  (selected)="onSelected($event)"
+  (unSelected)="onUnSelected($event)"
+></ps-nearest-list>

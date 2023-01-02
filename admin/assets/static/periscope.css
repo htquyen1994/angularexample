@@ -1,0 +1,157 @@
+﻿
+
+body {
+    color: #3a4766; /* 100% Blue */
+    font-family: 'Source Sans Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: column;
+}
+
+a, a:hover {
+    color: #f1941c;
+    text-decoration: none;
+}
+
+.navbar-inverse {
+    background-color: #3a4766; /* 100% Blue */
+    border-color: #3a4766; /* 100% Blue */
+}
+
+    .navbar-inverse .navbar-brand {
+        margin-left: 100px;
+        color: #e5edf4; /* 10% Blue */
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        font-size: 22px;
+    }
+
+        .navbar-inverse .navbar-brand:hover, .navbar-inverse .navbar-brand:focus {
+            color: #e5edf4; /* 10% Blue */
+        }
+
+.panel, .alert {
+    border-radius: 0;
+}
+
+.panel-no-border {
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+}
+
+.panel-title {
+    font-size: 18px;
+    text-align: center;
+}
+
+.panel-default > .panel-heading.panel-heading-no-background {
+    color: #3a4766; /* 100% Blue */
+    background-color: transparent;
+    border-color: #8ac54b; /* 100% Orange */
+    padding: 0 0 3px 0;
+}
+
+.panel-body-full-width {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.form-control {
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    transition: none;
+}
+
+    .form-control:focus {
+        outline: 0;
+        border-color: #3a4766;
+    }
+
+#loginbutton, #resetPasswordButton, #gobackButton {
+    margin-top: 20px;
+    color: #FFF;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    width: 100%;
+    background: linear-gradient(to bottom, #3a4766 0%, #2A3554 100%);
+    border: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -moz-transition: all 0.2s;
+    -webkit-transition: all 0.2s;
+    transition: all 0.2s;
+}
+
+.login-page .login-remember {
+    padding-left: 0;
+}
+
+.form-group label {
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.newgrove-logo {
+    background-color: #3a4766;
+    width: 100%;
+    padding: 15px;
+}
+
+    .newgrove-logo img {
+        height: 30px;
+    }
+
+.password-list {
+    color: #333;
+}
+
+    .password-list ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+    .password-list li {
+        padding-left: 0;
+        /*text-indent: -.7em;*/
+    }
+
+        .password-list li:before {
+            content: "• ";
+            font-size: 16px;
+        }
+
+.custom-html-widget a {
+    text-decoration: none;
+    color: #FFF !important;
+}
+
+
+.login-page .list-unstyled {
+    margin-left: 0;
+}
+
+.additional-page-link-list {
+    margin-bottom: 0;
+}
+
+.login-page .list-unstyled li:last-child {
+    margin-bottom: 0;
+}
+
+input:-webkit-autofill {
+    background-color: transparent;
+}
+
+[ng-cloak] {
+    display: none !important;
+}

@@ -1,0 +1,15 @@
+<go-toolbar class="toolbar">
+  <go-button-group>
+    <go-button button-toolbar  title="Zoom All"
+      (clicked)="onZoomAll()" >
+      Zoom All
+    </go-button>
+  </go-button-group>
+  <div class="group-push"></div>
+  <go-button-group>
+    <go-button button-raised [disabled]="!canDownload" title="Download records"
+      (clicked)="onDownload()" [spinnerbtn]="loading">
+      Download
+    </go-button>
+  </go-button-group>
+</go-toolbar>

@@ -1,0 +1,34 @@
+@import 'shared-mixins';
+ps-report-location-form{
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    .warning{
+        background-color: @color-warning;
+        white-space: break-spaces;
+        padding: 5px;
+        margin: 0 -5px;
+        .mat-icon {
+            width: 16px;
+            height: 16px;
+        }
+    }
+    .form {
+        padding-top: 10px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        .form-control{
+            display: flex;
+            align-items: center;
+            width: 100%;
+            label, input{
+                flex: 1 1;
+            }
+        }
+    }
+    .actions{
+        padding-top: 10px;
+    }
+}

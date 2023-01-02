@@ -1,0 +1,19 @@
+<button mat-icon-button mat-dialog-close>
+	<mat-icon>close</mat-icon>
+</button>
+
+<h1 mat-dialog-title>Delete Cache - <b>Selected layers</b></h1>
+
+<form class="position-relative" mat-dialog-content [formGroup]="form">
+  <go-periscope-dropdown *ngIf="zoomLevels?.length" [options]="zoomLevels" placeholder="Select Zoom Level"
+  formControlName="zoomLevel" width="100%" multiple="true"></go-periscope-dropdown>
+  <go-periscope-dropdown *ngIf="zoomLevels_clustered?.length" [options]="zoomLevels_clustered" placeholder="Select Zoom Level (Clustered)"
+  formControlName="zoomLevel_clustered" width="100%" multiple="true"></go-periscope-dropdown>
+</form>
+
+<div mat-dialog-actions>
+	<div class="separator"></div>
+	<button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
+    <button mat-raised-button [disabled]="form.invalid" (click)="onSubmit()" color="accent" [spinnerbtn]="loading$ | async">Submit
+    </button>
+</div>

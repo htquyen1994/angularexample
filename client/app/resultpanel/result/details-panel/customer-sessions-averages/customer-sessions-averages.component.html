@@ -1,0 +1,17 @@
+<div class="customer-sessions-warper" *ngIf="(loading$ | async) || (data$ | async)?.length">
+    <div class="customer-sessions-table">
+        <periscope-table [loading]="loading$ | async" [data]="data$ | async" [rowTemplate]="rowTemplate">
+            <ng-template #rowTemplate let-row>
+                <div class="rTableCell" [ngClass]="'w-50 col-title'">
+                    {{row['title'] }}
+                </div>
+                <div class="rTableCell" [ngClass]="'w-50 col-content'">
+                    {{row['numSessions'] }}
+                </div>
+            </ng-template>
+        </periscope-table>
+    </div>
+</div>
+<div class="empty" *ngIf="!(loading$ | async) && !(data$ | async)?.length">
+    No customer sessions averages available for this branch.
+</div>

@@ -1,0 +1,56 @@
+<div class="container">
+    <p>Opening hours for <b>{{data?.name}}</b> are:</p>
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="align-left">Day</th>
+                    <th class="align-left">Open</th>
+                    <th class="align-left">Lunch Start</th>
+                    <th class="align-left">Lunch End</th>
+                    <th class="align-left">Close</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let row of data?.datas">
+                    <tr>
+                        <td class="align-left">{{row['Day']}}</td>
+                        <td class="align-left">{{row['Open'] | date: 'H:mm' }}</td>
+                        <td class="align-left">{{row['LunchStart'] | date: 'H:mm' }}</td>
+                        <td class="align-left">{{row['LunchEnd'] | date: 'H:mm'}}</td>
+                        <td class="align-left">{{row['Close'] | date: 'H:mm' }}</td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <p>Total hours open for <b>{{data?.name}}</b>: {{data?.hours}}</p>
+    <!--<p *ngIf="!data?.payStationDatas?.length">Paystation Hours currently unavailable for this branch.</p>-->
+</div>
+<!--<div class="container" *ngIf="data?.payStationDatas?.length">
+    <p>Paystation opening hours for <b>{{data?.name}}</b> are:</p>
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>AM From</th>
+                    <th>AM To</th>
+                    <th>PM From</th>
+                    <th>PM To</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let row of data?.payStationDatas">
+                    <tr>
+                        <td class="align-left">{{row['Day']}}</td>
+                        <td>{{row['AM_TIME_FROM'] | date: 'H:mm' }}</td>
+                        <td>{{row['AM_TIME_TO'] | date: 'H:mm'}}</td>
+                        <td>{{row['PM_TIME_FROM'] | date: 'H:mm'}}</td>
+                        <td>{{row['PM_TIME_TO'] | date: 'H:mm' }}</td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>-->

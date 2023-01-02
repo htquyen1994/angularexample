@@ -1,0 +1,159 @@
+@import "shared-mixins";
+
+:host {
+	display: inline-block;
+	width: 100%;
+	max-width: 434px;
+	height: 70px;
+	margin: 0px 10px 0px 20px;
+	position: relative;
+	text-align: left;
+	border: none;
+	&.disabled {
+		background-color: transparent;
+	}
+	&.loading {
+		background-color: transparent;
+	}
+}
+
+.handle {
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	cursor: ew-resize;
+	background: rgba(27, 75, 149, 0.50);
+	border-radius: 50%;
+	box-sizing: border-box;
+	z-index: 2;
+	top: -9px;
+	margin-left: -12px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	&:before {
+		content: '';
+		display: block;
+		height: 6px;
+		width: 6px;
+		background-color: @color-inverted;
+		border-radius: 50%;
+		user-select: none;
+	}
+	&.handle-active {
+		background-color: @color-secondary;
+	}
+}
+
+.handle-value {
+	background-color: rgba(0, 0, 0, 0.1);
+	position: absolute;
+	top: -24px;
+	padding: 2px;
+	user-select: none;
+	border-radius: 4px;
+	&.handle-value-right {
+		left: 8px;
+	}
+	&.handle-value-left {
+		right: 8px;
+	}
+}
+
+.range {
+	position: absolute;
+	z-index: 1;
+	font-size: .7em;
+	display: block;
+	border: 0;
+	background: rgba(27, 75, 149, 0.50);
+	border-radius: 3px;
+	top: 0;
+	height: 100%;
+	user-select: none;
+}
+
+.histogram {
+	display: flex;
+	align-items: flex-end;
+	height: 50px;
+	width: 100%;
+	bottom: 3px;
+	user-select: none;
+}
+
+.histogram-step {
+	flex-grow: 1;
+	background-color: rgba(27, 75, 149, 0.20);
+}
+.histogram-svg {
+	fill: rgba(27, 75, 149, 0.20);
+}
+.position() {
+	position: absolute;
+	top: 20px;
+	background-color: #fff;
+	user-select: none;
+}
+
+.position-min {
+	.position();
+	left: 0;
+}
+
+.value-min {
+	position: absolute;
+	bottom: 5px;
+	left: 5px;
+	user-select: none;
+}
+
+.value-max {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	user-select: none;
+}
+
+.position-max {
+	.position();
+	right: 0;
+}
+
+.input() {
+	width: 75px;
+	height: 25px;
+}
+
+.input-min {
+	.input();
+}
+
+.input-max {
+	.input();
+}
+.info {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 5px;
+}
+.info-text{
+	font-size: 13px;
+	&.info-text-min{
+		position: absolute;
+		bottom: 20px;
+		left: 5px;
+		user-select: none;
+	}
+	&.info-text-max{
+		position: absolute;
+		bottom: 20px;
+		right: 5px;
+		user-select: none;
+	}
+}
+.loading-block{
+	display: flex;
+	height: 100%;
+	align-items: center;
+}

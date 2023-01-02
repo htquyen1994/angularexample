@@ -1,0 +1,28 @@
+<go-dialog [title]="'Crime Statistic'" #dialog (close)="onDialogClose()" isDrag="true" [position]="innitPosition">
+  <div class="warning">
+    <ng-container *ngIf="!shapeRef">
+      Click on the map to get crime statistic
+    </ng-container>
+    <ng-container *ngIf="shapeRef">
+      Move <mat-icon svgIcon="map-plus"></mat-icon> on the map to refresh crime statistic
+    </ng-container>
+  </div>
+  <div class="info-text" *ngIf="location">
+    <div> Lat/Lng:
+      ({{location?.lat | dynamicPipe : 'number': ['1.2-2']}}, {{location?.lng | dynamicPipe : 'number': ['1.2-2']}})</div>
+    <div class="group-push"></div>
+    <go-button type="icon" icon="refresh" title="Refresh" (clicked)="onRefresh()">
+    </go-button>
+    <go-button type="icon" icon="locate" title="Locate location" (clicked)="onLocate()">
+    </go-button>
+  </div>
+  <periscope-table class="row" [columns]="crimeStatisticsHeaders" [loading]="loading$ | async" [data]="(data$ | async)"
+    [rowTemplate]="rowTemplateStatisticData">
+    <ng-template #rowTemplateStatisticData let-row>
+      <ng-container *ngFor="let header of crimeStatisticsHeaders">
+        <div class="rTableCell" [ngClass]="header.class" [innerText]="row[header.trackBy]">
+        </div>
+      </ng-container>
+    </ng-template>
+  </periscope-table>
+</go-dialog>

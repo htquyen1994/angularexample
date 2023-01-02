@@ -1,0 +1,42 @@
+@import "variables";
+@import "mixins";
+
+ps-tabview {
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    .tabs {
+        display: flex;
+        flex-shrink: 0;
+        position: relative;
+        opacity: 0.87;
+    }
+
+    .tabs-item {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 500;
+        user-select: none;
+        padding: 3px 10px;
+
+        &[aria-selected="true"] {
+            box-shadow: 0px 5px 0px 0px @primary-color;
+            opacity: 1;
+        }
+
+        &[aria-disabled="true"] {
+            color: @color-disabled;
+            cursor: unset;
+        }
+    }
+
+    .content-wrapper {
+        margin-top: 10px;
+        overflow: auto;
+    }
+}

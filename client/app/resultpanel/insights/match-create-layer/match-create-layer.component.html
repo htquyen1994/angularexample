@@ -1,0 +1,33 @@
+<go-dialog [title]="title" #saveMatchDialog (close)="onDialogClose()" isDrag="true">
+    <ng-template [ngIf]="saveMatchForm">
+      <div class="row" *ngIf="saveMatchFormError">
+          <go-error-message [error]="saveMatchFormError"></go-error-message>
+      </div>
+      <form [formGroup]="saveMatchForm">
+        <go-spinner *ngIf="matchFormLoading" class="spinner"></go-spinner>
+        <div class="row">
+          <label class="label">Layer Name *</label>
+          <input type="text" class="input" formControlName="layerName" (keyup.enter)="onComplete()">
+          <div class="error-message" *ngIf="!saveMatchForm.controls['layerName'].valid && saveMatchForm.controls['layerName'].dirty && saveMatchForm?.controls['layerName']?.errors['maxlength']">
+            <p>Name can not be longer than 40 characters</p>
+          </div>
+        </div>
+        <div class="row" *ngIf="groupId">
+          <label>Layer Group *</label>
+          <ps-select [styleClass]="'ps-select'" [options]="groupOptions" formControlName="groupId"
+            [placeholder]="'Select a layer'" [appendTo]="'body'">
+          </ps-select>
+        </div>
+        <div class="row" *ngIf="description">
+          <label>Description</label>
+          <textarea name="layerDescription" formControlName="description"></textarea>
+        </div>
+        <div class="row d-flex">
+          <div class="divider"></div>
+          <go-button button-raised (clicked)="onCreateMatchLayer()" [disabled]="matchFormLoading || saveMatchForm.invalid">
+            Create Layer
+          </go-button>
+        </div>
+      </form>
+    </ng-template>
+  </go-dialog>

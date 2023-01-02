@@ -1,0 +1,18 @@
+
+<ps-outreach-services [loading]="loading$ | async" [data]="outreachServicesData$ | async" [headers]="headers" #outreachService>
+  <div class="groups-container">
+    <div class="group-content">
+      <div class="group-detail">
+        <div class="detail-title">
+            Nearest Locations by:
+        </div>
+        <div class="detail-text">
+          <ps-select class="select" [options]="options$ | async" [(ngModel)]="selectedFilter" (ngModelChange)="onSelectedFilter($event)"
+            [placeholder]="'Select a type'" [appendTo]="'body'">
+          </ps-select>
+          <!-- <mat-spinner class="ml-15" *ngIf="loading$ | async" color="primary"  strokeWidth="3" diameter="24"></mat-spinner> -->
+        </div>
+    </div>
+    </div>
+  </div>
+</ps-outreach-services>

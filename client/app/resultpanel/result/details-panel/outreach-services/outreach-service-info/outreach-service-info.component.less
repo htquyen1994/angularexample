@@ -1,0 +1,38 @@
+ps-outreach-service-info {
+  .info-container {
+    height: 100%;
+    position: relative;
+    .tool-bar {
+      display: flex;
+      padding-bottom: 7px;
+      go-button {
+        &[button-toolbar] {
+          &[type='icon'] {
+            width: 45px;
+          }
+        }
+      }
+    }
+    .info-container--routes {
+      overflow: auto;
+      height: calc(100% - 37px);
+    }
+  }
+  .info-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    .info-row {
+      padding-bottom: 10px;
+      padding-top: 10px;
+    }
+    .info-title {
+      color: #000000;
+      font-weight: bold;
+    }
+  }
+  .line {
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}

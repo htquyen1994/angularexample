@@ -1,0 +1,62 @@
+@import "shared-mixins";
+
+go-page {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	width: 100vw;
+
+	.profile-button {
+		margin-left: auto;
+  }
+  .logo {
+    display: block;
+    height: 20px;
+    width: 20px;
+    margin: 0 10px 0 10px;
+    background-image: url(/admin/assets/logo.png);
+    background-size: 16px;
+    background-repeat: no-repeat;
+  }
+  .logo-header{
+    display: flex;
+    align-items: center;
+  }
+}
+
+.mat-toolbar {
+	box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
+	z-index: 2;
+}
+
+.mat-toolbar-row {
+	justify-content: space-between;
+	background: @color-primary url(/admin/assets/logo.svg) center no-repeat;
+	background-size: auto 26px;
+}
+
+/* side nav */
+.mat-sidenav {
+	width: 250px;
+	padding: 10px;
+}
+
+.mat-list-item {
+	cursor: pointer;
+	border-radius: 3px;
+	&[aria-active=true] {
+		background-color: @color-inverted;
+	}
+	&:hover {
+		background-color: @color-inverted;
+	}
+}
+
+.mat-drawer {
+	background-color: #fafafa;
+	flex-grow: 1;
+}
+
+.mat-sidenav-container {
+	flex: 1;
+}

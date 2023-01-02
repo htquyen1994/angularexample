@@ -1,0 +1,27 @@
+<div class="spinner" *ngIf="!withoutWrapper; else WithoutWrapper">
+  <ng-container [ngTemplateOutlet]="TypeOfSpinner"></ng-container>
+</div>
+<ng-template #WithoutWrapper>
+  <ng-container [ngTemplateOutlet]="TypeOfSpinner"></ng-container>
+</ng-template>
+<ng-template #TypeOfSpinner>
+  <ng-container [ngSwitch]="type">
+    <ng-container *ngSwitchCase="SpinnerType.ELLIPSIS">
+      <ng-container [ngTemplateOutlet]="ELLIPSIS"></ng-container>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <ng-container [ngTemplateOutlet]="CIRCLE"></ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+<ng-template #CIRCLE>
+  <mat-spinner color="primary" strokeWidth="3" [diameter]="diameter"></mat-spinner>
+</ng-template>
+<ng-template #ELLIPSIS>
+  <div class="lds-ellipsis">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+</ng-template>

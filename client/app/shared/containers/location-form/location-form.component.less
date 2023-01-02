@@ -1,0 +1,31 @@
+@import 'shared-mixins';
+
+go-location-form {
+	display: flex;
+	flex-direction: column;
+	padding: 10px 0;
+	min-width: 200px;
+	background-color: @color-inverted;
+  #homelocation {
+    width: unset;
+    padding-right: 10px;
+  }
+  .edit-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+  }
+
+  .edit-input {
+    display: flex;
+    padding: 0 5px;
+    border: 1px solid @color-input-border;
+    border-radius: 2px;
+    line-height: @hitarea-size - 2;
+    width: 100%;
+  }
+
+  .separator {
+    flex-grow: 1;
+  }
+}

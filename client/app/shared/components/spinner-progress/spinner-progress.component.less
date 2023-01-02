@@ -1,0 +1,22 @@
+
+@import 'shared-mixins';
+
+.percentage
+{
+	position: relative;
+	top: -26px;
+	left: 10px;
+	color: @color-primary;
+	font-weight: 400;
+	font-size: 12px;
+}
+
+:host::ng-deep .mat-progress-spinner circle
+{
+	fill: rgba(255, 255, 255, 0.75) !important;
+}
+
+.spinner {
+	position: absolute;
+  z-index: 999;
+}

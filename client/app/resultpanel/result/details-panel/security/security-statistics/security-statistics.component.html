@@ -1,0 +1,30 @@
+<!-- <div class="security-statistics-total"><b>Total score:</b> {{(data$ | async)?.totalScore}}</div> -->
+<div class="security-statistics-content">
+  <periscope-table [columns]="crimeStatisticsHeaders" [loading]="loading$ | async"
+    [data]="(data$ | async)?.crimeStatistics" [rowTemplate]="rowTemplate">
+    <ng-template #rowTemplate let-row>
+      <ng-container *ngFor="let header of crimeStatisticsHeaders">
+        <div class="rTableCell" [ngClass]="header.class" [innerText]="row[header.trackBy]">
+        </div>
+      </ng-container>
+    </ng-template>
+  </periscope-table>
+  <div class="group-separator"></div>
+  <periscope-table class="" [columns]="calculatedDataHeaders" [loading]="loading$ | async"
+    [data]="(data$ | async)?.calculatedData" [rowTemplate]="rowTemplateCalculatedData">
+    <ng-container *goTableFooter>
+      <div class="rTableFoot">
+        <div class="rTableCell" [ngClass]="calculatedDataHeaders[0].class">
+          Total score:
+        </div>
+        <div class="rTableCell w-45">{{(data$ | async)?.totalScore}}</div>
+      </div>
+    </ng-container>
+    <ng-template #rowTemplateCalculatedData let-row>
+      <ng-container *ngFor="let header of calculatedDataHeaders">
+        <div class="rTableCell" [ngClass]="header.class" [innerText]="row[header.trackBy]">
+        </div>
+      </ng-container>
+    </ng-template>
+  </periscope-table>
+</div>

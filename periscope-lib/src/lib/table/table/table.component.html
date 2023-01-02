@@ -1,0 +1,146 @@
+<div class="rTable-container">
+  <ng-container *ngTemplateOutlet="rTable"></ng-container>
+  <ng-container *ngIf="!!goToolPanelTemplate; then toolPanelTemplate; else panelTool"></ng-container>
+  <ng-template #toolPanelTemplate>
+    <ng-container [ngTemplateOutlet]="goToolPanelTemplate"></ng-container>
+  </ng-template>
+  <ng-template #panelTool>
+    <ps-tool-panel *ngIf="columnTool && toolPanelColumns.length" [columns]="toolPanelColumns"></ps-tool-panel>
+  </ng-template>
+</div>
+<ng-container *ngTemplateOutlet="paginator"></ng-container>
+<ng-template #rTable>
+  <div class="rTable" [class.show-scroll]="isShowingScroll">
+    <ng-container *ngIf="!goHeaderTemplate; then headerItemTemplate; else headersTemplate"></ng-container>
+
+    <ng-template #headerItemTemplate>
+      <div class="rTableHeading" [ngStyle]="headerStyles">
+
+        <ng-container *ngIf="!headerTemplate; else headerCustomTemplate">
+          <ng-container *ngFor="let header of columns; trackBy: trackByIndex">
+            <div class="rTableHead" [class.pointer]="sorted" [ngClass]="header.class" (click)="onSort(header)">
+              {{header.name}}
+              <div class="sort" *ngIf="sorted">
+                <label class="desc" *ngIf="header.sort === 'ASC'" (click)="onSort(header)"></label>
+                <label class="asc" *ngIf="header.sort === 'DESC'" (click)="onSort(header)"></label>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-template #headerCustomTemplate>
+          <ng-container *ngFor="let header of columns; trackBy: trackByIndex">
+            <div class="rTableHead" [class.pointer]="sorted" [ngClass]="header.class">
+              <ng-container [ngTemplateOutlet]="headerTemplate" [ngTemplateOutletContext]="{ $implicit: header }">
+              </ng-container>
+            </div>
+          </ng-container>
+        </ng-template>
+      </div>
+    </ng-template>
+
+    <ng-template #headersTemplate>
+      <div class="header" [style.left.px]="scrollLeft">
+        <ng-container [ngTemplateOutlet]="goHeaderTemplate"></ng-container>
+      </div>
+    </ng-template>
+
+    <ng-container
+      *ngIf="(rowTemplate || rowTemplate_withoutWrapper) && data; then rowsNormalTemplate; else rowsTemplate">
+    </ng-container>
+
+    <ng-template #rowsNormalTemplate>
+      <ng-container *ngIf="(data$ | async).length > 0; then rowItemTemplate; else emptyRowTemplate"></ng-container>
+    </ng-template>
+
+    <ng-template #rowItemTemplate>
+      <div class="table-content" #tableContent [ngStyle]="tableStyles" (scroll)="onScroll($event.target.scrollLeft)">
+        <ng-container *ngIf="isGroup; else normalTemplate">
+          <ng-container *ngFor="let group of data$ | async; trackBy: trackByIndex; let groupIndex = index">
+            <div class="rTableRow" (click)="group.expandGroup && onClickGroup(group)">
+              <div class="rTableCell w-100" [ngStyle]="groupStyles">
+                <ng-container [ngTemplateOutlet]="groupTemplate" [ngTemplateOutletContext]="{ $implicit: group }">
+                </ng-container>
+                <ng-container *ngIf="group.expandGroup">
+                  <label class="pointer" [ngClass]="{ asc: group.collapse, desc: !group.collapse }"
+                    (click)="onClickGroup(group)"></label>
+                </ng-container>
+              </div>
+            </div>
+            <ng-container *ngIf="!group.collapse">
+              <ng-container *ngFor="let child of group.children; trackBy: trackByIndex; let childIndex = index">
+                <ng-container *ngIf="rowTemplate_withoutWrapper; else rowTemplate_wrapper">
+                  <ng-container [ngTemplateOutlet]="rowTemplate_withoutWrapper" [ngTemplateOutletContext]="{
+                    $implicit: child,
+                    rowIndex: childIndex,
+                    groupLength: group.children.length
+                  }"></ng-container>
+                </ng-container>
+                <ng-template #rowTemplate_wrapper>
+                  <div class="rTableRow"
+                    [ngClass]="{'inactive':inactive ? child[inactive]: false, 'hover': mouseHover,'selected': selected ? child[selected] : false}"
+                    (click)="onRowSelect(child, childIndex, group ,groupIndex)">
+                    <ng-container [ngTemplateOutlet]="rowTemplate" [ngTemplateOutletContext]="{
+                        $implicit: child,
+                        rowIndex: childIndex,
+                        groupLength: group.children.length
+                      }"></ng-container>
+                  </div>
+                </ng-template>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+
+        <ng-template #normalTemplate>
+          <ng-container
+            *ngFor="let row of data$ | async; trackBy: identifier? trackByIdentifierColumn.bind(this, identifier): trackByIndex; let k = index">
+            <ng-container *ngIf="rowTemplate_withoutWrapper; else rowTemplate_wrapper">
+              <ng-container [ngTemplateOutlet]="rowTemplate_withoutWrapper"
+                [ngTemplateOutletContext]="{ $implicit: row, rowIndex: k }">
+              </ng-container>
+            </ng-container>
+            <ng-template #rowTemplate_wrapper>
+              <div class="rTableRow"
+                [ngClass]="{'inactive': row[inactive], 'hover': mouseHover, 'selected': row[selected]}"
+                (click)="onRowSelect(row, k)">
+                <ng-container [ngTemplateOutlet]="rowTemplate"
+                  [ngTemplateOutletContext]="{ $implicit: row, rowIndex: k }">
+                </ng-container>
+              </div>
+            </ng-template>
+          </ng-container>
+        </ng-template>
+
+      </div>
+    </ng-template>
+
+    <ng-template #rowsTemplate>
+      <ng-container [ngTemplateOutlet]="goTableRowTemplate"></ng-container>
+    </ng-template>
+
+    <ng-container *ngIf="goFooterTemplate" >
+      <div class="footer" [style.left.px]="scrollLeft">
+        <ng-container [ngTemplateOutlet]="goFooterTemplate"></ng-container>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyRowTemplate>
+      <div class="table-content" [ngStyle]="tableStyles">
+        <div class="rTableRow w-100 empty-row">
+          <div class="rTableCell w-100 align-center">
+            No data available in table
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <go-spinner *ngIf="loading$ | async"></go-spinner>
+    <div class="overlay" *ngIf="loading$ | async"></div>
+  </div>
+</ng-template>
+<ng-template #paginator>
+  <div class="paginator" *ngIf="isClientPaging" #paginator>
+    <periscope-paginator [page]="page$ | async" [total]="totalPage$ | async" [pageSize]="pageSize"
+      (pageChange)="pageChange($event)"></periscope-paginator>
+  </div>
+</ng-template>

@@ -1,0 +1,29 @@
+<div class="groups-container">
+  <div class="group-content">
+    <ng-template ngFor let-detail [ngForOf]="data?.details">
+      <div class="group-detail">
+        <div class="detail-title">
+          {{detail?.name}}
+        </div>
+        <div class="detail-text">
+          <ng-container *ngIf="detail.isArray; else notArray">
+            <ul>
+              <li *ngFor="let item of detail?.value">
+                {{item}}
+              </li>
+            </ul>
+          </ng-container>
+          <ng-template #notArray>
+            <ng-template [ngIf]="detail.formatPipe && detail.format">
+              {{detail?.value | dynamicPipe:detail.formatPipe:detail.format}}
+            </ng-template>
+            <ng-template [ngIf]="!(detail.formatPipe && detail.format)">
+              {{detail?.value}}
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+

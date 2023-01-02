@@ -1,0 +1,15 @@
+<div class="label-container" role="tablist">
+	<a class="logo" href="https://newgrove.com/" target="_blank"></a>
+    <a (click)="onLabel(2)" class="label" [attr.aria-selected]="activeTab===2">Layers</a>
+    <a (click)="onLabel(1)" class="label" [attr.aria-selected]="activeTab===1">Places</a>
+    <div class="label-separator"></div>
+    <go-button class="toggle-button" type="icon" icon="expand-left" (clicked)="onToggle()"></go-button>
+</div>
+<div class="content-container" [attr.active]="activeTab">
+    <go-places></go-places>
+    <go-layers></go-layers>
+</div>
+<div class="copyright">
+  <div class="copyright-c">{{copyrightLevel1}}</div>
+  <div class="copyright-c">{{copyrightLevel2}}</div>
+</div>

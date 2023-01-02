@@ -1,0 +1,33 @@
+@import 'shared-mixins';
+
+ps-button-group-column {
+  z-index: 1;
+  go-button-group {
+    .shadow-overlay();
+    display: flex;
+    flex-direction: column !important;
+    border-radius: 2px;
+    background-color: @color-inverted-transparent;
+    margin-bottom: 10px;
+    &.groups-container{
+      background-color: unset;
+      align-items: flex-start;
+    }
+  }
+  go-button{
+    &[type=icon]{
+      &[aria-disabled=true] {
+        background-color: unset;
+        color: #9a9a9a;
+      }
+      &.expand-more-button{
+        height: 16px;
+        border-top: 1px solid #9a9a9a;
+      }
+    }
+    &[type=icon]:hover {
+      background-color: @color-primary-hover;
+      box-shadow: 0px 0px 2px 2px @color-primary-hover;
+    }
+  }
+}

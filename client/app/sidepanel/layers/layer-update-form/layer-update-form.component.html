@@ -1,0 +1,28 @@
+<go-dialog title="Update Layer '{{layer.name}}'" (close)="onClose($event)" #dialog isDrag="true">
+	<go-spinner *ngIf="isLoading"></go-spinner>
+	<div class="page">
+		<form [formGroup]="form">
+			<div class="page-content">
+				<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+				<div class="row">
+					<label>Name *</label>
+					<input type="text" formControlName="name">
+				</div>
+				<div class="error-message" *ngIf="form.controls['name'].hasError('maxlength')">
+					Name can not be longer than
+					{{form.controls['name'].errors['maxlength'].requiredLength}} characters
+				</div>
+				<div class="row">
+					<label>Description</label>
+					<textarea formControlName="description"></textarea>
+				</div>
+			</div>
+		</form>
+		<div class="row-button">
+			<div class="separator"></div>
+			<go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+			<go-button button-raised (clicked)="onComplete()" [disabled]="form.invalid || isLoading">Update Layer
+			</go-button>
+		</div>
+	</div>
+</go-dialog>

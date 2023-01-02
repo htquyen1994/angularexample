@@ -1,0 +1,145 @@
+<go-spinner *ngIf="isLoading"></go-spinner>
+<go-copy-form *ngIf="isCopyForm" (close)="isCopyForm = false" (save)="copyRowMorrison($event)"></go-copy-form>
+<go-download-form [error]="downloadError" [layer]="activeLayer" *ngIf="isDownloadForm" (close)="onDownloadForm(false)"
+  (save)="download($event)"></go-download-form>
+<go-document-form-dialog *ngIf="isDocumentForm" (close)="isDocumentForm = false" [layer]="activeLayer"></go-document-form-dialog>
+
+<go-toolbar class="toolbar" [class.d-none]="state">
+  <ps-select class="layer-select" [options]="layerGroupOptions" [(ngModel)]="activeLayerId" (ngModelChange)="setLayer($event)"
+  [placeholder]="'Select a layer'" [showClear]="true" [appendTo]="'body'" [group]="true">
+</ps-select>
+
+  <go-filter class="group-separator  group-push" [layer]="activeLayer" (createLayer)="onNewLayerFromFilter($event)">
+  </go-filter>
+  <!--<go-button class="group-separator" type="icon" icon="refresh" title="Refresh"></go-button>-->
+  <go-button-group class="group-separator" *ngIf="showColumnGroups" >
+    <go-button button-toolbar [icon]="showIcon ? 'group_show' : null" [selected]="showGroups" title="Column Groups"
+      [disabled]="activeLayer === null" (clicked)="onShowGroups()">
+      Column Groups
+    </go-button>
+  </go-button-group>
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [icon]="showIcon ? 'locate' : null" title="Locate active record"
+      [disabled]="activeLayer === null || !selectedIds" (clicked)="onLocateSelection()">
+      Locate
+    </go-button>
+    <go-button button-toolbar [icon]="showIcon ? 'streetview' : null" title="Show in street view"
+      [disabled]="!activeShapeId || activeLayer?.type !== layerType.POINT" (clicked)="onStreetview()">
+      Street view
+    </go-button>
+
+    <go-label-form [activeStyle]="activeLabelStyle" [styles]="labelStyles | async" [disabled]="!activeLayer"
+    (createStyle)="onCreateLabelStyle($event)" (changeStyle)="onChangeStyle($event)" (deleteStyle)="onDeleteStyle($event)"></go-label-form>
+
+  </go-button-group>
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [icon]="showIcon ? 'flip_to_front': null" title="Show Selected Only"
+      [disabled]="activeLayer === null" [selected]="showSelectedOnly"
+      (clicked)="onToggleShowSelectedOnly(showSelectedOnly)">
+      Selected
+    </go-button>
+  </go-button-group>
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [icon]="showIcon ? 'pin' : null" title="Pin selected shapes"
+      [disabled]="activeLayer === null" [selected]="isPinSelected" (clicked)="onPinSelected()">
+      Pin Selected
+    </go-button>
+  </go-button-group>
+
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [icon]="showIcon ? 'screen' : null" title="Filter by map view"
+      [disabled]="activeLayer === null" [selected]="isFilterByMap" (clicked)="onQueryOnScreen()">
+      Filter by Map
+    </go-button>
+  </go-button-group>
+
+  <go-button-group class="group-separator">
+    <go-button button-toolbar [icon]="showIcon ? 'check_box_outline' : null" title="Deselect all shapes"
+      [disabled]="activeLayer === null && !selectedIds" (clicked)="onDeselect()">
+      Deselect
+    </go-button>
+  </go-button-group>
+  <go-button type="icon" icon="menu" title="Menu" (clicked)="dropdown.toggle($event)"></go-button>
+  <ps-overlaypanel dropdown #dropdown [styleClass]="'dropdown'">
+    <go-button [disabled]="!hasAddPermission" (clicked)="addRow();dropdown.hide()" title="Create new record">
+      New Record
+    </go-button>
+    <go-button [disabled]="!hasCreatePermission" (clicked)="editRow();dropdown.hide()" title="Edit record">
+      Edit Record
+    </go-button>
+    <go-button [disabled]="!hasCreatePermission" (clicked)="deleteRow.onHide(false);dropdown.hide()"
+      title="Delete record">
+      Delete Record
+    </go-button>
+    <go-button *ngIf="isMorrisonLayer" [disabled]="!hasCreatePermission && true"
+      (clicked)="onExtensionTrading();dropdown.hide()" title="Make Extension Trading">
+      Extension Trading
+    </go-button>
+    <go-button [disabled]="!hasCreatePermission"
+      (clicked)="copyRow();dropdown.hide()" title="Copy record">
+      Copy Record
+    </go-button>
+    <go-button [disabled]="!hasEditBatchPermission" (clicked)="editAllRowSelected();dropdown.hide()"
+      title="Batch edit selected records">
+      Batch Edit Record
+    </go-button>
+    <go-button [disabled]="!(hasDownloadPermission || hasRestrictedDownloadPermission)"
+      title="Download selected records" (clicked)="onDownloadForm(true);dropdown.hide()">
+      Download Records
+    </go-button>
+    <go-button *ngIf="!isPostOffice" [disabled]="!hasAddDocuments" (clicked)="documents();dropdown.hide()" title="Manage documents">
+      Manage Documents
+    </go-button>
+    <go-button *ngIf="canManageOrCalculateColumns && activeLayer?.source === layerSource.USER"
+      [disabled]="activeLayer === null || !hasAddPermission"
+      title="Manage columns" (clicked)="onEditColumns();dropdown.hide()">
+      Manage Columns
+    </go-button>
+    <go-button *ngIf="canManageOrCalculateColumns && activeLayer?.source === layerSource.USER"
+      [disabled]="activeLayer === null || !hasAddPermission"
+      title="Column Calculator" (clicked)="onCalculateColumn();dropdown.hide()">
+      Column Calculator
+    </go-button>
+    <go-button *ngIf="canCopyToTenant" [disabled]="activeLayer === null" title="Download Package Code"
+      (clicked)="onDownloadPackageCode(activeLayer?.id);dropdown.hide()">
+      Download Package
+    </go-button>
+  </ps-overlaypanel>
+</go-toolbar>
+<go-result-grid [layer]="activeLayer" [pinSelected]="isPinSelected" [filterByMap]="isFilterByMap"
+  [isShowGroup]="showGroups" #resultGrid (openShape)="openRow($event)"></go-result-grid>
+<div class="result-container" *ngIf="state">
+  <label-style-form *ngIf="state === EResultState.LABELSTYLE"
+  [isLoading]="labelStyleLoading | async"
+  [layer]="activeLayer"
+  [columns]="activeLayer?.columns"
+  [style]="editStyle"
+  (close)="onCloseLabelStyle($event)"></label-style-form>
+  <go-edit-form *ngIf="state === EResultState.RECORD" [hasCreatePermission]="hasAddPermission" [isViewMode]="isViewMode"
+  [isAddRow]="isAddRow" [isBatchEdit]="isBatchEdit" (close)="onClose()" [layer]="activeLayer" (edit)="onEdit($event)"
+  [resultGrid]="resultGridRef" [activeTab]="editFormActiveTab" [excludingZone]="excludingZone"></go-edit-form>
+  <go-details-panel *ngIf="state === EResultState.DETAILPANEL" [layer]="activeLayer" (close)="onClose()" [refreshObservable]="refreshDetail$"></go-details-panel>
+</div>
+
+<go-dialog title="Delete Row" #deleteRow>
+  <go-spinner *ngIf="isLoadingDelete"></go-spinner>
+  <go-error-message class="row" *ngIf="deleteError" [error]="deleteError"></go-error-message>
+  <div class="dialog-body">
+    <p>Are you sure you want to delete this record?</p>
+  </div>
+
+  <div class="dialog-button">
+    <go-button button-raised (clicked)="onDeleteRow()" [disabled]="isLoadingDelete">Delete</go-button>
+  </div>
+</go-dialog>
+
+<go-dialog title="Extension Trading" #extensionTrading>
+  <go-spinner *ngIf="isLoadingExtension"></go-spinner>
+  <go-error-message class="row" *ngIf="extensionError" [error]="extensionError"></go-error-message>
+  <div class="dialog-body">
+    <p>Are you sure you want to make this record extension trading?</p>
+  </div>
+  <div class="dialog-button">
+    <go-button button-raised (clicked)="onMakeStoreExtensionTrading()" [disabled]="isLoadingExtension">Yes</go-button>
+  </div>
+</go-dialog>

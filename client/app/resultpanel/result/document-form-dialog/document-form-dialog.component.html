@@ -1,0 +1,17 @@
+<go-dialog title="Documents" (close)="onClose($event)" #dialog isDrag="true">
+	<div class="page">
+		<go-document-form
+		[files]="files"
+		[loading]="submitting"
+		[error]="error"
+		(save)="onSave($event)"
+		(delete)="onDelete($event)"
+		#documentForm
+		></go-document-form>
+	</div>
+	<div class="cta-wrap">
+		<div class="cta-inner">
+			<go-button button-flat (clicked)="closeForm()">Close</go-button>
+		</div>
+	</div>
+</go-dialog>

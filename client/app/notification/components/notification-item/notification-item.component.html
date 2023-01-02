@@ -1,0 +1,20 @@
+<div class="card card-material" (click)="onClick()" [class.markAsRead]="item.markAsRead">
+  <div class="icon">
+    <div class="logo"></div>
+  </div>
+  <div class="card-content">
+    <div class="title">
+      {{item.title}}
+      <div class="link-right">
+        {{item.updated}}
+      </div>
+    </div>
+    <div class="text">
+      {{item.message?.caption}}
+    </div>
+    <div class="time">
+      <a *ngIf="!item.markAsRead" tabindex="0" class="link link-right" (click)="$event.stopImmediatePropagation();onMarkAsRead()">Mark as Read</a>
+      <a *ngIf="item.markAsRead" tabindex="0" class="link link-right" (click)="$event.stopImmediatePropagation();onMarkAsUnRead()">Mark as Unread</a>
+    </div>
+  </div>
+</div>

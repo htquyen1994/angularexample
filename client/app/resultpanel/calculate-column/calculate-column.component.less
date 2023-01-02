@@ -1,0 +1,39 @@
+@import 'shared-mixins';
+:host {
+    & .p-inputgroup [button-toolbar]{
+        height: 33px;
+    }
+    .select {
+      width: 100%;
+      max-width: 310px;
+  }
+}
+.form {
+    overflow: auto;
+}
+.page-row {
+	padding: 5px 0;
+	display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    width: 100%;
+}
+.label {
+    width: 150px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.p-inputgroup {
+    padding: 5px 0;
+}
+.calculator-help-wrapper {
+    padding: 5px 0;
+    display: flex;
+    flex-direction: column;
+}
+.calculator-help-tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

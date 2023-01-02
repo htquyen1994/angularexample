@@ -1,0 +1,5 @@
+<go-icon-select [formControl]="item.controls['icon']" [fillColor]="item?.controls['fillColor']?.value"
+    *ngIf="isPointLayer" ngDefaultControl></go-icon-select>
+<input title="Color" type="color" [formControl]="item.controls['fillColor']">
+<input *ngIf="!isPointLayer" title="Outline" type="color" [formControl]="item.controls['strokeColor']">
+<input type="text" [formControl]="item.controls['name']">

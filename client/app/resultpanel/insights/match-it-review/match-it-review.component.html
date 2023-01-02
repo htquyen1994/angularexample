@@ -1,0 +1,49 @@
+<go-spinner class="spinner" *ngIf="loading"></go-spinner>
+<div class="map-wrapper">
+  <div #map class="map"></div>
+</div>
+<div class="grid-wrapper" *ngIf="valuesDisplay && valuesDisplay.length > 0">
+  <div class="table-wrapper">
+    <p-table styleClass="p-datatable-sm p-datatable-gridlines" [columns]="cols" [value]="valuesDisplay" [scrollable]="true" [style]="{width:'100%'}" scrollHeight="calc(100% - 103px)"
+      selectionMode="single" [(selection)]="selectedRow" (onRowSelect)="onRowSelect($event)"
+      (onRowUnselect)="onRowUnselect($event)" #table >
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let group of colGroups" [attr.colspan]="group?.colspan">
+            {{group.name}}
+          </th>
+        </tr>
+        <tr>
+          <th *ngFor="let col of columns">
+            {{col.header}}
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="rowData" [pSelectableRowIndex]="rowIndex" #row [attr.row-index]="rowIndex">
+          <td *ngFor="let col of columns, let i = index" [attr.data-type]="col.align" [ngSwitch]="col.type">
+            <ng-container *ngSwitchCase="'percent'"> {{rowData[col?.id] / 100 | percent:'1.1-1'}}</ng-container>
+            <ng-container *ngSwitchCase="'format'">
+              {{rowData[col?.id] | dynamicPipe:col.formatPipe:col.format}}
+            </ng-container>
+            <ng-container *ngSwitchDefault> {{rowData[col?.id]}}</ng-container>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="footer">
+    <div class="results">Records: {{values.length | number}}</div>
+    <div class="pager">Page {{pageNumber + 1}} of {{maxPages | number}}</div>
+    <go-button-group>
+      <go-button button-raised [disabled]="pageNumber === 0" icon="expand-left" (clicked)="onPreviousPage()">
+        previous
+      </go-button>
+      <go-button button-raised [disabled]="maxPages < pageNumberNext" icon-right icon="expand-right"
+        (clicked)="onNextPage()">Go to page
+      </go-button>
+      <input class="input-number" type="number" min="1" [max]="maxPages" [(ngModel)]="pageNumberNext"
+        [disabled]="maxPages === 0">
+    </go-button-group>
+  </div>
+</div>

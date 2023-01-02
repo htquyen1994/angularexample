@@ -1,0 +1,16 @@
+<div class="notification-detail-wrapper">
+  <div class="notification-detail-header">
+    <div class="icon">
+      <div class="logo"></div>
+    </div>
+      <div class="title">
+        {{item?.title}}
+      </div>
+      <div class="time">
+        {{item?.updated}}
+      </div>
+  </div>
+  <div class="notification-detail-content">
+    <div [innerHTML]="item?.message?.detail"></div>
+  </div>
+</div>

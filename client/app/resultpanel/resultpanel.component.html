@@ -1,0 +1,46 @@
+<ng-container *ngIf="activeTab$ | async as activeTab">
+  <div class="tabs">
+    <ng-container *ngFor="let tab of tabs$ | async; trackBy: trackByIndex">
+      <ng-container *ngIf="tab.show">
+        <div class="tabs-item" [attr.aria-selected]="tab.id === activeTab.id" [attr.aria-disabled]="tab.disabled"
+          (click)="onActive(tab)">
+          {{tab.label}}
+          <ng-container *ngIf="tab.type == TabType.DYNAMIC">
+            <go-button type="icon" icon="close" class="remove-tab icon-super-small" (clicked)="onCloseTab(tab)">
+            </go-button>
+          </ng-container>
+        </div>
+      </ng-container>
+    </ng-container>
+    <div class="separator"></div>
+    <div class="group-close">
+      <go-button class="button-fullscreen" type="icon" icon="screenfull"
+        (clicked)="setState(state === ResultPanelCollapseState.HALF_SCREEN ?  ResultPanelCollapseState.FULL_SCREEN : ResultPanelCollapseState.HALF_SCREEN)"
+        title="Show fullscreen"></go-button>
+      <go-button type="icon" icon="screenfull-double" (clicked)="setState(ResultPanelCollapseState.CLOSE)"
+        title="Close result panel"></go-button>
+    </div>
+  </div>
+  <go-result [style.display]="activeTab.id == TabName.DATA_VIEW ?'flex':'none'"></go-result>
+  <!-- <ps-find [style.display]="activeTab.id == TabName.FIND?'flex':'none'"></ps-find> -->
+  <go-streetview [active]="activeTab.id == TabName.STREET_VIEW"
+    [style.display]="activeTab.id == TabName.STREET_VIEW?'block':'none'" (onActive)="onActiveStreetView($event)">
+  </go-streetview>
+  <ng-container *ngIf="tabs$ | async as tabs">
+    <ng-container *ngIf="[TabName.NEAREST, tabs] | pipeFunction: isShowPanel">
+      <ps-nearest-result [style.display]="activeTab.id == TabName.NEAREST?'flex':'none'">
+      </ps-nearest-result>
+    </ng-container>
+    <ng-container *ngIf="[TabName.INSIGHTS, tabs] | pipeFunction: isShowPanel">
+      <ps-insight-result [style.display]="activeTab.id == TabName.INSIGHTS?'flex':'none'">
+      </ps-insight-result>
+    </ng-container>
+    <ng-container *ngIf="[TabName.FIND, tabs] | pipeFunction: isShowPanel">
+   <ps-find [style.display]="activeTab.id == TabName.FIND?'flex':'none'"></ps-find>
+    </ng-container>
+  </ng-container>
+
+  <go-button button-raised type="icon" size="big" icon="expand-up" class="result-button button-circle"
+    title="VIEW RESULTS" (clicked)="setState(ResultPanelCollapseState.HALF_SCREEN)" [tooltipPosition]="'left'">
+  </go-button>
+</ng-container>

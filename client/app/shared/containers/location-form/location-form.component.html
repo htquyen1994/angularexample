@@ -1,0 +1,18 @@
+<div class="edit-row">
+  <input #name tabindex="" class="edit-input" type="text" placeholder="Location name" [value]="location?.name"
+    (focusout)="onFocusOut($event)">
+</div>
+<div class="edit-row">
+  <go-checkbox #isDefault id="homelocation" [state]="location?.isDefault?2:0" (change)="onClick($event,location)">
+  </go-checkbox>
+  <label>Home location</label>
+  <div class="separator"></div>
+  <go-button *ngIf="!(hasDelete || hasCancel)" button-raised (clicked)="onAction($event, location, name.value, isDefault.value === 2)">Save</go-button>
+</div>
+<div class="edit-row" *ngIf="hasDelete || hasCancel">
+  <go-button button-flat *ngIf="hasDelete && !location.isDefault" (clicked)="deleteLocation($event, location)">Delete
+  </go-button>
+  <div class="separator"></div>
+  <go-button button-flat *ngIf="hasCancel" (clicked)="cancelLocationEdit($event)">Cancel</go-button>
+  <go-button button-raised (clicked)="onAction($event, location, name.value, isDefault.value === 2)">Save</go-button>
+</div>

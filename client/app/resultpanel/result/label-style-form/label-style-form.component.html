@@ -1,0 +1,91 @@
+<go-toolbar class="toolbar">
+    <div class="toolbar-title">{{style ?'Editing Label Style':'Adding New Label Style'}}</div>
+</go-toolbar>
+<div class="result-content">
+    <div class="form-container">
+        <div class="form-container-wrap" [formGroup]="form">
+            <go-spinner *ngIf="isLoading" class="spinner-block-ui"></go-spinner>
+            <div class="input-row w-100">
+                <div class="input-row-label">Name</div>
+                <input type="text" class="input" formControlName="name">
+                <div>*</div>
+            </div>
+            <div class="input-row w-100">
+                <div class="input-row-label">Column Name</div>
+                <ps-select class="select" [options]="columnsOptions$ | async" formControlName="columnName" [placeholder]="'Pick a column'" [appendTo]="'body'">
+                </ps-select>
+            </div>
+            <div class="input-row w-100">
+                <div class="input-row-label">Set as default</div>
+                <input class="checkbox" type="checkbox" formControlName="isDefault">
+            </div>
+            <div class="input-row w-50">
+                <div class="input-row-label">Text Color</div>
+                <input type="color" formControlName="color">
+            </div>
+            <div class="input-row w-50">
+                <div class="input-row-label">Text Size</div>
+                <div class="range-wrapper">
+                    <input class="range" type="range" min="4" max="32" step="1" formControlName="textSize">
+                    <div class="range-number">{{form.get('textSize')?.value}}</div>
+                </div>
+            </div>
+            <div class="input-row w-50">
+                <div class="input-row-label">Background</div>
+                <input type="color" formControlName="backgroundColor">
+            </div>
+            <div class="input-row w-50">
+                <div class="input-row-label">Opacity</div>
+                <div class="range-wrapper">
+                    <input class="range" type="range" min="0" max="1" step="0.1"
+                        formControlName="backgroundTransparent">
+                    <div class="range-number">{{form.get('backgroundTransparent')?.value | percent:'1.0-0'}}</div>
+                </div>
+            </div>
+            <div class="input-container--column w-50">
+              <div class="input-row w-100">
+                <div class="input-row-label">Text Style</div>
+                <go-button-group>
+                  <go-button type="icon" icon="format_bold" title="Bold" class="background-stressed"
+                    [selected]="form.get('fontStyle')?.value?.includes('bold')" (clicked)="onSelectStyle('bold')">
+                  </go-button>
+                  <go-button type="icon" icon="format_italic" title="Italic" class="background-stressed"
+                    [selected]="form.get('fontStyle')?.value?.includes('italic')" (clicked)="onSelectStyle('italic')">
+                  </go-button>
+                  <go-button type="icon" icon="format_underlined" title="Underline" class="background-stressed"
+                    [selected]="form.get('fontStyle')?.value?.includes('underline')" (clicked)="onSelectStyle('underline')">
+                  </go-button>
+                </go-button-group>
+              </div>
+              <div class="input-row w-100" *ngIf="layer?.type != LayerType.POLYLINE">
+                <div class="input-row-label">Position</div>
+                <ps-select class="select" [options]="positionOptions" formControlName="position" [placeholder]="'Pick a position'" [appendTo]="'body'">
+                </ps-select>
+              </div>
+            </div>
+            <div class="input-container--column w-50">
+              <div class="input-row w-100">
+                <div class="input-row-label">Scale range</div>
+                <mat-slide-toggle formControlName="enableScaleRange"></mat-slide-toggle>
+              </div>
+              <div class="input-row w-100" *ngIf="form.get('enableScaleRange').value">
+                <div class="input-row-label"></div>
+                <div class="input-container--column">
+                  <div class="text-nowrap">Labels are visible between Google zoom levels {{form.get('rangeScale').value[0]}} (max) to {{form.get('rangeScale').value[1]}} (min)</div>
+                  <div class="range-scale">
+                    <span class="text-before">Min <br> (Zoomed out)</span>
+                    <p-slider formControlName="rangeScale" [range]="true" [min]="5" [max]="19"></p-slider>
+                    <span class="text-after">Max <br> (Zoomed in)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="action-container">
+        <div class="separator"></div>
+        <go-button button-flat (clicked)="onCancel()">Cancel</go-button>
+        <go-button button-raised (clicked)="onSave()" [disabled]="form.invalid">Save
+        </go-button>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+@import 'shared-mixins';
+
+:host {
+	display: block;
+	position: relative;
+}
+
+.dropdown {
+	flex-direction: row;
+	flex-wrap: wrap;
+	left: 0;
+	width: 280px;
+}
+
+[aria-selected=true]:not([aria-disabled=true]){
+	color: @color-text;
+}

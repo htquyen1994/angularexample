@@ -1,0 +1,20 @@
+<go-dialog title="Select Record Build Type" (close)="onClose()" #dialog isDrag="true">
+	<div class="page">
+		<form class="form" [formGroup]="form">
+			<div class="row">
+				<label>Build Type</label>
+			</div>
+			<div class="row">
+        <ps-select [options]="buildTypeOptions" formControlName="Build_Type" [placeholder]="'Select a type'"
+          [appendTo]="'body'">
+        </ps-select>
+			</div>
+		</form>
+	</div>
+	<div class="cta-wrap" *ngIf="form">
+		<div class="cta-inner">
+			<go-button button-flat (clicked)="onClose()">Close</go-button>
+			<go-button button-raised (clicked)="onComplete()" [disabled]="isNotComplete">Copy Row</go-button>
+		</div>
+	</div>
+</go-dialog>

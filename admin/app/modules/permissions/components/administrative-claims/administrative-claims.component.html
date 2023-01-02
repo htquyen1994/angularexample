@@ -1,0 +1,16 @@
+<go-spinner *ngIf="loading$ | async"></go-spinner>
+<div class="overlay" *ngIf="loading$ | async"></div>
+<ng-container *ngIf="form.valid  else InvalidForm">
+  <div class="claims-form" *ngIf="formClaims" [formGroup]="formClaims">
+    <div *ngFor="let claim of administrativeClaimsData" class="form-row">
+      <mat-checkbox color="primary" [formControlName]="claim.key">
+        {{claim.name}}
+      </mat-checkbox>
+    </div>
+  </div>
+</ng-container>
+<ng-template #InvalidForm>
+  <div>
+    No data available
+  </div>
+</ng-template>

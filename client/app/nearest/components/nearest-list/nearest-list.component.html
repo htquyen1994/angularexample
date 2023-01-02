@@ -1,0 +1,30 @@
+  <div class="table-wrapper" [hidden]="!_refreshTableSuccessful">
+    <p-table styleClass="p-datatable-sm p-datatable-gridlines" [columns]="columns" [value]="results" [scrollable]="true" [style]="{width:'100%'}" scrollHeight="calc(100% - 34px)"
+       #table selectionMode="single" [(selection)]="selectedRow" (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)">
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns;let i=index"  clickable (click)="onOrderCol(col, i)">
+            {{col.header}}
+            <mat-icon *ngIf="orderCol?.field === col.id" class="caret"
+              [svgIcon]="orderCol?.order == 'desc'? 'caret-down' :'caret-up'" size="small"></mat-icon>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="rowData" [pSelectableRowIndex]="rowIndex" #row [attr.row-index]="rowIndex">
+          <td *ngFor="let col of columns, let i = index" [attr.data-type]="col.align" [ngSwitch]="col.type">
+            <ng-container *ngSwitchCase="'percent'"> {{rowData[col?.id] / 100 | percent:'1.1-1'}}</ng-container>
+            <ng-container *ngSwitchCase="'format'">
+              <ng-container *ngIf="col.formatPipe == 'distance';else formatTemplate">
+                {{rowData[col?.id] * 1000 | dynamicPipe:'distance': [isMetric ? 'metric' : 'imperial']}}
+              </ng-container>
+              <ng-template #formatTemplate>
+                {{rowData[col?.id] | dynamicPipe:col.formatPipe:col.format}}
+              </ng-template>
+            </ng-container>
+            <ng-container *ngSwitchDefault> {{rowData[col?.id]}}</ng-container>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>

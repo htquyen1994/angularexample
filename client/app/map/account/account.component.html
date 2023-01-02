@@ -1,0 +1,58 @@
+<div class="button">
+  <go-button #accountBtn class="account" type="icon" icon="account" (clicked)="dropdown.toggle($event)">
+  </go-button>
+  <ps-overlaypanel dropdown #dropdown [styleClass]="'account-dropdown'">
+    <div class="button-close-wrap">
+      <go-button class="button-close" button-flat (clicked)="dropdown.toggle($event)">Close</go-button>
+    </div>
+      <div class="action-container" *ngIf="account">
+        <div class="link">{{account.forename}} {{account.surname}}</div>
+        <div class="link">{{account.username}}</div>
+        <div class="link" *ngIf="account?.isSuperUser">
+          <a tabindex="0" class="link" href="https://periscopeadmintest.newgrove.com/" target="_blank">
+            User Management Site (Test)
+          </a>
+        </div>
+        <div class="link" *ngIf="account?.isTenantAdmin && env.name == 'prod'">
+          <a tabindex="0" class="link" href="https://periscopeadmin.newgrove.com/" target="_blank">User Management
+            Site</a>
+        </div>
+      </div>
+      <div class="link-container link-container-border">
+        <a tabindex="0" class="link" (click)="showAccountSetting()">My Settings</a>
+      </div>
+      <!-- <div class="link-container link-container-border link-container-flex-center">
+        <a tabindex="0" class="link" (click)="showNotifications()">My Notifications</a>
+        <div class="icon-number-value icon-number-value-horizontal icon-number-value--prominent" *ngIf="notReadCounting$ | async">{{notReadCounting$ |async}}</div>
+      </div> -->
+      <div class="link-container">
+        <!--<a tabindex="0" class="link" href="https://periscopev9shared.blob.core.windows.net/userguide/Periscope%20User%20Guide_v9_1.pdf" target="_blank">User Guide</a>-->
+        <a tabindex="0" class="link" (click)="elSupport.onHide(false)">Contact Support</a>
+        <a tabindex="0" class="link" (click)="elAbout.onHide(false)">About Periscope</a>
+        <a tabindex="0" class="link" href="/client/assets/documents/Periscope_EndUserLicenceAgreement.txt" target="_blank">Terms of Use</a>
+      </div>
+      <div class="cta-container">
+        <!--<go-button button-raised><a class="action-link" href="/Administration/Tenants" target="_blank">Account</a></go-button>-->
+        <go-button button-raised><a class="action-link" href="/Logout/Logout">Logout</a></go-button>
+      </div>
+  </ps-overlaypanel>
+</div>
+
+<go-dialog title="Contact Support" button="Close" #elSupport isDrag="true">
+  <p>
+    For any enquiries or to provide feedback relating to Periscope® please contact the NEWGROVE
+    Support Team
+    using
+  </p>
+  <p><a href="email:support@newgrove.com">support@newgrove.com</a></p>
+  <p><a href="tel:+44 20 3397 4711">+44 20 3397 4711</a></p>
+</go-dialog>
+
+<go-dialog title="About Periscope" button="Close" #elAbout isDrag="true">
+  <div>Periscope® {{account?.version}}</div>
+  <p>Contains National Statistics data &copy;<BR>Crown copyright and database right 2021</p>
+  <p>Contains Ordnance Survey data &copy;<BR> Crown copyright and database right 2021</p>
+  <p>Contains Royal Mail data &copy;<BR> Royal Mail copyright and database right 2021</p>
+  <p>Powered by TfL Open Data</p>
+  <p>Postal Boundaries &copy;<BR> GeoLytix copyright and database right 2021</p>
+</go-dialog>

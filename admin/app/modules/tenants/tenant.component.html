@@ -1,0 +1,86 @@
+<div class="page-body">
+	<div class="page-body__header">
+		<div class="page-body__header__page-title">
+			Tenants
+		</div>
+	</div>
+	<div class="page-body__content">
+		<div class="row">
+			<mat-form-field>
+				<input matInput type="text" placeholder="Search by tenant name" aria-label="Number"
+					[formControl]="searchControl">
+			</mat-form-field>
+			<div class="separator"></div>
+		</div>
+		<periscope-table [columns]="headers"  [data]="datas$ | async"
+    [rowTemplate_withoutWrapper]="rowTemplate" [sorted]="true" [isClientPaging]="true" [loading]="loading$ | async"
+			[pageSize]="pageSize">
+			<ng-template #rowTemplate let-row>
+        <div class="rTableRow"
+        [class.bg-warning-light]="row.licenceExpiresWarning === ELicenceExpiresStatus.WARNING3M"
+        [class.bg-error-light]="row.licenceExpiresWarning === ELicenceExpiresStatus.WARNING1M">
+          <div class="rTableCell" [ngClass]="headers[0].class">
+            <div class="text-truncate">
+              {{row[headers[0].trackBy]}}
+            </div>
+          </div>
+          <div class="rTableCell" [ngClass]="headers[1].class">
+            <div class="text-truncate">
+              {{row[headers[1].trackBy]}}
+            </div>
+          </div>
+          <div class="rTableCell" [ngClass]="headers[2].class" >
+            <div class="urls_wrapper">
+              <ng-container *ngFor="let userallcation of row['_userAllocations']">
+                <div class="userallcation">
+                  <div class="text-truncate">{{userallcation.text}}</div>
+                  <div class="userallcation-value">{{userallcation.value}}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="rTableCell" [ngClass]="headers[3].class">
+            <div class="urls_wrapper">
+              <ng-container *ngFor="let url of row['urls']">
+                <a target="_blank" [attr.href]="url">{{url}}</a>
+              </ng-container>
+            </div>
+          </div>
+          <div class="rTableCell" [ngClass]="headers[4].class" [innerHTML]="row[headers[4].trackBy]">
+          </div>
+          <div class="rTableCell" [ngClass]="headers[5].class">
+            {{row[headers[5].trackBy] |date: 'dd/MM/yyyy'}}
+          </div>
+          <div class="rTableCell" [ngClass]="headers[6].class" [innerHTML]="row[headers[6].trackBy]">
+          </div>
+          <div class="rTableCell" [ngClass]="headers[7].class" [innerHTML]="row[headers[7].trackBy]">
+          </div>
+          <div class="rTableCell" [ngClass]="headers[8].class">
+            <button mat-icon-button (click)="openDialog(row.id)">
+              <mat-icon aria-label="Edit">edit</mat-icon>
+            </button>
+            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="rowIndex = row.id" class="ml-15">
+              <mat-icon aria-label="Menu">more_vert</mat-icon>
+            </button>
+          </div>
+        </div>
+			</ng-template>
+		</periscope-table>
+	</div>
+	<div class="page-body__footer"></div>
+</div>
+
+<mat-menu #menu="matMenu">
+	<button mat-menu-item (click)="openUser()">Users</button>
+	<button mat-menu-item (click)="openRole()">User templates</button>
+	<!-- <button mat-menu-item (click)="openState()">UI State</button> -->
+	<button mat-menu-item [matMenuTriggerFor]="menuBlob">Settings</button>
+</mat-menu>
+
+<mat-menu #menuBlob="matMenu">
+	<button mat-menu-item (click)="noop()">Layer Groups</button>
+	<button mat-menu-item (click)="noop()">Insights</button>
+	<button mat-menu-item (click)="noop()">Location</button>
+	<button mat-menu-item (click)="noop()">Styles</button>
+	<button mat-menu-item (click)="noop()">Filters</button>
+</mat-menu>

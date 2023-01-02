@@ -1,0 +1,195 @@
+@import "../../node_modules/primeng/resources/primeng.min.css";
+@import "styles/primetheme.css";
+@import "styles/primeicons.css";
+@import "styles/styles.css";
+@import "styles/os-branding.css";
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue.
+/*
+@color-primary: #3a4766;
+@color-secondary: #8ac54b;
+@color-neutral: #F3F3F3;
+@color-inverted: #FFFfff;
+@color-text: #333333;
+*/
+
+$indigo: (
+        50: #3a4766,
+        100: #3a4766,
+        200: #3a4766,
+        300: #3a4766,
+        400: #3a4766,
+        500: #3a4766,
+        600: #3a4766,
+        700: #3a4766,
+        800: #3a4766,
+        900: #3a4766,
+        A100: #3a4766,
+        A200: #3a4766,
+        A400: #3a4766,
+        A700: #3a4766,
+        contrast: (
+                50: white,
+                100: white,
+                200: white,
+                300: white,
+                400: white,
+                500: white,
+                600: white,
+                700: white,
+                800: white,
+                900: white,
+                A100: white,
+                A200: white,
+                A400: white,
+                A700: white,
+        )
+);
+$green: (
+        50: #8ac54b,
+        100: #8ac54b,
+        200: #8ac54b,
+        300: #8ac54b,
+        400: #8ac54b,
+        500: #8ac54b,
+        600: #8ac54b,
+        700: #8ac54b,
+        800: #8ac54b,
+        900: #8ac54b,
+        A100: #8ac54b,
+        A200: #8ac54b,
+        A400: #8ac54b,
+        A700: #8ac54b,
+        contrast: (
+                50: white,
+                100: white,
+                200: white,
+                300: white,
+                400: white,
+                500: white,
+                600: white,
+                700: white,
+                800: white,
+                900: white,
+                A100: white,
+                A200: white,
+                A400: white,
+                A700: white,
+        )
+);
+$mat-light-theme-foreground: (
+  base:              black,
+  divider:           $dark-dividers,
+  dividers:          $dark-dividers,
+  disabled:          $dark-disabled-text,
+  disabled-button:   rgba(black, 0.26),
+  disabled-text:     $dark-disabled-text,
+  elevation:         black,
+  hint-text:         $dark-disabled-text,
+  secondary-text:    $dark-secondary-text,
+  icon:              rgba(black, 0.54),
+  icons:             rgba(black, 0.54),
+  text:              rgba(black, 0.87),
+  slider-min:        rgba(#484848, 0.87),
+  slider-off:        rgba(black, 0.26),
+  slider-off-active: rgba(black, 0.38),
+);
+
+$candy-app-primary: mat-palette($indigo);
+$candy-app-accent: mat-palette($green);
+
+// The warn palette is optional (defaults to red).
+$candy-app-warn: mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$candy-app-theme: mat-light-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($candy-app-theme);
+
+$height-slider: 8px !important;
+
+mat-icon {
+  & {
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    fill: currentColor;
+    svg {
+      display: block;
+      fill: currentColor;
+      pointer-events: none;
+      user-select: none;
+      stroke: none;
+
+      width: 100%;
+      height: 100%;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  &[size="small"] {
+    height: 14px;
+    width: 14px;
+    SVG {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &[size="medium"] {
+    height: 18px;
+    width: 18px;
+    SVG {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+.mat-slider{
+  padding: 0px !important;
+}
+.mat-slider-horizontal{
+  .mat-slider-wrapper {
+    top: unset !important;
+    height: $height-slider;
+  }
+  .mat-slider-track-wrapper{
+    height: $height-slider;
+  }
+  .mat-slider-track-background{
+    height: $height-slider;
+  }
+  .mat-slider-track-fill{
+    height: $height-slider;
+  }
+  .mat-slider-ticks-container{
+    height: $height-slider;
+  }
+  .mat-slider-ticks{
+    height: $height-slider;
+  }
+}
+.mat-dialog-container{
+  padding: 0px !important;
+}
+mat-icon[size="tiny"]{
+  width: 10px;
+  height: 10px;
+}
+$buttonPadding: 0px;

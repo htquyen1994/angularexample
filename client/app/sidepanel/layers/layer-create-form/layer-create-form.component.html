@@ -1,0 +1,329 @@
+<go-dialog [wide]="true" title="Create Layer ({{page}}/{{creationMethod === layerCreationMethod.POSTCODE ? 3 : 2}})"
+	(close)="onClose($event)" #dialog isDrag="true">
+	<go-spinner *ngIf="(isLoading | async)"></go-spinner>
+	<div *ngIf="page === 1" class="page">
+		<form [formGroup]="formPage1">
+			<div class="page-content">
+				<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+				<div class="row">
+					<input type="hidden" formControlName="method">
+					<!-- <label>Method</label> -->
+					<go-button-group>
+						<go-button button-toolbar
+							[selected]="formPage1.controls.method.value === layerCreationMethod.EMPTY"
+							(clicked)="setFileMethod(layerCreationMethod.EMPTY)">Create empty layer
+						</go-button>
+						<go-button button-toolbar
+							[selected]="formPage1.controls.method.value === layerCreationMethod.FILES"
+							(clicked)="setFileMethod(layerCreationMethod.FILES)">Import shape file
+						</go-button>
+						<go-button button-toolbar
+							[selected]="formPage1.controls.method.value === layerCreationMethod.POSTCODE"
+							(clicked)="setFileMethod(layerCreationMethod.POSTCODE)">Join to postcode data
+
+						</go-button>
+						<go-button button-toolbar
+							[selected]="formPage1.controls.method.value === layerCreationMethod.COORDINATES"
+							(clicked)="setFileMethod(layerCreationMethod.COORDINATES)">Create point layer from lat/lngs
+						</go-button>
+					</go-button-group>
+					<ng-container *ngIf="formPage1.controls.method.value === layerCreationMethod.POSTCODE">
+						<fieldset class="method-note">
+							<legend>Note: </legend>
+							<li>Only UK Postcode data is supported</li>
+							<li>A postcode is in the format "PO1 3AX".</li>
+							<li>A postcode sector is in the format "PO1 3".</li>
+							<li>A postcode district is in the format "PO1".</li>
+							<li>A postcode area is in the format "PO".</li>
+						</fieldset>
+					</ng-container>
+				</div>
+				<div class="row">
+					<label>Name *</label>
+					<input type="text" name="layerName" formControlName="name">
+				</div>
+				<div class="error-message" *ngIf="formPage1.controls['name'].hasError('maxlength')">
+					Name can not be longer than
+					{{formPage1.controls['name'].errors['maxlength'].requiredLength}} characters
+				</div>
+
+				<div class="row" *ngIf="formPage1.controls.method.value !== layerCreationMethod.FILES">
+					<label>Type *</label>
+          <ps-select [options]="typeOptions" formControlName="type" [placeholder]="'Select a type'" [appendTo]="'body'">
+          </ps-select>
+				</div>
+				<div class="row">
+					<label>Layer Group *</label>
+          <ps-select [options]="layerGroupOptions$ | async" formControlName="groupId" [placeholder]="'Select a type'"
+            [appendTo]="'body'">
+          </ps-select>
+				</div>
+				<div class="row">
+					<label>Description</label>
+					<textarea name="layerDescription" formControlName="description"></textarea>
+				</div>
+
+				<div class="row" *ngIf="formPage1.controls.method.value === layerCreationMethod.FILES">
+					Please upload the .shp, .shx, .dbf, and .prj files that comprise the shapefile:<br />
+					(Only the World Geodetic System 1984 (EPSG:4326) is supported currently.)
+				</div>
+				<div class="row d-flex"
+					*ngIf="formPage1.controls.method.value === layerCreationMethod.COORDINATES || formPage1.controls.method.value === layerCreationMethod.POSTCODE">
+					<input type="checkbox" class="checkbox" formControlName="hasHeader" /> <label>CSV has header
+						row</label>
+				</div>
+				<div class="row" *ngIf="formPage1.controls.method.value !== layerCreationMethod.EMPTY">
+					<input #browseFileBtn type="file" ng2FileSelect [uploader]="uploader" type="file"
+						[accept]="formPage1.controls.method.value === layerCreationMethod.FILES?'.shp,.dbf,.shx,.prj' : '.csv'"
+						multiple />
+					<div *ngIf="formPage1.controls['file'].invalid">
+						<div class="error-wrap" *ngIf="formPage1.controls['file'].hasError('missing')">
+							Please upload a {{formPage1.controls['file'].errors['missing'].value.join(', ')}} file.
+						</div>
+						<div class="error-wrap" *ngIf="formPage1.controls['file'].hasError('toomany')">
+							Found {{formPage1.controls['file'].errors['toomany'].value}} files.
+							Only {{formPage1.controls['file'].errors['toomany'].required}} files are required.
+						</div>
+						<div class="error-wrap" *ngIf="overFileSizeInQueue">
+							Sorry, files bigger than 100MB cannot be uploaded.
+						</div>
+					</div>
+					<div class="row" *ngFor="let item of uploader.queue">
+						<div class="file-wrap">
+							<div class="file-name">{{item?.file?.name}}</div>
+							<div class="file-size">{{item?.file?.size/1024/1024 | number:'.2'}} MB</div>
+							<div class="file-info">
+								<span *ngIf="item.isSuccess">success</span>
+								<span *ngIf="item.isCancel">cancel</span>
+								<span *ngIf="item.isError">error</span>
+							</div>
+
+							<mat-icon class="edit-icon show-icon" label="delete file" svgIcon="small-delete"
+								(click)="onDeleteFile(item)"></mat-icon>
+						</div>
+						<div class="error-wrap" *ngIf="item.error">
+							{{item?.error?.error?.message}}
+						</div>
+						<div class="progress">
+							<div class="progress-bar" role="progressbar" [style.width.%]="item.progress"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div *ngIf="page === 2" class="page">
+		<form [formGroup]="formPage2">
+			<div class="page-content">
+				<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+				<div class="row">
+					<div class="form-heading">Set up your layer columns and column grouping</div>
+				</div>
+				<div class="row">
+					<label>Identifier Column</label>
+					<div class="row-line">
+            <ps-select class="column-input" [options]="columnIdentifierOptions" [formControl]="formPage2.get('columnIdentifier')"
+              [placeholder]="'Select a column'" [appendTo]="'body'" [group]="true" [showClear]="true">
+            </ps-select>
+						<go-info-button class="info-bubble">
+							Specify the column which contains unique values to use as an identifier. If this is not
+							required then specify (none)
+						</go-info-button>
+					</div>
+				</div>
+
+				<div class="page-row">
+					<go-button button-toolbar (clicked)="onAddGroup()">Add Column Group</go-button>
+				</div>
+
+				<div class="d-flex">
+					<div class="error-wrap" *ngIf="formPage2.invalid && formPage2.touched">
+						<div class="error" *ngIf="formPage2.hasError('postcodeCount')">
+							Please select Join column
+						</div>
+						<div class="error" *ngIf="formPage2.hasError('latCount')">
+							Please select a Latitude column
+						</div>
+						<div class="error" *ngIf="formPage2.hasError('lngCount')">
+							Please select a Longitude column
+						</div>
+					</div>
+					<go-info-button class="info-bubble ml-auto"
+						*ngIf="formPage2.controls['columnGroups'].controls?.length">
+						<p><b>Picklist:</b> Specifies that the column has a fixed list of values that should be chosen
+							from a picklist</p>
+						<p><b>Required:</b> Specifies that the column must have a value entered into it when adding a
+							new record</p>
+					</go-info-button>
+				</div>
+
+				<div formArrayName="columnGroups" class="groups">
+					<div class="group-wrap"
+						*ngFor="let group of formPage2.controls['columnGroups'].controls; let i = index">
+						<div class="group-row">
+							<!--<go-icon icon="small-drag" class="drag-icon"></go-icon>-->
+							<input class="group-input" placeholder="Group name" type="text"
+								[formControl]="group.controls['name']">
+							<div>
+								<go-button button-toolbar label="delete group" icon="small-delete" class=""
+									(clicked)="deleteGroup(i)">Delete Column Group</go-button>
+
+							</div>
+						</div>
+						<div class="error-wrap"
+							*ngIf="group.controls['name'].invalid && group.controls['name'].touched">
+							Column Group Error
+						</div>
+						<div class="page-row">
+
+							<go-button-group>
+								<go-button button-toolbar label="add column" icon="small-add" class=""
+									(clicked)="onAddColumn(i)">
+									Add Column
+								</go-button>
+							</go-button-group>
+						</div>
+						<div class="column-wrap">
+							<div class="column-row">
+								<div class="column-input column-input-first"></div>
+								<div class="column-input"></div>
+								<div class="column-required" *ngIf="formPage1.controls['method'].value !== layerCreationMethod.EMPTY">
+									Picklist
+								</div>
+								<div class="column-required">
+									Required
+								</div>
+								<div class="column-icon"></div>
+							</div>
+						</div>
+						<div class="column-wrap"
+							*ngFor="let column of group.controls['columns'].controls; let j = index">
+							<div class="column-row">
+								<!--<go-icon icon="small-drag" class="drag-icon"></go-icon>-->
+								<input class="column-input column-input-first" placeholder="Column name" type="text"
+									[formControl]="column.controls.name">
+                  <ps-select class="column-input" [options]="columnTypeOptions" [formControl]="column.controls.type"
+                    [placeholder]="'Select a type'" [appendTo]="'body'">
+                  </ps-select>
+								<label class="column-required"
+									*ngIf="formPage1.controls['method'].value !== layerCreationMethod.EMPTY">
+									<input class="column-required-input" type="checkbox" class="checkbox"
+										[formControl]="column.controls.isPicklist" />
+								</label>
+								<label class="column-required">
+									<input class="column-required-input" type="checkbox" class="checkbox"
+										[formControl]="column.controls.required" />
+								</label>
+								<div class="column-icon">
+									<go-button type="icon" icon="small-delete" title="Delete Column"
+										(clicked)="deleteColumn(i, j)"></go-button>
+								</div>
+							</div>
+							<div class="error-wrap"
+								*ngIf="column.controls['name'].invalid && column.controls['name'].touched">
+								Column Error
+							</div>
+							<div class="error-wrap"
+								*ngIf="column.controls['type'].invalid && column.controls['type'].touched">
+								Type Error
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div *ngIf="page === 3" class="page">
+		<form [formGroup]="formPage2">
+			<div class="page-content">
+				<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+				<div class="row">
+					<div class="form-heading">Set up your layer joins</div>
+				</div>
+
+				<div class="row">
+					<label>Join Column</label>
+					<div class="row-line">
+						<div class="row-value">
+							{{formPage2.controls.joinColumnList.controls[0].controls.name.value}}
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<label>Geography Type</label>
+					<div class="row-line">
+            <ps-select class="column-input" [options]="joinLayerOptions" [formControl]="formPage2.controls['joinLayer']"
+              [placeholder]="'Select a type'" [appendTo]="'body'">
+            </ps-select>
+						<go-info-button class="info-bubble">
+							Specify the column which contains unique values to use as an identifier. If this is not
+							required then specify (none)
+						</go-info-button>
+					</div>
+				</div>
+
+				<div formArrayName="columnGroups" class="groups">
+					<div class="group-wrap"
+						*ngFor="let group of formPage2.controls['columnGroups'].controls; let i = index">
+						<div class="group-row">
+							<input class="group-input" placeholder="Group name" type="text"
+								[formControl]="group.controls['name']">
+						</div>
+
+
+						<div class="column-wrap"
+							*ngFor="let column of group.controls['columns'].controls; let j = index">
+							<div class="column-row">
+								<input class="column-input column-input-first" placeholder="Column name" type="text"
+									[formControl]="column.controls.name">
+
+								<div>
+									<go-button button-toolbar label="delete column" icon="small-delete" class=""
+										(clicked)="deleteColumn(i, j)">Delete</go-button>
+								</div>
+
+							</div>
+							<div class="error-wrap"
+								*ngIf="column.controls['name'].invalid && column.controls['name'].touched">
+								Column Error
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div footer class="row-button">
+		<ng-template [ngIf]="page === 1">
+			<div class="separator"></div>
+			<go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+			<go-button button-raised (clicked)="onCompleteStep1()"
+				[disabled]="formPage1.invalid || (isLoading | async)">Next</go-button>
+		</ng-template>
+		<ng-template [ngIf]="page === 2">
+			<go-button button-flat (clicked)="onBack(1)" [disabled]="(isLoading | async)">Back</go-button>
+			<div class="separator"></div>
+			<go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+			<go-button button-raised *ngIf="creationMethod !== layerCreationMethod.POSTCODE"
+				(clicked)="onCompleteStep2()" [disabled]="form.invalid || (isLoading | async)">
+				Create Layer
+			</go-button>
+			<go-button button-raised *ngIf="creationMethod === layerCreationMethod.POSTCODE"
+				(clicked)="createLayerPostcodeStep2()" [disabled]="form.invalid || (isLoading | async)">
+				Next
+			</go-button>
+		</ng-template>
+		<ng-template [ngIf]="page === 3">
+			<go-button button-flat (clicked)="onBack(2)" [disabled]="(isLoading | async)">Back</go-button>
+			<div class="separator"></div>
+			<go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+			<go-button button-raised (clicked)="onCompleteStep2()" [disabled]="form.invalid || (isLoading | async)">
+				Create Layer</go-button>
+		</ng-template>
+	</div>
+</go-dialog>

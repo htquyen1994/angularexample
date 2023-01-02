@@ -1,0 +1,21 @@
+<go-toolbar class="toolbar">
+  <go-button-group class="group-separator">
+    <mat-slide-toggle [(ngModel)]="showPercentage" (ngModelChange)="onToggle('showPercentage', $event)">%</mat-slide-toggle>
+  </go-button-group>
+  <go-button-group class="group-separator">
+    <mat-slide-toggle [(ngModel)]="showCompactView" (ngModelChange)="onToggle('showCompactView', $event)">Compact</mat-slide-toggle>
+  </go-button-group>
+  <go-button-group class="group-separator">
+    <mat-slide-toggle [(ngModel)]="showComparison" (ngModelChange)="onToggle('showComparison', $event)">Indices</mat-slide-toggle>
+  </go-button-group>
+
+  <div class="group-push"></div>
+  <go-button-group>
+    <go-button button-raised *ngIf="isCreateMatch" (clicked)="onCreateMatch()" [spinnerbtn]="createMatchLoading" [disabled]="createMatchDisabled">
+      Create Match
+    </go-button>
+    <go-button button-raised (clicked)="onDownload()" [spinnerbtn]="loading">
+      Download
+    </go-button>
+  </go-button-group>
+</go-toolbar>

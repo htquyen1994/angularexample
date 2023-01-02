@@ -1,0 +1,22 @@
+<button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+</button>
+
+<h1 mat-dialog-title>Create Template</h1>
+
+<form class="position-relative" mat-dialog-content [formGroup]="form">
+    <go-spinner *ngIf="loading$ | async"></go-spinner>
+    <div class="overlay" *ngIf="loading$ | async"></div>
+    <mat-form-field>
+        <input matInput autofocus placeholder="Name" formControlName="name">
+    </mat-form-field>
+</form>
+
+
+<div mat-dialog-actions>
+    <div class="separator"></div>
+    <button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
+    <button mat-raised-button [disabled]="form.invalid" (click)="onSaveAsTemplate()" color="accent">
+        save
+    </button>
+</div>

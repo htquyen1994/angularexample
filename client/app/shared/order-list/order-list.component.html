@@ -1,0 +1,10 @@
+<div class="single-wrap" *ngIf="list?.length > 0">
+    <input class="input search-auto" type="text" placeholder="Search" [ngModel]="search"
+        (ngModelChange)="onSearch($event)">
+    <virtual-scroller #virtualScroll class="virtual-container" [items]="sortedList" (vsUpdate)="viewPortItems = $event">
+        <div *ngFor="let item of viewPortItems" class="order-list-item" (click)="onSelectItem(item)">
+            <div class="order-list-item--name">{{item?.name}}</div>
+            <div class="order-list-item--des">{{item?.description}}</div>
+        </div>
+    </virtual-scroller>
+</div>

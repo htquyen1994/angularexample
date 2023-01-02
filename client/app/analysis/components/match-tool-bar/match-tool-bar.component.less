@@ -1,0 +1,45 @@
+@import "shared-mixins";
+
+ps-match-tool-bar{
+  .matchit-form {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+  }
+
+  .form-control {
+    display: flex;
+    flex-direction: row;
+    margin: 0 10px 0 0;
+    align-items: center;
+    label {
+        display: block;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        margin-right: 5px;
+    }
+    INPUT[type="text"], INPUT[type="date"], INPUT[type="number"]{
+        margin: 0px 10px;
+    }
+    SELECT{
+        margin: 0px 10px;
+    }
+  }
+
+  .w-60 {
+    width: 60px;
+  }
+  .w-70 {
+    width: 70px;
+  }
+  .w-120 {
+    width: 120px;
+  }
+  .ng-invalid {
+    border: 1px solid @color-error;
+  }
+  form.ng-invalid {
+    border-width: 0;
+  }
+}

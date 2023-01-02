@@ -1,0 +1,22 @@
+<div class="warning">
+  <ng-container *ngIf="shapeRef;else warningTextWithoutShape">Please move the icon <mat-icon svgIcon="map-plus"></mat-icon> on the map</ng-container>
+  <ng-template #warningTextWithoutShape>Please click on the map</ng-template>
+  {{warningText}}
+</div>
+<div class="form" [formGroup]="formGroup">
+    <div class="form-control">
+        <label>Location: </label>
+        <input class="input w-70" type="text" formControlName="lat">
+        <input class="input w-70 ml-15" type="text" formControlName="lng">
+        <go-button type="icon" icon="locate" title="Locate location" (clicked)="onLocate()">
+        </go-button>
+    </div>
+    <go-spinner *ngIf="submitting$ | async"></go-spinner>
+</div>
+<div class="actions d-flex w-100">
+    <div class="divider"></div>
+    <go-button button-flat (clicked)="onClose()">Close</go-button>
+    <go-button button-raised [disabled]="submitting$ | async" (clicked)="onSave()">
+        Submit
+    </go-button>
+</div>

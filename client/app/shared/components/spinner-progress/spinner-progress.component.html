@@ -1,0 +1,5 @@
+<div class="spinner" *ngIf="percentageValue < 1">
+    <mat-progress-spinner value="{{percentageValue * 100 | number:'1.0-0'}}" color="primary"  strokeWidth="3" diameter="40">
+    </mat-progress-spinner>
+	<div class="percentage">{{percentageValue * 100 | numrounddown}}%</div>
+</div>

@@ -1,0 +1,18 @@
+<!-- <go-dialog [title]="'Route and Directions'" #dialog (close)="onDialogClose()" isDrag="true" [position]="innitPosition"> -->
+  <div [formGroup]="directionsForm" class="locations-container">
+    <div formArrayName="locations" class="locations-wrapper">
+      <div *ngFor="let location of locations.controls; let i=index" class="location-container">
+        <div [formGroupName]="i" class="location-item">
+          <div class="location-label">{{i==0? 'From:': 'To:'}}</div>
+          <input type="text" class="form-control" formControlName="text" [attr.placeholder]="focusingTextBox == i ? 'Click on the map to choose point': ''">
+        </div>
+      </div>
+    </div>
+    <go-button type="icon" icon="swap_vert" title="Reverse" (clicked)="onReverseDirection()"></go-button>
+  </div>
+  <go-spinner *ngIf="loading$ | async" class="spinner"></go-spinner>
+  <ps-outreach-service-info [unit]="isMetric ? UnitTypeId.METRIC : UnitTypeId.IMPERIAL"
+    [showReverse]="showReverseButton" [hidden]="!(selectedRouteData$ | async)" [selectedRoute]="selectedRouteData$"
+    [selectedTravelMode]="selectedTravelMode$" [reverseDirection]="reverseDirection$"
+    (selected)="onSelectedTravelMode($event)" (reverseDirection)="onReverseDirection()"></ps-outreach-service-info>
+<!-- </go-dialog> -->

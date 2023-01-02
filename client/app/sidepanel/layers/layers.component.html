@@ -1,0 +1,145 @@
+<div [ngSwitch]="dialogState">
+  <go-layer-create-form *ngSwitchCase="dialogType.CREATE" (close)="onLayerCreate(false)"></go-layer-create-form>
+  <go-layer-copy-form *ngSwitchCase="dialogType.COPY" [layer]="activeLayer" (close)="onLayerCopy(false)">
+  </go-layer-copy-form>
+  <go-layer-delete-form *ngSwitchCase="dialogType.DELETE" [layer]="activeLayer" (close)="onLayerDelete(false)">
+  </go-layer-delete-form>
+  <go-layer-update-form *ngSwitchCase="dialogType.UPDATE" [layer]="activeLayer" (close)="onLayerUpdate(false)">
+  </go-layer-update-form>
+  <go-layer-share-form *ngSwitchCase="dialogType.SHARE" [layer]="activeLayer" (close)="onLayerShare(false)">
+  </go-layer-share-form>
+</div>
+<div class="tool-bar">
+  <go-button-group class="button-group">
+    <!--<go-button class="push" button-toolbar icon="locate" [disabled]="activeLayer === null" (clicked)="onLocate()"
+               title="Locate layer">Zoom</go-button>-->
+    <go-button class="push" button-toolbar [selected]="isShowLegends" (clicked)="toggleLegends()"
+               title="Show legends">Legends</go-button>
+    <go-button-group class="button-group" *ngIf="viewTurnOffLayers">
+      <go-button button-toolbar (clicked)="turnOffLayers()" [selected]="isTurnOffPressed"
+                 title="Turn off all layers">
+        Layers Off
+      </go-button>
+    </go-button-group>
+  </go-button-group>
+  <go-button type="icon" icon="menu" title="Editing" (clicked)="dropdown.toggle()"></go-button>
+  <go-dropdown #dropdown>
+    <go-button (clicked)="onLayerCreate(true);dropdown.onState(false)" [disabled]="!canCreateUserLayer"
+               title="Create a New Layer">
+      Create Layer
+    </go-button>
+    <go-button (clicked)="onLayerUpdate(true);dropdown.onState(false)"
+               [disabled]="activeLayer?.source === layerSource.CORPORATE || !activeLayer?.isEditable"
+               title="Rename Active Layer">
+      Rename Layer
+    </go-button>
+    <!--<go-button (clicked)="onLayerCopy(true);dropdown.onState(false)"
+      [disabled]="activeLayer?.source === layerSource.CORPORATE || !activeLayer?.isEditable"
+      title="Copy Active Layer" *ngIf="isDevMode">Copy Layer
+    </go-button>-->
+    <go-button (clicked)="onLayerDelete(true);dropdown.onState(false)"
+               [disabled]="activeLayer === null || activeLayer?.source === layerSource.CORPORATE"
+               title="Delete Active Layer">
+      Delete Layer
+    </go-button>
+    <go-button *ngIf="canShareUserLayer"
+               [disabled]="activeLayer === null || activeLayer?.source === layerSource.SHARED || activeLayer?.source === layerSource.CORPORATE"
+               (clicked)="onLayerShare(true)" title="Share Layer">
+      Share Layer
+    </go-button>
+    <go-button (clicked)="onGroupCreateForm();dropdown.onState(false)" [disabled]="!canEditLayerGroup"
+               title="Create Layer Group">
+      Create Layer Group
+    </go-button>
+  </go-dropdown>
+</div>
+
+<div class="tree" #treeEl cdkDropList [cdkDropListData]="layerGroups" (cdkDropListDropped)="dropGroup($event)">
+  <go-spinner *ngIf="loading | async" class="spinner-block-ui"></go-spinner>
+  <div class="tree-wrapper" #treeElWrapper>
+    <div class="tree-container" *ngIf="isGroupAdd" #addGroupInput>
+      <div class="label" tabindex="0">
+        <input class="group-editing-input" type="text" placeholder="Layer Group Name" #addInput
+          (keyup.enter)="onGroupAdd(addInput)">
+        <go-button type="icon" icon="small-done" title="Edit Layer Group" (clicked)="onGroupAdd(addInput)"></go-button>
+        <go-button type="icon" icon="close" title="Cancel" (clicked)="onCancelGroupAdd()"></go-button>
+      </div>
+    </div>
+
+    <div class="tree-container" *ngFor="let group of layerGroups; let i = index" cdkDropListGroup cdkDrag
+      [cdkDragData]="group" [cdkDragDisabled]="true">
+      <div class="tree-container-wrapper" [@.disabled]="disabledAnimation$ | async" cdkDropList id="{{group.id}}" [cdkDropListData]="group.layers"
+        (cdkDropListDropped)="dropItem($event)" [cdkDropListConnectedTo]="getConnectedList()" [cdkDropListDisabled]="group.isLocked">
+        <ng-container *ngIf="editingGroupId != group?.id; else groupEditingTemplate">
+          <div class="label" tabindex="0" *ngIf="groupEditingIndex !== i">
+            <go-button class="label-arrow" [size]="'medium'" type="icon" [icon]="group.isCollapsed ? 'chevron_right': 'expand_more'" (clicked)="onExpanded(group)"></go-button>
+            <div (click)="onExpanded(group)" class="label-expand">
+              <div class="content" tooltipPosition="top" [psTextOverflowTooltip]="group.name">{{group.name}}</div>
+            </div>
+            <ng-container *ngIf="canEditLayerGroup">
+              <go-button class="group-icon" type="icon" icon="small-edit" title="Editing group"
+                *ngIf="!group.isLocked" (clicked)="onGroupEditForm(i, group)">
+              </go-button>
+              <go-button class="group-icon" type="icon" icon="small-delete" title="Delete group"
+                *ngIf="!group.isLocked" [disabled]="layerGroups.length === 1 || group.layers.length > 0"
+                (clicked)="onGroupDelete(i)"></go-button>
+            </ng-container>
+            <mat-icon *ngIf="group?.isHavingSelectedRecords" class="layer-active-dot" size="tiny" svgIcon="active_dot"
+              title="layer have selected records">
+            </mat-icon>
+          </div>
+        </ng-container>
+
+        <div class="child-container" [@parentOpen] *ngIf="!group.isCollapsed">
+          <div class="child-container-wrapper">
+
+            <div class="child" *ngFor="let child of group.layers; let j = index" tabindex="0"
+              [attr.hasWarning]="child.isEnabled === 2" [attr.aria-selected]="child.isSelected"
+              [attr.aria-active]="child.isActive" cdkDrag [cdkDragData]="child" [cdkDragDisabled]="(child.source === layerSource.CORPORATE)">
+              <!--[attr.aria-disabled]="child.isDisabled"-->
+
+              <div class="child-label" [class.corporate-layer]="child.source === layerSource.CORPORATE" >
+                <mat-icon *ngIf="!(child.source === layerSource.CORPORATE)" cdkDragHandle svgIcon="small-drag" class="label-drag">
+                </mat-icon>
+                <go-checkbox [disabled]="child.isDisabled" class="child-label-check"
+                  [state]="(child.isSelected || stateCache[child.id]?.isSelected) ? 2 : 0"
+                  (change)="onSelection($event === 2, child)"></go-checkbox>
+                <div class="child-label-text" (click)="onActivate(child)">
+                  <div class="child-text" [class.bundle-layer-text]="child | pipeFunction: isBundleLayer"
+                   tooltipPosition="top"  [psTextOverflowTooltip]="child.name">
+                    {{child.name}}
+                  </div>
+                  <ng-container *ngIf="child | pipeFunction: isBundleLayer">
+                    <div class="rollup-icon" [innerHTML]="child['icon'] | pipeFunction : trustHtml : this"></div>
+                  </ng-container>
+                  <div class="child-icons">
+                    <mat-icon label="Shared layer" size="small" *ngIf="child.source === layerSource.SHARED" [svgIcon]="'layer-share'"
+                      title="Shared layer"></mat-icon>
+                    <mat-icon label="Edit legend" size="small" *ngIf="!child.isEditable"
+                      [svgIcon]="child.isEditable? 'unlock': 'lock'" title="layer is not editable">
+                    </mat-icon>
+                    <mat-icon *ngIf="child?.selectedRecords?.length > 0" class="layer-active-dot" size="tiny"
+                      svgIcon="active_dot" title="layer have selected records">
+                    </mat-icon>
+                    <mat-icon *ngIf="child?.description" class="layer-description" size="small" svgIcon="description-layer"
+                      pTooltip="{{child.description}}">
+                    </mat-icon>
+                  </div>
+                </div>
+              </div>
+              <go-style-form *ngIf="child.isSelected" [setLayer]="child" [isShowLegends]="isShowLegends"></go-style-form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #groupEditingTemplate>
+  <div class="label" tabindex="0" [formGroup]="formGroup">
+    <input class="group-editing-input" type="text" placeholder="Group name" formControlName="name" (keyup.enter)="onGroupEdit()">
+    <go-button type="icon" icon="small-done" title="Edit group" (clicked)="onGroupEdit()"></go-button>
+    <go-button type="icon" icon="close" title="Cancel" (clicked)="onCancelGroupEdit()"></go-button>
+  </div>
+</ng-template>

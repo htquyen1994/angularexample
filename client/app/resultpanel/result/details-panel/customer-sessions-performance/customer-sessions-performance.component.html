@@ -1,0 +1,63 @@
+<div class="customer-sessions-warper">
+  <ng-container *ngFor="let group of data$ | async; let index=index">
+    <div class="groups-container">
+      <div class="group-label" (click)="onToggle(index)"
+        *ngIf="(data$ | async).length > 1 && group?.details?.length > 0">
+        <span *ngIf="groupCollapse[index]" class="d-flex mr-5px">
+          <mat-icon svgIcon="expand_more" size="medium"></mat-icon>
+        </span>
+        <span *ngIf="!groupCollapse[index]" class="d-flex mr-5px">
+          <mat-icon svgIcon="chevron_right" size="medium"></mat-icon>
+        </span>
+        {{group?.name}}
+      </div>
+
+      <div class="group-content" *ngIf="groupCollapse[index]">
+        <div class="group-detail-wrapper" [class.w-50]="group?.name == 'Product Mix'">
+          <div class="group-detail group-title" *ngIf="group?.name == 'Product Mix'">
+            <div class="detail-title">Name</div>
+            <div class="detail-text">Product Mix</div>
+            <div class="detail-text">National Averages</div>
+          </div>
+          <ng-template ngFor let-detail [ngForOf]="group?.details">
+            <div class="group-detail">
+              <div class="detail-title">
+                {{detail?.name}}
+              </div>
+              <div class="detail-text">
+                <ng-container *ngIf="group?.name == 'Product Mix' && detail?.value; else normalTemplateGroup">
+                  <ng-container *ngIf="nationalAveragesData[detail?.name];else normalTemplateProductMix">
+                    <span
+                      [ngClass]="detail?.value > nationalAveragesData[detail?.name] ? 'color-better': detail?.value < nationalAveragesData[detail?.name] ? 'color-less' : 'color-equal'">{{detail?.value}}%</span>
+                  </ng-container>
+                  <ng-template #normalTemplateProductMix>
+                    {{detail?.value}}%
+                  </ng-template>
+                </ng-container>
+                <ng-template #normalTemplateGroup>
+                  {{detail?.value}}
+                </ng-template>
+              </div>
+              <div class="detail-text">
+                <ng-container *ngIf="group?.name == 'Product Mix'">
+                  {{nationalAveragesData[detail?.name]}}%
+                </ng-container>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+        <ng-template [ngIf]="group?.name == 'Product Mix'">
+          <div class="product-mix-graph w-50">
+            <ps-pipe-chart [chartColors]="chartColors" [customClickLegend]="false" [data]="dataChart$ | async"
+              [labels]="labels$ | async" [chartType]="'pie'" [options]="chartOptions"></ps-pipe-chart>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+  <go-spinner *ngIf="loading$ | async"></go-spinner>
+  <div class="overlay" *ngIf="loading$ | async"></div>
+  <div class="empty" *ngIf="!(loading$ | async) && !(data$ | async)?.length">
+    No Summary Performance Customer Sessions available for this branch
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<form class="form" [formGroup]="form">
+	<go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+	<ng-container *ngIf="showPreview">
+		<ng-template ngFor let-file [ngForOf]="files">
+			<div class="row file">
+				<div class="filename" (click)="onExpand(file)">
+					<b>{{file.name}}</b><br>
+					<i>{{file.description}}</i>
+				</div>
+				<!--<go-button type="icon" icon="view" size="medium" (clicked)="onView(file.id)"></go-button>-->
+				<a [href]="file.uri" target="_blank">
+					<go-button type="icon" icon="small-download" size="medium" title="Download file"></go-button>
+				</a>
+				<go-button type="icon" icon="small-delete" size="medium" title="Delete file" (clicked)="onDelete(file)"
+					[disabled]="file.addedBy !== username"></go-button>
+			</div>
+			<div class="expand" *ngIf="file.isExpanded">
+				<div class="expand-text"><b>Added by: </b>{{file.addedBy}}</div>
+				<div class="expand-text"><b>Added: </b>{{file.date}}</div>
+				<div class="expand-text"><b>Description: </b>{{file.description}}</div>
+				<div class="expand-text">
+					<img class="expand-image" [src]="file | pipeFunction : getUri:this" />
+				</div>
+			</div>
+		</ng-template>
+	</ng-container>
+	<div class="row margin" *ngIf="files.length === 0 && showPreview">
+		No documents have been uploaded for this record
+	</div>
+	<div class="row upload-file">
+		<label>Please enter file description</label>
+		<textarea class="description" formControlName="description"></textarea>
+	</div>
+	<div class="row upload-file" *ngIf="uploader?.queue?.length < 1">
+		<label>Upload File</label>
+		<input type="file" ng2FileSelect [uploader]="uploader" [accept]="getAccept" />
+		<p class="file-type">Supported file types {{getAcceptDisplay}}</p>
+	</div>
+	<div class="row upload-file upload-progress" *ngFor="let item of uploader.queue">
+		<div class="file-wrap">
+			<div class="file-name">{{item?.file?.name}}</div>
+			<div class="file-size">{{item?.file?.size/1024/1024 | number:'.2'}} MB</div>
+			<div class="file-info">
+				<span *ngIf="item.isSuccess">success</span>
+				<span *ngIf="item.isCancel">cancel</span>
+				<span *ngIf="item.isError">error</span>
+			</div>
+			<go-button type="icon" size="medium" class="edit-icon show-icon" label="delete file" icon="small-delete"
+				(clicked)="onDeleteFile(item)"></go-button>
+		</div>
+		<div class="progress">
+			<div class="progress-bar" role="progressbar" [style.width.%]="item.progress"></div>
+		</div>
+	</div>
+	<div class="row upload-file cta-wrap">
+		<div class="cta-inner">
+			<go-button button-raised (clicked)="onComplete()" [disabled]="form.invalid || loading">Save</go-button>
+		</div>
+	</div>
+</form>

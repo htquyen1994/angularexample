@@ -1,0 +1,104 @@
+@import 'shared-mixins';
+go-match-it-review {
+    overflow: auto;
+    height: 100%;
+    display: flex;
+    go-resultpanel[state="2"] & {
+        flex-direction: column;
+        .map-wrapper, .grid-wrapper{
+            height: 50%;
+        }
+    }
+    go-resultpanel[state="1"] & {
+        flex-direction: row;
+    }
+    .p-datatable table{
+        width: unset;
+    }
+    .p-datatable .p-datatable-tbody > tr > td {
+        white-space: nowrap;
+        &[data-type=right] {
+            text-align: right;
+        }
+    }
+    .p-datatable .p-datatable-thead > tr > th {
+        white-space: nowrap;
+    }
+    .p-datatable .p-datatable-tbody > tr.p-state-highlight{
+        background-color: rgba(0, 186, 187, 0.3);
+        color: #333333
+    }
+    .p-datatable .p-datatable-tbody > tr:nth-child(even){
+        &.p-state-highlight{
+            background-color: rgba(0, 186, 187, 0.3);
+            color: #333333
+        }
+    }
+
+    .table-wrapper{
+        height: 100%;
+        position: relative;
+        p-table {
+            .p-datatable{
+                height: 100%;
+                .p-datatable-scrollable-wrapper{
+                    height: 100%;
+                    .p-datatable-scrollable-view{
+                        height: 100%;
+                    }
+                }
+            }
+        }
+    }
+    .footer {
+        background-color: @color-background-stressed;
+        border-top: 1px solid @color-item-border;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        padding: 3px;
+        position: absolute;
+        bottom: 0;
+        width: calc(100% - 10px);
+    }
+    .results {
+        flex-grow: 1;
+        padding: 5px;
+    }
+    .pager {
+        padding: 5px;
+    }
+    .map .gmnoprint.gm-bundled-control.gm-bundled-control-on-bottom{
+        div:first-child{
+            width: 33px !important;
+            height: 67px !important;
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            button{
+                width: 33px !important;
+                height: 33px !important;
+            }
+            div{
+                width: unset !important;
+            }
+        }
+    }
+}
+
+.map-wrapper, .grid-wrapper{
+    height: 100%;
+    padding: 0 5px;
+    position: relative;
+    go-resultpanel[state="2"] & {
+        width: 100%;
+    }
+    go-resultpanel[state="1"] & {
+        width: 50%;
+	}
+}
+.map{
+    height: 100%;
+    width: 100%;
+}
+.visibility-collapse {
+    visibility: collapse;
+}

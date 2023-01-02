@@ -1,0 +1,71 @@
+@import 'shared-mixins';
+
+go-insight-tool {
+  width: 400px;
+
+  .view-select {
+    min-width: 100px;
+    width: 100%;
+  }
+  .row {
+    padding: 5px 0;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    .row-label {
+      margin-right: 10px;
+    }
+  }
+  .text-info {
+    display: flex;
+    justify-content: flex-end;
+  }
+  p {
+    margin: 0;
+  }
+  .instructions {
+    width: 100%;
+  }
+
+  .row-action {
+    justify-content: flex-end;
+    padding-top: 20px;
+  }
+
+  .range {
+    margin-right: 10px;
+    flex-grow: 1;
+  }
+
+  .unit {
+    width: 100px;
+    align-self: center;
+  }
+
+  .button-close {
+  }
+
+  .checkbox {
+    height: 15px;
+    width: 16px;
+    margin: 0 5px 10px 5px;
+  }
+
+  .button-close-wrap {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  go-error-message.row {
+    top: unset;
+  }
+
+  .error {
+    color: @color-error;
+  }
+
+  .button-block-width {
+    justify-content: center;
+    width: 81px;
+  }
+}

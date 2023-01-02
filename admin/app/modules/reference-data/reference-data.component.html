@@ -1,0 +1,529 @@
+<div class="page-body">
+  <div class="page-body__header">
+    <div class="page-body__header__page-title">Data Catalog</div>
+    <div>
+      The table below is a snapshot of what layers are available to a particular tenant (or tenants) and information
+      about the layers - accurate to the current Periscope deployment.
+    </div>
+    <button class="ml-15" type="button" mat-raised-button color="accent" (click)="onDownload()" [spinnerbtn]="isDownload$  | async">
+      Download
+    </button>
+    <button class="ml-15" type="button" mat-raised-button color="accent" (click)="onDownloadDefaultBuild()" [spinnerbtn]="isDownloadDefaultBuild$  | async">
+      Download Default Build
+    </button>
+  </div>
+  <div class="page-body__content">
+    <div class="row">
+      <form *ngIf="form" [formGroup]="form">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Id, Layer Name, Group Name" formControlName="term">
+        </mat-form-field>
+        <go-periscope-dropdown class="ml-15" [isLoading]="isTenantLoading$ | async" [options]="tenantOptions"
+          placeholder="Filter by tenant" formControlName="selectedTenants" width="250px" multiple="true">
+        </go-periscope-dropdown>
+        <mat-slide-toggle class="ml-15" formControlName="defaultBuildOnly">Just Default Build</mat-slide-toggle>
+      </form>
+      <div class="separator"></div>
+      <button *ngIf="(haveChecked$ | async) && data$ | async as data" class="button-spinner" type="button" mat-raised-button color="primary"
+              (click)="onDeleteSelectedLayersCache(data)">
+        Delete selected cache
+      </button>
+    </div>
+    <periscope-table [loading]="(isLoading$ | async) || (isLoadingGetReferencedInsightViews$ | async)" [isClientPaging]="true" [data]="data$ | async"
+                     [rowTemplate]="rowTemplate" [pageSize]="pageSize"
+                     [tableStyles]="{'margin-top': (headerHeight| pipeFunction : getHeaderHeight)}">
+      <ng-container *goTableHeader>
+        <ng-container *ngIf="activeSort$ | async as activeSort">
+          <div class="header-container" #headerWrapper>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'_selection'] | pipeFunction : showColumn ">
+              <div class="rTableHead align-center w-50--fixed" style="height: 100%;">
+                Selection
+                <!-- <mat-checkbox color="primary" [checked]="allChecked$ | async" [indeterminate]="someChecked$ | async"
+                  (change)="onCheckAll($event.checked)">
+                </mat-checkbox> -->
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'id'] | pipeFunction : showColumn ">
+              <div class="rTableHead align-center pointer" style="height: 100%; width: 200px;"
+                   (click)="onSort(activeSort.type !== 'ASC', 'dataPackageId')">
+                Id
+                <div class="sort" *ngIf="activeSort.field == 'dataPackageId'">
+                  <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                  <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                </div>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'layerInfo'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" style="width: 664px; min-width: 664px;">
+                  Information
+                </div>
+              </div>
+              <div class="rTableHeading h-100">
+                <div class="rTableHead align-center w-200--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'groupsName')">
+                  Layer Group
+                  <div class="sort" *ngIf="activeSort.field == 'groupsName'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-200--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'metadata', 'datasetName')">
+                  Layer Name
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetName'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-200--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'metadata', 'datasetDescription')">
+                  Description
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetDescription'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'tenantsWithAccess'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" [style.width]="(tenants$ | async)?.length * 32 - 32 +'px'">
+                  <div class="text-truncate">Tenants</div>
+                </div>
+              </div>
+              <div class="rTableHeading">
+                <ng-container *ngIf="(tenants$ | async)  | pipeFunction : getTenants : this as tenants ">
+                  <ng-container *ngFor="let tenant of tenants; let i=index">
+                    <div class="rTableHead w-10--fixed tenant-display tenant-access">
+                      {{tenant.tenantName}}
+                    </div>
+                  </ng-container>
+                </ng-container>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'insight'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" style="width: 232px; min-width: 232px;">
+                  Analysis
+                </div>
+              </div>
+              <div class="rTableHeading h-100">
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'insightInfo', 'insightable', 'boolean')">
+                  In Insight
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'insightable'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'insightInfo', 'matchable', 'boolean')">
+                  In Match/Find
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'matchable'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'datasource'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" style="width: 1156px;min-width: 1156px;">
+                  Data Source
+                </div>
+              </div>
+              <div class="rTableHeading h-100">
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetAccuracy')">
+                  Accuracy
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetAccuracy'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetCoverage')">
+                  Coverage
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetCoverage'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetShapeType')">
+                  Shape Type
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetShapeType'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='The Source of the data"'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetSource')">
+                  Source
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetSource'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='The Provider of the data loaded by Newgrove"'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetProvidedBy')">
+                  Provided By
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetProvidedBy'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='Leave blank for now'
+                     (click)="onSort(activeSort.type !== 'ASC', 'metadata', 'datasetCopyright')">
+                  Copyright
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetCopyright'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip="A month/quarter/period etc. telling us when the data in the system related to e.g. 2020 Q1, P3 2017. Spring 2021 (can be a date but often isn't)"
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetDataVintage')">
+                  Vintage
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetDataVintage'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='How often the layer is refreshed by Newgrove'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetUpdateFrequency')">
+                  Update Frequency
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetUpdateFrequency'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='The date the data could be upated if we wanted to update it'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datasource', 'datasetNextUpdateAvailable')">
+                  Next Update Available
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetNextUpdateAvailable'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'datamanagement'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" style="width: 924px;min-width: 924px;">
+                  Data Management Process
+                </div>
+              </div>
+              <div class="rTableHeading h-100">
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='The date the data was last updated by Newgrove'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetLastUpdated')">
+                  Last Updated
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetLastUpdated'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='to do'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetNextUpdatePlanned')">
+                  Next Update Planned
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetNextUpdatePlanned'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='The frequency the data is planned to be updated by Newgrove'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetPlannedUpdateFrequency')">
+                  Planned Update Frequency
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetPlannedUpdateFrequency'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='The update Type'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetUpdateType')">
+                  Update Type
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetUpdateType'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='So we can we flag the dataset goes into the default build for a new client i.e. what is on the PDF that gets sent to clients'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetInDefaultBuild', 'boolean')">
+                  Default Build
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetInDefaultBuild'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-50--fixed pointer" matTooltip='How long to process the data in man hours'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetTimeCorePersonHours')">
+                  Time Core Person (Hours)
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetTimeCorePersonHours'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-50--fixed pointer" matTooltip='How long script takes to process the core attributes'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetTimeCoreComputeHours')">
+                  Time Core Compute (Hours)
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetTimeCoreComputeHours'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer" matTooltip='Any notes about the layer that is useful - usually will be blank'
+                     (click)="onSort(activeSort.type !== 'ASC', 'datamanagement', 'datasetNotes')">
+                  Notes
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'datasetNotes'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'zoomLevelSettings'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" style="width: 296px;min-width: 296px;">
+                  Zoom Level Settings
+                </div>
+              </div>
+              <div class="rTableHeading h-100">
+                <div class="rTableHead align-center w-50--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'zoomLevelSettings', 'maxZoomLevel')">
+                  Max
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'maxZoomLevel'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-50--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'zoomLevelSettings', 'minZoomLevel')">
+                  Min
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'minZoomLevel'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-50--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'zoomLevelSettings', 'maxClusteredZoomLevel')">
+                  Max (Clustered)
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'maxClusteredZoomLevel'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-50--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'zoomLevelSettings', 'minClusteredZoomLevel')">
+                  Min (Clustered)
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'minClusteredZoomLevel'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns, 'databaseSettings'] | pipeFunction : showColumn ">
+              <div class="rTableHeading">
+                <div class="rTableHead align-center" style="width: 696px;min-width: 696px;">
+                  Database Settings
+                </div>
+              </div>
+              <div class="rTableHeading h-100">
+                <div class="rTableHead align-center w-200--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'databaseInfo', 'viewName')">
+                  View
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'viewName'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-200--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'databaseInfo', 'database')">
+                  Database
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'database'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'databaseInfo', 'numColumns')">
+                  Columns
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'numColumns'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+                <div class="rTableHead align-center w-100--fixed pointer"
+                     (click)="onSort(activeSort.type !== 'ASC', 'databaseInfo', 'numRows')">
+                  Rows (approx.)
+                  <div class="sort" *ngIf="activeSort.fieldChild == 'numRows'">
+                    <label class="desc" *ngIf="activeSort?.type === 'ASC'"></label>
+                    <label class="asc" *ngIf="activeSort?.type === 'DESC'"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="header-wrapper" *ngIf="[toolPanelColumns,'actions'] | pipeFunction : showColumn ">
+              <div class="rTableHead align-center" style="height: 100%; width: 50px;">
+                Actions
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <ng-template #rowTemplate let-row>
+        <ng-container *ngIf="[toolPanelColumns,'_selection'] | pipeFunction : showColumn ">
+          <div class="rTableCell align-center w-50--fixed">
+            <mat-checkbox color="primary" [checked]="row.checked" [disabled]="(allChecked$ | async) && !row.checked"
+                          (change)="onCheckRow(row, $event.checked)">
+            </mat-checkbox>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'id'] | pipeFunction : showColumn ">
+          <div class="rTableCell w-200--fixed">
+            <div [innerHtml]="row.dataPackageId | psRegexHighlight: (activeFilter$ | async)?.term"></div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'layerInfo'] | pipeFunction : showColumn">
+          <div class="rTableCell w-200--fixed">
+            <div class="tenants_wrapper">
+              <ng-container *ngFor="let _groupName of row._groupNames">
+                <div [innerHtml]="_groupName | psRegexHighlight: (activeFilter$ | async)?.term"></div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="rTableCell w-200--fixed">
+            <div class="tenants_wrapper">
+              <ng-container *ngFor="let _datasetName of row['_datasetNameAliases']">
+                <div [innerHtml]="_datasetName | psRegexHighlight: (activeFilter$ | async)?.term"></div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="rTableCell w-200--fixed">
+            {{row.metadata.datasetDescription}}
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'tenantsWithAccess'] | pipeFunction : showColumn ">
+          <ng-container *ngFor="let tenant of tenants$ | async">
+            <div class="rTableCell w-10--fixed tenant-access">
+              <div class="tenants_wrapper" [ngClass]="row._tenantsWithAccess[tenant.tenantId] ? 'yes': 'no'">
+                {{row._tenantsWithAccess[tenant.tenantId] ? 'Y' : 'N'}}
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'insight'] | pipeFunction : showColumn ">
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.insightInfo.insightable ? 'yes': 'no'}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.insightInfo.matchable ? 'yes': 'no'}}</div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'datasource'] | pipeFunction : showColumn ">
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetAccuracy}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetCoverage}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.metadata.datasetShapeType}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetSource}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetProvidedBy}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetCopyright}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetDataVintage}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate">{{row.metadata.datasetUpdateFrequency}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.metadata.datasetNextUpdateAvailable | date: 'dd/MM/yyyy'}}</div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="[toolPanelColumns,'datamanagement'] | pipeFunction : showColumn ">
+
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.metadata.datasetLastUpdated | date: 'dd/MM/yyyy'}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate">{{row.metadata.datasetNextUpdatePlanned | date: 'dd/MM/yyyy'}}</div>
+          </div>
+
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.metadata.datasetPlannedUpdateFrequency}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.metadata.datasetUpdateType}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.metadata.datasetInDefaultBuild ? 'yes': 'no'}}</div>
+          </div>
+          <div class="rTableCell w-50--fixed">
+            <div class="text-truncate">{{row.metadata.datasetTimeCorePersonHours}}</div>
+          </div>
+          <div class="rTableCell w-50--fixed">
+            <div class="text-truncate">{{row.metadata.datasetTimeCoreComputeHours}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            {{row.metadata.datasetNotes}}
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'zoomLevelSettings'] | pipeFunction : showColumn ">
+          <div class="rTableCell w-50--fixed">
+            <div class="text-truncate"> {{row.zoomLevelSettings.maxZoomLevel}}</div>
+          </div>
+          <div class="rTableCell w-50--fixed">
+            <div class="text-truncate"> {{row.zoomLevelSettings.minZoomLevel}}</div>
+          </div>
+          <div class="rTableCell w-50--fixed">
+            <div class="text-truncate"> {{row.zoomLevelSettings.maxClusteredZoomLevel}}</div>
+          </div>
+          <div class="rTableCell w-50--fixed">
+            <div class="text-truncate">{{row.zoomLevelSettings.minClusteredZoomLevel}}</div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns, 'databaseSettings'] | pipeFunction : showColumn ">
+          <div class="rTableCell w-200--fixed">
+            <div class="text-truncate"> {{row.databaseInfo.viewName}}</div>
+          </div>
+          <div class="rTableCell w-200--fixed">
+            {{row.databaseInfo.database}}
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate"> {{row.databaseInfo.numColumns}}</div>
+          </div>
+          <div class="rTableCell w-100--fixed">
+            <div class="text-truncate">{{row.databaseInfo.numRows}}</div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="[toolPanelColumns,'actions'] | pipeFunction : showColumn ">
+          <div class="rTableCell w-50--fixed">
+            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="currentActionData = row" class="ml-15">
+              <mat-icon aria-label="Menu">more_vert</mat-icon>
+            </button>
+          </div>
+        </ng-container>
+      </ng-template>
+      <ng-container *goToolPanel>
+        <ps-tool-panel [columns]="toolPanelColumns" (changed)="onFilterColumns($event)"></ps-tool-panel>
+      </ng-container>
+    </periscope-table>
+  </div>
+</div>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="onDeleteCache(currentActionData)">Delete cache</button>
+  <button mat-menu-item (click)="onOpenDependencies(currentActionData)">Dependencies</button>
+</mat-menu>

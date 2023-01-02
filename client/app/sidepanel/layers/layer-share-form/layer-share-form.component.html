@@ -1,0 +1,49 @@
+<go-dialog title="Share Layer" (close)="onClose($event)" #dialog isDrag="true">
+  <go-spinner *ngIf="isLoading"></go-spinner>
+  <div class="page" *ngIf="form">
+    <form [formGroup]="form">
+      <div class="page-content">
+        <div class="row">
+          Layer: {{layer.name}}
+        </div>
+        <div class="row" *ngFor="let user of form.controls['users'].controls; let i = index">
+          <div>
+            <mat-form-field class="permissions">
+              <mat-select placeholder="Permission" [formControl]="user.controls.permission">
+                <mat-option [value]="0">
+                  Read
+                </mat-option>
+                <mat-option [value]="1">
+                  Edit
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div>{{optionsTable[user.controls.userId.value]}}</div>
+          <div class="separator"></div>
+          <go-button type="icon" icon="delete" (clicked)="deleteUser(i)"></go-button>
+        </div>
+        <div class="row">
+          <mat-form-field class="full-width">
+            <input class="autocomplete" type="text" placeholder="Users" aria-label="Number" matInput
+                   [formControl]="form.controls.autocomplete" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let option of filteredOptions | async" [value]="option.name">
+                {{option.name}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <go-button [disabled]="isValidAdd === false" button-flat (clicked)="addUserFromAutocomplete()">Add
+          </go-button>
+        </div>
+      </div>
+      <div class="row-button">
+        <div class="separator"></div>
+        <go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+        <go-button button-raised (clicked)="onComplete()" [disabled]="form.invalid || !userAddedOrRemoved">
+          Save
+        </go-button>
+      </div>
+    </form>
+  </div>
+</go-dialog>

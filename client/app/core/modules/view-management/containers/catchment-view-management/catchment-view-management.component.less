@@ -1,0 +1,113 @@
+@import 'shared-mixins';
+
+ps-catchment-view-management {
+  .window {
+    min-width: 300px;
+  }
+  .go-dialog .content {
+    min-width: none;
+  }
+  .page {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    height: 100%;
+  }
+  .table {
+    border-collapse: collapse;
+    display: flex;
+    flex-direction: column;
+    th,
+    td {
+      padding: 0 7px;
+      &:nth-child(1) {
+        width: 115px;
+        text-align: left;
+        &.empty-selection {
+          padding: 15px;
+          text-align: center;
+        }
+      }
+      &:nth-child(2) {
+        width: 100px;
+        text-align: left;
+      }
+      &:nth-child(3) {
+        width: 50px;
+        text-align: right;
+        position: relative;
+      }
+      &:nth-child(4) {
+        width: 50px;
+        text-align: left;
+        & input {
+          margin: auto;
+        }
+      }
+      &:nth-child(5) {
+        width: 100px;
+        text-align: left;
+        & input {
+          margin: auto;
+        }
+      }
+      &:nth-child(6) {
+        width: 100px;
+        text-align: left;
+      }
+      &:nth-child(7) {
+        width: 120px;
+        text-align: right;
+      }
+    }
+    tr.row {
+      td {
+        border-bottom: 1px solid #c8c8c8;
+      }
+      &:nth-child(2) {
+        margin-top: 10px;
+      }
+      &:nth-last-child(2).form-control-row {
+        td {
+          border-bottom: unset;
+        }
+      }
+      &:last-child {
+        td {
+          border-bottom: unset;
+        }
+      }
+    }
+  }
+  .form-control-row {
+    td {
+      padding: 0 2px;
+      &:nth-child(4) {
+        padding: 0 6px;
+      }
+      &:nth-child(7) {
+        padding: 0 6px;
+      }
+      .p-button-label {
+        text-align: left;
+        white-space: nowrap;
+      }
+    }
+  }
+  .page-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  .error {
+    color: @color-error;
+    text-align: left !important;
+    white-space: nowrap;
+  }
+  .error-row {
+    height: 18px;
+  }
+  .range-value {
+    width: 45px;
+  }
+}

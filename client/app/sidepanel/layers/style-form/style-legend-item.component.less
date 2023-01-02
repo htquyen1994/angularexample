@@ -1,0 +1,29 @@
+@import 'shared-mixins';
+
+go-style-legend-item {
+	display: flex;
+	align-items: center;
+	// height: 38px;
+  padding: 8px 0px;
+  .icon-raster {
+    margin: 3px 8px 3px 4px;
+    flex-shrink: 0;
+  }
+
+  .icon {
+    flex-shrink: 0;
+    margin-right: 5px;
+  }
+  mat-icon {
+    svg {
+      stroke: inherit;
+      stroke-width: inherit;
+    }
+  }
+  .legend-item-icon[type="icon"] {
+    height: 100%;
+  }
+}
+
+
+

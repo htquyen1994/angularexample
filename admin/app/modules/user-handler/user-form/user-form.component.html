@@ -1,0 +1,61 @@
+<button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+</button>
+
+<h1 mat-dialog-title>{{data.update? 'Edit': 'Create'}} User</h1>
+
+<form class="position-relative" mat-dialog-content [formGroup]="form">
+    <go-spinner *ngIf="loading$ | async"></go-spinner>
+    <div class="overlay" *ngIf="loading$ | async"></div>
+    <mat-form-field *ngIf="(account$ | async).isSuperUser">
+        <input matInput placeholder="Tenant" formControlName="tenantName">
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput placeholder="Username" formControlName="username">
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput placeholder="Surname" formControlName="surname">
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput placeholder="Forename" formControlName="forename">
+    </mat-form-field>
+    <!-- <mat-form-field>
+        <mat-select placeholder="User Template" formControlName="template">
+            <mat-option [value]="0"></mat-option>
+            <mat-option [value]="1">User Template 1</mat-option>
+            <mat-option [value]="2">User Template 2</mat-option>
+            <mat-option [value]="3">User Template 3</mat-option>
+        </mat-select>
+    </mat-form-field> -->
+    <mat-form-field>
+        <mat-select placeholder="Functionality User Group" formControlName="membershipLevel">
+            <mat-option *ngFor="let level of membershipLevels | async" [value]="level.id">{{level.name}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+        <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
+    </mat-form-field>
+    <div class="mat-input-wrapper mat-form-field-wrapper">
+        <mat-checkbox formControlName="enabled">Lockout user</mat-checkbox>
+    </div>
+</form>
+
+
+<div mat-dialog-actions>
+  <!--<button *ngIf="data.update === true" mat-button (click)="onDelete()" color="warn" tabindex="-1">Delete</button>-->
+
+  <button *ngIf="isSuperUser" type="button" mat-raised-button [disabled]="form.invalid" (click)="sendNewUserEmail()">
+    Send Email
+  </button>
+
+
+  <div class="separator"></div>
+  <button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
+  <button *ngIf="data.update === false" mat-raised-button [disabled]="form.invalid" (click)="onSave()" color="accent">
+    Create
+  </button>
+  <button *ngIf="data.update === true" mat-raised-button [disabled]="form.invalid" (click)="onUpdate()"
+          color="accent">
+    Update
+  </button>
+</div>

@@ -1,0 +1,97 @@
+<div class="customer-sessions-warper">
+    <div class="customer-sessions-graph" [class.w-50]="addBranchActive" [class.w-100]="!addBranchActive">
+        <div class="customer-sessions-filter" [formGroup]="form">
+            <div class="form-control">
+                <input type="text" [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="mindate">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker (opened)="onDatePickerOpened()"></mat-datepicker>
+            </div>
+            <div class="group-separator">and</div>
+            <div class="group-separator form-control">
+                <input type="text" [min]="minDate" [max]="maxDate" [matDatepicker]="picker1" formControlName="maxdate">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1 (opened)="onDatePickerOpened()"></mat-datepicker>
+            </div>
+            <go-button-group class="group-separator">
+                <go-button class="group-separator" button-raised (clicked)="onUpdate(addedBranches, true)" [disabled]="loading$ | async">
+                    Update
+                </go-button>
+            </go-button-group>
+            <go-button-group class="group-separator">
+              <go-button button-toolbar [disabled]="!(data$ | async)?.length" [selected]="addBranchActive" (clicked)="onAddBranches()">
+                Show/Hide Additional
+              </go-button>
+            </go-button-group>
+            <go-button-group class="group-separator">
+                <go-button button-raised (clicked)="onDownload()" [disabled]="loadingDownload$ | async" [spinnerbtn]="loadingDownload$ | async">
+                    Download
+                </go-button>
+            </go-button-group>
+        </div>
+        <div class="customer-sessions-chart" *ngIf="(loading$ | async) || (data$ | async)?.length">
+            <ps-line-chart #lineChart [data]="data$ | async" [labels]="labels$ | async" [loading]="loading$ | async" [options]="chartOptions" [chartColors]="chartColors"
+            (onClickLegend)="onClickLegend($event)" (onClick)="onClickChart($event)">
+            </ps-line-chart>
+        </div>
+        <div class="empty" *ngIf="!(loading$ | async) && !(data$ | async)?.length">
+            No customer sessions available for this branch for this date range. Please adjust your date range.
+        </div>
+    </div>
+
+    <div class="customer-sessions-branches w-50" *ngIf="addBranchActive">
+        <div class="customer-sessions-filter" [formGroup]="formSearchBranches" >
+            <div class="form-control">
+                <input type="text" formControlName="searchTerm" (keyup.enter)="getBranches()">
+            </div>
+            <go-button-group class="group-separator">
+                <go-button button-raised (clicked)="getBranches()">
+                    Search
+                </go-button>
+            </go-button-group>
+            <go-button-group class="group-separator form-control">
+                <mat-slide-toggle formControlName="historicClosures">Historic Closures</mat-slide-toggle>
+            </go-button-group>
+            <div class="group-push"></div>
+            <go-button-group class="group-separator">
+                <go-button button-raised (clicked)="addBranches()">
+                    Add
+                </go-button>
+            </go-button-group>
+        </div>
+        <div class="customer-sessions-table">
+            <periscope-table [columns]="headers" [loading]="branchesLoading$ | async" [data]="branchesData$ | async"
+                [rowTemplate]="rowTemplate" mouseHover="true" [selected]="'isSelected'" (rowSelect)="onRowSelect($event)">
+                <ng-template #rowTemplate let-row>
+                    <div class="rTableCell" [ngClass]="headers[0].class">
+                        <div class="text-truncate">
+                            {{row[headers[0].trackBy]}}
+                        </div>
+                    </div>
+                    <div class="rTableCell" [ngClass]="headers[1].class">
+                        <div class="text-truncate">
+                            {{row[headers[1].trackBy]}}
+                        </div>
+                    </div>
+                    <div class="rTableCell" [ngClass]="headers[2].class">
+                        <div class="text-truncate">
+                            {{row[headers[2].trackBy]}}
+                        </div>
+                    </div>
+                    <div class="rTableCell" [ngClass]="headers[3].class">
+                      <div class="text-truncate">
+                          {{row[headers[3].trackBy]}}
+                      </div>
+                  </div>
+                  <div class="rTableCell" [ngClass]="headers[4].class">
+                    <div class="text-truncate">
+                        {{row[headers[4].trackBy]}}
+                    </div>
+                </div>
+                </ng-template>
+            </periscope-table>
+        </div>
+    </div>
+</div>
+<div #tooltipEl class="chart-tooltip">
+  <table></table>
+</div>

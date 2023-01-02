@@ -1,0 +1,51 @@
+<div class="multi-select-tag-wrapper">
+  <ng-container *ngFor="let selection of (innerValue | pipeFunction : selectedOptions : this)">
+    <div class="multi-select-tag-group">{{selection.label}}</div>
+    <div class="multi-select-tag-list">
+      <ng-container *ngFor="let item of selection.items">
+        <div class="multi-select-tag">
+          <div class="multi-select-tag-content" [title]="item.label">{{item.label}}
+          </div>
+          <mat-icon class="icon" svgIcon="close" (click)="removeSelection(item)"></mat-icon>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>
+
+<go-button button-raised [disabled]="disabled" class="multi-class-select" (clicked)="dropdownComp.toggle($event)">Select
+  <ps-overlaypanel dropdown #dropdownComp [styleClass]="'multi-select-overlay'">
+    <div class="button-close-wrap">
+      <go-checkbox [state]="[innerValue, selectedGroup] | pipeFunction : isCheckedAllGroup: this" (ngModelChange)="onCheckAllGroup($event, selectedGroup)">
+      </go-checkbox>
+      <span>Select All / None</span>
+      <div class="divider"></div>
+      <go-button type="icon" icon="close" class="button-close" (clicked)="dropdownComp.toggle($event)">
+      </go-button>
+    </div>
+    <input class="input" type="text" placeholder="Search" [ngModel]="searchTerm" (ngModelChange)="filter$.next($event)">
+    <div class="group-label">Select group: </div>
+    <ps-select [styleClass]="'select'" [options]="options" [(ngModel)]="selectedGroup" [placeholder]="'Group'">
+    </ps-select>
+    <div class="multi-class-dropdown">
+      <ng-container
+        *ngIf="([selectedGroup, searchTerm] | pipeFunction : getItemsInGroup : this) as items;else emptyTemplate">
+        <ng-container *ngIf="items.length; else emptyTemplate">
+          <ng-container *ngFor="let item of items">
+            <div class="label">
+              <go-checkbox [state]="[innerValue, item] | pipeFunction : isChecked"
+                (ngModelChange)="updateValue($event, item)"></go-checkbox>
+              <!-- <input tabindex="-1" class="checkbox" type="checkbox" [ngModel]="[innerValue, item] | pipeFunction : isChecked" (ngModelChange)="updateValue($event, item)"> -->
+              <div class="description">
+                {{item.label}}
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      <ng-template #emptyTemplate>
+        <div class="empty-selection">No Values</div>
+      </ng-template>
+    </div>
+  </ps-overlaypanel>
+</go-button>

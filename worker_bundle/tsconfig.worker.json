@@ -1,0 +1,37 @@
+{
+  // "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./web-worker",
+    "outDir": "./dist/out-tsc/worker",
+    "sourceMap": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2015",
+    "lib": [
+      "esnext",
+      "webworker"
+    ],
+    "module": "es2015",
+    "typeRoots": [
+      "../../node_modules/@types"
+    ],
+    "types": [],
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts",
+    "src/worker/WorkerHub.ts",
+  ],
+  "include": [
+    "**/*.ts",
+    "src/worker/*.ts",
+    "src/client/environments/*.ts",
+  ],
+  "files": [
+    "../client/app/shared/global_origin.ts"
+  ]
+}

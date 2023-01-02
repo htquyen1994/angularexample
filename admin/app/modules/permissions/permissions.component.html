@@ -1,0 +1,157 @@
+<div class="page-body">
+  <div class="page-body__header">
+    <div class="page-body__header__page-title">
+      Data Permissions
+    </div>
+    <div class="separator"></div>
+    <div class="page-body__header__page-content">
+
+    </div>
+  </div>
+  <div class="page-body__content">
+    <div class="row">
+      <ng-container [ngTemplateOutlet]="UserFilter"></ng-container>
+      <ng-container *ngIf="activeTab === 0; else ClaimsControl">
+        <ng-container [ngTemplateOutlet]="DataPermissionControl"></ng-container>
+      </ng-container>
+    </div>
+
+    <ng-container *ngIf="!isSuperUser; else TabView">
+      <ng-container [ngTemplateOutlet]="DataPermission"></ng-container>
+    </ng-container>
+  </div>
+  <div class="page-body__footer">
+  </div>
+</div>
+<ng-template #DataPermission>
+  <periscope-table [sorted]="true" [loading]="layerLoading || (submitting | async)" [isClientPaging]="true"
+    [data]="datas$ | async" [rowTemplate_withoutWrapper]="rowTemplate" [groupTemplate]="groupTemplate"
+    [isGroup]="true" [groupRowsBy]="'groupName'" [pageSize]="pageSize">
+    <ng-container *goTableHeader>
+      <div class="rTableHeading">
+        <div class="rTableHead" style="width: 100%;">
+          Layers
+        </div>
+        <ng-container *ngFor="let claim of claims$ | async">
+          <div class="rTableHead align-center">
+            <mat-checkbox color="primary" [disabled]="allClaims[claim.id]?.disabled"
+              [checked]="allClaims[claim.id]?.checked == 1" [indeterminate]="allClaims[claim.id]?.checked == 2"
+              (change)="onSelectColumn(claim, $event.checked)">
+              {{claim.name}}
+            </mat-checkbox>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-template #groupTemplate let-group>
+      <b>{{ group?.groupName }}</b>
+    </ng-template>
+    <ng-template #rowTemplate let-row>
+      <ng-container *ngIf="row?.children?.length > 1">
+        <div class="rTableRow">
+          <div class="rTableCell pointer" style="width: 100%;" (click)="onToggleGroup(row)">
+            {{ row['layerName'] }}
+            <label [ngClass]="{ asc: row.collapsed, desc: !row.collapsed }"></label>
+          </div>
+          <ng-container *ngFor="let claim of claims$ | async">
+            <div class="rTableCell align-center">
+              <mat-checkbox color="primary" [disabled]="!row?.enabled[claim.id]"
+                [checked]="row?.claimsData[claim.id] == 1" [indeterminate]="row?.claimsData[claim.id] == 2"
+                (change)="onSelectClaim(row, claim, $event.checked)">
+              </mat-checkbox>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngFor="let child of row?.children">
+        <div class="rTableRow" [hidden]="row.collapsed">
+          <ng-container *ngIf="row?.children?.length == 1; else layerChild">
+            <div class="rTableCell" style="width: 100%;">
+              {{child['layerName']}}
+            </div>
+          </ng-container>
+          <ng-template #layerChild>
+            <div class="rTableCell" style="width: 100%;">
+              <div class="child">
+                {{ child['layerName'] }}
+              </div>
+            </div>
+          </ng-template>
+          <ng-container *ngFor="let claim of claims$ | async">
+            <div class="rTableCell align-center">
+              <mat-checkbox color="primary" [disabled]="!child?.enabled[claim.id]"
+                [ngModel]="child?.claimsData[claim.id]"
+                (ngModelChange)="onSelectClaim(child, claim, !child.claimsData[claim.id])">
+              </mat-checkbox>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </ng-template>
+  </periscope-table>
+</ng-template>
+
+<ng-template #TabView>
+  <ps-tabview (change)="onTabChange($event)" #tabView>
+    <ps-tabpanel header="Data Permission">
+      <ng-container [ngTemplateOutlet]="DataPermission"></ng-container>
+    </ps-tabpanel>
+    <ps-tabpanel header="Administrative Claims" [disabled]="this.form?.invalid || isEditingTemplate">
+      <ps-administrative-claims [tenantId]="this.form?.get('selectedTenant').value"
+      [userId]="this.form?.get('selectedUser').value" #administrativeTemplate></ps-administrative-claims>
+    </ps-tabpanel>
+  </ps-tabview>
+</ng-template>
+
+<ng-template #UserFilter>
+  <ng-container [formGroup]="form">
+    <go-periscope-dropdown *ngIf="isSuperUser" class="mr-15" [isLoading]="tenantLoading"
+      [options]="tenantOptions" placeholder="Select tenant" formControlName="selectedTenant"></go-periscope-dropdown>
+    <go-periscope-dropdown class="auto-width mr-15" [isLoading]="userLoading" [options]="userOptions" placeholder="Select user"
+      formControlName="selectedUser" ></go-periscope-dropdown>
+  </ng-container>
+</ng-template>
+
+<ng-template #DataPermissionControl>
+    <ng-container [formGroup]="formDataPermissions">
+      <go-periscope-dropdown class="mr-15" [isLoading]="layerLoading" [options]="layerOptions" multiple="true"
+        placeholder="Filter Layers" formControlName="filterLayers" width="250px" [isGroup]="true">
+      </go-periscope-dropdown>
+      <div class="separator"></div>
+      <go-periscope-dropdown class="mr-15" [removeSelected]="true" [isLoading]="templatesLoading"
+        [options]="templateOptions" [placeholder]="templateOptions?.length ? 'Select Template': 'No templates exist'" formControlName="selectedTemplate"
+        actionOptionIcon="delete" (actionOptionClicked)="onActionOptionTemplateClicked($event)">
+      </go-periscope-dropdown>
+    </ng-container>
+    <ng-container *ngIf="!isEditingTemplate; else EditingTemplate">
+      <button *ngIf="isSuperUser" class="button-spinner mr-15" type="button" [disabled]="!formDataPermissions.get('selectedTemplate')?.value"
+      mat-icon-button color="primary" (click)="onEditingTemplate()">
+       <mat-icon>edit</mat-icon>
+      </button>
+      <button class="button-spinner mr-15" type="button" [disabled]="form?.invalid || (submitting | async)" mat-raised-button
+        color="primary" (click)="onSaveAsTemplate()">
+        New Template
+      </button>
+    </ng-container>
+    <button class="button-spinner" type="button" [disabled]="form?.invalid || (submitting | async) || isEditingTemplate"
+      mat-raised-button color="primary" (click)="onSave()">
+      Save
+    </button>
+</ng-template>
+
+<ng-template #EditingTemplate>
+  <button mat-icon-button class="button-spinner mr-15" type="button" color="primary" (click)="onCancelUpdateTemplate()"  matTooltip="Cancel Editing">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button class="button-spinner mr-15" type="button" mat-raised-button
+    color="primary" (click)="onUpdateTemplate()">
+    Update Template
+  </button>
+</ng-template>
+<ng-template #ClaimsControl>
+  <div class="separator"></div>
+  <button class="button-spinner" type="button" [spinnerbtn]="claimsSubmitting$ | async" [disabled]="form?.invalid  || (claimsSubmitting$ | async)"
+    mat-raised-button color="primary" (click)="onSaveClaims()">
+    Save
+  </button>
+</ng-template>

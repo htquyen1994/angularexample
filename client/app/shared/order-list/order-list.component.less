@@ -1,0 +1,43 @@
+.single-wrap {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+    border: 1px solid #999;
+}
+.select, .input {
+	flex-shrink: 0;
+	margin: 2px;
+	width: 340px;
+	&.search-auto {
+		width: auto;
+	}
+}
+.order-list-item{
+    padding: 5px 7px;
+    cursor: pointer;
+	height: 33px;
+    align-items: center;
+    display: flex;
+    &:hover{
+        background-color: #d7d7d7;
+    }
+}
+.order-list-item--name{
+    min-width: 100px;
+    text-overflow: ellipsis;
+	  white-space: nowrap;
+	  overflow: hidden;
+}
+.order-list-item--des{
+    flex: 1 0;
+    text-overflow: ellipsis;
+	  white-space: nowrap;
+    overflow: hidden;
+    color: #929292;
+}
+.virtual-container {
+	display: block;
+	width: 100%;
+    max-height: 200px;
+    min-height: 200px;
+}

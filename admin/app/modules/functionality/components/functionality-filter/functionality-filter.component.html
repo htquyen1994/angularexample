@@ -1,0 +1,8 @@
+<form [formGroup]="formGroup">
+  <go-periscope-dropdown  class="mr-15" [isLoading]="tenantLoading"
+    [options]="tenantOptions" placeholder="Select tenant" formControlName="tenantId"></go-periscope-dropdown>
+</form>
+<div class="separator"></div>
+<button class="button-spinner" type="button"  [spinnerbtn]="loadingDownload" [disabled]="disabledDownload" mat-raised-button color="primary" (click)="onDownload()">
+  Download
+</button>

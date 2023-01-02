@@ -1,0 +1,34 @@
+ps-customer-sessions-by-week {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  .customer-sessions-chart {
+    height: calc(100% - 40px);
+    width: 100%;
+  }
+
+  .customer-sessions-graph {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .customer-sessions-branches {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .chart-tooltip {
+    display: none;
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    border: 1px solid rgba(0,0,0,0.8);
+    font-size: 12px;
+    padding: 6px;
+    text-align: center;
+    width: fit-content;
+  }
+}

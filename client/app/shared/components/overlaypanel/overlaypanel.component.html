@@ -1,0 +1,6 @@
+<p-overlayPanel #op [styleClass]="'overlay-panel-wrapper ' + styleClass" [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'"
+appendTo="body" (onShow)="onShow()" (onHide)="onHide()" >
+  <ng-template pTemplate>
+      <ng-content></ng-content>
+  </ng-template>
+</p-overlayPanel>

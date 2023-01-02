@@ -1,0 +1,17 @@
+<ps-tabview (change)="onTabChange($event)">
+    <ps-tabpanel header="By Week">
+        <ps-customer-sessions-by-week *ngIf="data && isInit" [fadCode]="data?.FadCode"></ps-customer-sessions-by-week>
+    </ps-tabpanel>
+    <ps-tabpanel header="By Kit">
+        <ps-customer-sessions-by-kit *ngIf="data" [fadCode]="data?.FadCode"></ps-customer-sessions-by-kit>
+    </ps-tabpanel>
+    <ps-tabpanel header="By Day / Time">
+        <ps-customer-sessions-by-day-time *ngIf="data" [fadCode]="data?.FadCode"></ps-customer-sessions-by-day-time>
+    </ps-tabpanel>
+    <!--<ps-tabpanel header="Averages">
+        <ps-customer-sessions-averages *ngIf="data" [fadCode]="data?.FadCode"></ps-customer-sessions-averages>
+    </ps-tabpanel>-->
+    <ps-tabpanel header="Product Mix">
+        <ps-customer-sessions-performance *ngIf="data" [fadCode]="data?.FadCode"></ps-customer-sessions-performance>
+    </ps-tabpanel>
+</ps-tabview>

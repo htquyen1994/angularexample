@@ -1,0 +1,6 @@
+<p-divider [align]="align">
+  <ng-content select="[legend]"></ng-content>
+</p-divider>
+<ng-container *ngIf="show">
+  <ng-content></ng-content>
+</ng-container>

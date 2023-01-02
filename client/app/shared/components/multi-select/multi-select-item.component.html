@@ -1,0 +1,7 @@
+<div class="label">
+	<input tabindex="-1" class="checkbox" type="checkbox" [(ngModel)]="checked"
+		*ngIf="item.isParent === false" (ngModelChange)="updateValue($event)">
+	<div class="description">
+		{{item.description}}
+	</div>
+</div>

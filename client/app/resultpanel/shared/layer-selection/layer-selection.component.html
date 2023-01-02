@@ -1,0 +1,7 @@
+<go-button icon="layers" button-toolbar>Layer selected
+	<mat-icon [svgIcon]="'caret-down'" svgIcon="small" class="caret"></mat-icon>
+</go-button>
+<go-dropdown #dropdown>
+	<div *ngFor="let layer of layers">
+		<go-button>{{layer.name}}</go-button></div>
+</go-dropdown>

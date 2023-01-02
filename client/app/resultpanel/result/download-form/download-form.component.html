@@ -1,0 +1,27 @@
+<go-dialog title="Download Data" (close)="onClose($event)" #dialog isDrag="true">
+  <go-spinner *ngIf="isLoading && !error"></go-spinner>
+  <div class="page">
+    <form [formGroup]="form">
+      <div class="page-content">
+        <go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+        <div class="row">
+          <label>Records selection</label>
+          <ps-select [options]="selectionTypeOptions" formControlName="selectionType" [placeholder]="'Select a type'"
+            [appendTo]="'body'">
+          </ps-select>
+        </div>
+        <div class="row">
+          <label>Download file type</label>
+          <ps-select [options]="fileTypeOptions" formControlName="fileType" [placeholder]="'Select a file type'"
+            [appendTo]="'body'">
+          </ps-select>
+        </div>
+      </div>
+    </form>
+    <div class="row-button">
+      <div class="separator"></div>
+      <go-button button-flat (clicked)="onClose(true)">Cancel</go-button>
+      <go-button button-raised (clicked)="onComplete()" [disabled]="form?.invalid">Download</go-button>
+    </div>
+  </div>
+</go-dialog>

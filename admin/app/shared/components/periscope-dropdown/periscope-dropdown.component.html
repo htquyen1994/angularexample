@@ -1,0 +1,108 @@
+<mat-form-field [style.width]="width">
+    <mat-label *ngIf="isLoading">Loading...</mat-label>
+    <mat-label *ngIf="!isLoading">{{placeholder}}</mat-label>
+    <ng-template [ngIf]="!multiple">
+        <mat-select [formControl]="selected" panelClass="periscope-dropdown-select">
+            <mat-select-trigger>
+                <div class="select-trigger-name">
+                    {{[selected.value, oldoptions] | pipeFunction : getNameSelected}}
+                </div>
+                <div *ngIf="removeSelected" class="select-trigger-action">
+                    <button class="option-action" *ngIf="selected.value" mat-icon-button matSuffix [disabled]="disabled"
+                        (click)="onRemoveSelected($event)">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+            </mat-select-trigger>
+            <div class="select-search-wrapper" *ngIf="search">
+                <input matInput class="select-search-input" placeholder="Search " (keyup)="onKey($event.target.value)">
+            </div>
+            <ng-container *ngIf="isGroup;else normalOptionsTemplate">
+                <mat-optgroup *ngFor="let group of groupOptions" [label]="group.name">
+                    <mat-option *ngFor="let item of group.options" [value]="item.id">
+                        <div class="option-name">{{item?.name}}</div>
+                        <button class="option-action" *ngIf="actionOptionIcon" mat-icon-button matSuffix
+                            (click)="onClickOptionAction(item)">
+                            <mat-icon>{{actionOptionIcon}}</mat-icon>
+                        </button>
+                    </mat-option>
+                </mat-optgroup>
+                <ng-container [ngTemplateOutlet]="noDataGroupTemplate"></ng-container>
+            </ng-container>
+            <ng-template #normalOptionsTemplate>
+                <mat-option *ngFor="let item of options" [value]="item.id">
+                    <div class="option-name">{{item?.name}}</div>
+                    <button class="option-action" *ngIf="actionOptionIcon" mat-icon-button matSuffix
+                        (click)="onClickOptionAction(item)">
+                        <mat-icon>{{actionOptionIcon}}</mat-icon>
+                    </button>
+                </mat-option>
+                <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+            </ng-template>
+        </mat-select>
+    </ng-template>
+    <ng-template [ngIf]="multiple">
+        <mat-select [value]="selected.value" multiple panelClass="periscope-dropdown-select">
+            <mat-select-trigger>
+                <div class="select-trigger-name">
+                    {{[selected.value, oldoptions] | pipeFunction : getNameSelected}}
+                </div>
+                <div *ngIf="selected.value?.length > 1" class="additional-selection">
+                    (+{{selected.value.length - 1}} {{selected.value?.length === 2 ? 'other' : 'others'}})
+                </div>
+                <!-- <div *ngIf="removeSelected" class="select-trigger-action">
+                    <button class="option-action" *ngIf="selected.value" mat-icon-button matSuffix (click)="onRemoveSelected($event)">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div> -->
+            </mat-select-trigger>
+            <div class="select-search-wrapper" *ngIf="search">
+                <input matInput class="select-search-input" placeholder="Search " (keyup)="onKey($event.target.value)">
+                <mat-checkbox color="primary" [checked]="checkedAll" [indeterminate]="indeterminateAll"
+                    (change)="onCheckAll($event.checked)">
+                </mat-checkbox>
+            </div>
+
+            <ng-container *ngIf="isGroup;else normalOptionsTemplate">
+                <mat-optgroup *ngFor="let group of groupOptions">
+                    <div class="option-group">
+                        <mat-checkbox color="primary" [checked]="group.checked == 1"
+                            [indeterminate]="group.checked == 2" (change)="onClickGroup(group, $event.checked)">
+                        </mat-checkbox>
+                        {{group.name}}
+                    </div>
+                    <mat-option *ngFor="let item of group.options" [selected]="selected?.value?.includes(item.id)"
+                        [value]="item.id" #matOption (click)="onClickOption(matOption)">
+                        <div class="option-name">{{item?.name}}</div>
+                        <button class="option-action" *ngIf="actionOptionIcon" mat-icon-button matSuffix
+                            (click)="onClickOptionAction(item)">
+                            <mat-icon>{{actionOptionIcon}}</mat-icon>
+                        </button>
+                    </mat-option>
+                </mat-optgroup>
+                <ng-container [ngTemplateOutlet]="noDataGroupTemplate"></ng-container>
+            </ng-container>
+            <ng-template #normalOptionsTemplate>
+                <mat-option *ngFor="let item of options" [selected]="selected?.value?.includes(item.id)"
+                    [value]="item.id" #matOption (click)="onClickOption(matOption)">
+                    <div class="option-name">{{item?.name}}</div>
+                    <button class="option-action" *ngIf="actionOptionIcon" mat-icon-button matSuffix
+                        (click)="onClickOptionAction(item)">
+                        <mat-icon>{{actionOptionIcon}}</mat-icon>
+                    </button>
+                </mat-option>
+                <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+            </ng-template>
+        </mat-select>
+    </ng-template>
+</mat-form-field>
+<ng-template #noDataGroupTemplate>
+    <div *ngIf="groupOptions && groupOptions.length == 0" class="select-search-wrapper">
+        <label>No data to display</label>
+    </div>
+</ng-template>
+<ng-template #noDataTemplate>
+    <div *ngIf="options && options.length == 0" class="select-search-wrapper">
+        <label>No data to display</label>
+    </div>
+</ng-template>

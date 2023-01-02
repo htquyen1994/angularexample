@@ -1,0 +1,9 @@
+<ng-container *ngFor="let message of messages; let i = index">
+	<div class="message message-{{message.type}}" [@messageState]="messageState[i]">
+		<div class="message-text">{{message.message}}</div>
+
+		<button type="button" mat-icon-button (click)="onRemove(message)">
+			<mat-icon aria-label="Menu">close</mat-icon>
+		</button>
+	</div>
+</ng-container>

@@ -1,0 +1,6 @@
+<go-button type="icon" [icon]="'map-' + value" (clicked)="onClick($event, op)" [ngStyle]="{'color': _fillColor}"></go-button>
+<p-overlayPanel #op styleClass="icons-select-wrapper" [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'"
+	appendTo="body">
+	<go-button [selected]="icon === value" type="icon" *ngFor="let icon of iconKeys;" [icon]="'map-' + icon"
+		(clicked)="writeValue(icon);detroy(op)"></go-button>
+</p-overlayPanel>

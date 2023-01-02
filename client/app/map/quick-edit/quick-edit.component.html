@@ -1,0 +1,36 @@
+<!-- <go-dialog title="Quick Edit" (close)="close()" isDrag="true" #dialog [styles]="{'width': '300px'}" [position]="innitPosition"> -->
+    <!-- <div class="button-close-wrap">
+        <go-button class="button-close" button-flat (clicked)="onClose()">Close</go-button>
+      </div> -->
+    <div class="layers-wrapper">
+        <go-error-message class="row" *ngIf="error" [error]="error"></go-error-message>
+        <ng-container *ngFor="let layer of layers">
+            <div class="quickedit-layer">
+                <div class="quickedit-layer__row">
+                    <div class="label">Editing:</div>
+                    <div class="text">{{layer?.layerName}}</div>
+                </div>
+                <div class="quickedit-layer__row">
+                    <div class="label">Changes:</div>
+                    <div>{{changes[layer?.layerId] ? changes[layer?.layerId] : '0'}} of {{layer?.length}}</div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+    <div class="actions d-flex w-100">
+        <go-button-group>
+            <go-button button-raised (clicked)="undo()" [disabled]="!(queueActions$ | async).length">
+                Undo
+            </go-button>
+            <go-button button-raised (clicked)="undoAll()" [disabled]="!(queueActions$ | async).length">
+                Reset
+            </go-button>
+        </go-button-group>
+        <div class="divider"></div>
+        <go-button button-raised [disabled]="(loading$ | async)" (clicked)="onSave()">
+            Save
+        </go-button>
+    </div>
+    <go-spinner *ngIf="loading$ | async" class="spinner-block-ui"></go-spinner>
+    <!-- <div class="loading-overlay" *ngIf="(loading$ | async) || _isLoading"></div> -->
+<!-- </go-dialog> -->

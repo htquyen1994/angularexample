@@ -1,0 +1,159 @@
+<div class="map" #map></div>
+<div class="control-container-top">
+  <div style="align-self: center;margin: 5px;" *ngIf="timerValue && isDevMode">{{timerValue | number:'1.1-2' }} s</div>
+  <go-spinner-progress [percentageValue]="progress$ | async" class="map-progress-spinner">
+  </go-spinner-progress>
+  <go-button-group *ngIf="account?.showLocationTools">
+    <go-button type="icon" icon="home" title="Home location" (clicked)="onHomeLocation()"></go-button>
+    <go-button type="icon" icon="home-add" [selected]="activeMapTool === mapToolType.SAVE_LOCATION"
+      title="Save location" (clicked)="onToggleDialogTool($event, mapToolType.SAVE_LOCATION)" [disabled]="!(mapToolType.SAVE_LOCATION | mapToolAvailable | async)" [selected]="[activeDialogTools, mapToolType.SAVE_LOCATION] | pipeFunction: checkSelectedDialogTools">
+    </go-button>
+    <go-button type="icon" icon="locate" title="Locate all active shapes" [disabled]="selectedShapes === 0 || (!(mapToolType.LOCATE_ALL_SHAPES | mapToolAvailable | async))"
+      [selected]="activeMapTool === mapToolType.LOCATE_ALL_SHAPES" (clicked)="onTool(mapToolType.LOCATE_ALL_SHAPES)">
+    </go-button>
+  </go-button-group>
+  <go-button-group *ngIf="(account?.hasRouteWithDirections && account?.showRouteWithDirections) || account?.hasPOLSecurity">
+    <go-button *ngIf="account?.hasRouteWithDirections && account?.showRouteWithDirections" [selected]="[activeDialogTools, mapToolType.ROUTE_TOOL] | pipeFunction: checkSelectedDialogTools"
+      [disabled]="!(mapToolType.ROUTE_TOOL | mapToolAvailable | async)" type="icon" icon="road-route-map" size="medium"
+      title="Route and Directions" (clicked)="onToggleDialogTool($event, mapToolType.ROUTE_TOOL)"></go-button>
+    <go-button *ngIf="account?.hasPOLSecurity" [selected]="activeMapTool === mapToolType.CRIME_STATISTIC"
+      [disabled]="!(mapToolType.CRIME_STATISTIC | mapToolAvailable | async)" type="icon" icon="table_chart" size="medium"
+      title="Crime Statistic" (clicked)="onOpenCrimeStatistic()"></go-button>
+  </go-button-group>
+  <go-button-group>
+    <go-button type="icon" icon="geo-point" title="Draw point"
+      [disabled]="!(mapToolType.MARKER | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.MARKER"
+      (clicked)="onTool(mapToolType.MARKER)" *ngIf="account?.showDrawingTools"></go-button>
+    <go-button type="icon" icon="geo-polyline" title="Draw line" [disabled]="!(mapToolType.POLYLINE | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.POLYLINE"
+      (clicked)="onTool(mapToolType.POLYLINE)" *ngIf="account?.showDrawingTools"></go-button>
+    <go-button type="icon" icon="geo-circle" title="Draw circle"
+      [disabled]="!(mapToolType.CIRCLE | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.CIRCLE"
+      (clicked)="onTool(mapToolType.CIRCLE)" *ngIf="account?.showDrawingTools"></go-button>
+    <go-button type="icon" icon="geo-rectangle" title="Draw rectangle"
+      [disabled]="!(mapToolType.RECTANGLE | mapToolAvailable | async)"
+      [selected]="activeMapTool === mapToolType.RECTANGLE"
+      (clicked)="onTool(mapToolType.RECTANGLE)" *ngIf="account?.showDrawingTools"></go-button>
+    <go-button type="icon" icon="geo-polygon" title="Draw polygon"
+      [disabled]="!(mapToolType.POLYGON | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.POLYGON"
+      (clicked)="onTool(mapToolType.POLYGON)" *ngIf="account?.showDrawingTools"></go-button>
+    <go-button type="icon" icon="isogram" title="Show catchment" [disabled]="!(mapToolType.ISOGRAM | mapToolAvailable | async)" [selected]="[activeDialogTools, mapToolType.ISOGRAM] | pipeFunction: checkSelectedDialogTools"
+      (clicked)="onToggleDialogTool($event, mapToolType.ISOGRAM, true)" [isLoading]="loadingIcon[mapToolType[mapToolType?.ISOGRAM]]"
+      *ngIf="account?.showDrawingTools">
+    </go-button>
+    <go-button type="icon" icon="delete-one" title="Delete shape" [disabled]="!(mapToolType.SHAPE_DELETE | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.SHAPE_DELETE"
+      (clicked)="onTool(mapToolType.SHAPE_DELETE)"></go-button>
+    <go-button type="icon" icon="delete-all" title="Delete all shapes" [disabled]="!(mapToolType.SHAPE_DELETE_ALL | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.SHAPE_DELETE_ALL"
+      (clicked)="onTool(mapToolType.SHAPE_DELETE_ALL)"></go-button>
+  </go-button-group>
+
+
+  <go-button-group>
+    <go-button type="icon" icon="pointer" title="Select shape" [disabled]="!(mapToolType.SELECTION | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.SELECTION" (clicked)="onTool()"
+      style="z-index: 1001">
+      <go-edit-label dropdown [class.d-none]="!(mapToolType.SELECTION | mapToolAvailable | async)"></go-edit-label>
+    </go-button>
+    <go-button *ngIf="account?.showSelectionTools" type="icon" icon="selection-map"
+      title="Map selection tool: add shapes"  [isLoading]="selectionMapToolLoading$ | async" [disabled]="!(mapToolType.SELECTION_MAP | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.SELECTION_MAP"
+      (clicked)="onTool(mapToolType.SELECTION_MAP)"></go-button>
+    <go-button *ngIf="account?.showSelectionTools" type="icon" icon="selection-polygon"
+      title="Polygon selection tool: add shapes" [disabled]="!(mapToolType.SELECTION_POLYGON | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.SELECTION_POLYGON"
+      (clicked)="onTool(mapToolType.SELECTION_POLYGON)"></go-button>
+    <go-button *ngIf="account?.showSelectionTools" type="icon" icon="selection-add" title="Selection tool: add shapes"
+      [disabled]="!(mapToolType.SELECTION_ADD | mapToolAvailable | async)"
+      [selected]="activeMapTool === mapToolType.SELECTION_ADD" (clicked)="onTool(mapToolType.SELECTION_ADD)">
+    </go-button>
+    <go-button *ngIf="account?.showSelectionTools" type="icon" icon="selection-remove"
+      title="Selection tool: deselect shapes" [disabled]="!(mapToolType.SELECTION_REMOVE | mapToolAvailable | async)"
+      [selected]="activeMapTool === mapToolType.SELECTION_REMOVE" (clicked)="onTool(mapToolType.SELECTION_REMOVE)">
+    </go-button>
+    <go-button *ngIf="account?.showSelectionTools" type="icon" icon="selection-remove-all"
+      title="Selection tool: deselect all shapes" class="icon-number" [disabled]="!(mapToolType.SELECTION_REMOVE_ALL | mapToolAvailable | async)"
+      [selected]="activeMapTool === mapToolType.SELECTION_REMOVE_ALL"
+      (clicked)="onTool(mapToolType.SELECTION_REMOVE_ALL)">
+      <div class="icon-number-value" [class.icon-number-value--prominent]="selectedShapes > 0">
+        {{selectedShapes <= 99 ? selectedShapes : '99+'}}
+      </div>
+    </go-button>
+  </go-button-group>
+  <go-button-group>
+    <go-button *ngIf="account?.showInformation" type="icon" icon="selection-info" title="Show information" [disabled]="!(mapToolType.MEASUREMENT | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.MEASUREMENT"
+      (clicked)="onTool(mapToolType.MEASUREMENT)"></go-button>
+    <go-button type="icon" icon="measure-tool" title="Measure" [disabled]="!(mapToolType.MEASUREMENT_NEW | mapToolAvailable | async)" [selected]="[activeDialogTools, mapToolType.MEASUREMENT_NEW] | pipeFunction: checkSelectedDialogTools"
+      (clicked)="onToggleDialogTool($event, mapToolType.MEASUREMENT_NEW)">
+    </go-button>
+
+    <go-button type="icon" icon="report" title="Download Reports"
+      *ngIf="hasAdvancedReporting && account?.showEnhancedReportingTool" [disabled]="!(mapToolType.REPORTS | mapToolAvailable | async)" [selected]="[activeDialogTools, mapToolType.REPORTS] | pipeFunction: checkSelectedDialogTools"
+      (clicked)="onToggleDialogTool($event, mapToolType.REPORTS)" [isLoading]="loadingIcon[mapToolType[mapToolType?.REPORTS]]">
+    </go-button>
+
+     <go-button *ngIf="canIntersect && account?.showIntersectionTool" type="icon" icon="intersection"
+      title="Intersection" [disabled]="selectedShapes < 2 || !(mapToolType.INTERSECTION | mapToolAvailable | async)"
+      [selected]="activeMapTool === mapToolType.INTERSECTION" (clicked)="onTool(mapToolType.INTERSECTION)">
+    </go-button>
+    <go-button *ngIf="canIntersect && account?.showIntersectionTool" type="icon" icon="union" title="Union" [disabled]="selectedShapes < 2 || !(mapToolType.UNION | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.UNION"
+      (clicked)="onTool(mapToolType.UNION)">
+    </go-button>
+    <go-button type="icon" icon="insights" title="Insight" *ngIf="viewQuickInsight && account?.showInsights"
+      [disabled]="!(mapToolType.INSIGHTS | mapToolAvailable | async) || !(insightLayers$ | async).length" [selected]="[activeDialogTools, mapToolType.INSIGHTS] | pipeFunction: checkSelectedDialogTools"
+      (clicked)="onToggleDialogTool($event, mapToolType.INSIGHTS, true)">
+    </go-button>
+    <go-button type="icon" icon="nearest-tool" title="Nearest" *ngIf="viewNearest && account?.showNearest"
+      [disabled]="!(mapToolType.NEAREST | mapToolAvailable | async) || !(insightLayers$ | async).length" [selected]="[activeDialogTools, mapToolType.NEAREST] | pipeFunction: checkSelectedDialogTools"
+      (clicked)="onToggleDialogTool($event, mapToolType.NEAREST, true)">
+    </go-button>
+    <go-button type="icon" icon="geo-split" title="Split row" [disabled]="!(mapToolType.SHAPE_SPLIT | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.SHAPE_SPLIT"
+      *ngIf="canSplit && account?.showSplitShape" (clicked)="onTool(mapToolType.SHAPE_SPLIT)"></go-button>
+    <go-button type="icon" icon="print" title="Print map" *ngIf="canPrint && account?.showPrintTool" [disabled]="!(mapToolType.PRINT | mapToolAvailable | async)" [selected]="activeMapTool === mapToolType.PRINT"
+      (clicked)="onPrint()"></go-button>
+  </go-button-group>
+  <!--Comment out for first release-->
+  <!--<go-button-group class="groups-container" *ngIf="canIntersect && account?.showIntersectionTool">
+    <ps-button-group-column
+      [disabled]="selectedShapes < 2 || (activeMapTool | mapToolDisabled)" [items]="intersectionToolColumnButtons"
+      [active]="activeMapTool" (clicked)="onTool($event)">
+    </ps-button-group-column>
+  </go-button-group>-->
+  <go-button-group *ngIf="canQuickEdit">
+    <go-button *ngIf="account?.showQuickEdit" type="icon" icon="quick-edit" title="Quick Edit"
+      [disabled]="(selectedPointShapes < 1 || selectedPointShapes > MAXQUICKEDIT) || !(mapToolType.QUICKEDIT | mapToolAvailable | async)"
+      [selected]="[activeDialogTools, mapToolType.QUICKEDIT] | pipeFunction: checkSelectedDialogTools" (clicked)="onToggleDialogTool($event, mapToolType.QUICKEDIT)"
+      [isLoading]="loadingIcon[mapToolType[mapToolType?.QUICKEDIT]]">
+      <!-- <div class="icon-number-value" [class.icon-number-value--prominent]="selectedPointShapes > 0 && selectedPointShapes < 11">{{selectedPointShapes <= 10 ? selectedPointShapes : '10+'}}</div> -->
+    </go-button>
+  </go-button-group>
+  <go-button-group>
+    <go-button type="icon" [icon]="(notReadCounting$ | async) ? 'notifications-active' : 'notifications'" title="Notification"
+      [selected]="[activeDialogTools, mapToolType.NOTIFICATION] | pipeFunction: checkSelectedDialogTools" (clicked)="toggleNotifications()">
+      <div class="icon-number-value" [class.icon-number-value--focus]="notReadCounting$ | async">{{notReadCounting$ | async}}</div>
+    </go-button>
+  </go-button-group>
+  <go-button-group *ngIf="showRefreshBtn">
+    <go-button type="icon" icon="refresh" title="Refresh Screen Height" (clicked)="calculateVH()"></go-button>
+  </go-button-group>
+</div>
+<div class="control-container">
+  <go-button-group>
+    <go-button type="icon" icon="map-locate" title="Your location" *ngIf="hasGeoLocation && account?.showMyLocationTool"
+      (clicked)="onLocate()" tooltipPosition="left"></go-button>
+    <go-button type="icon" icon="tracking-location" title="Follow me"
+      *ngIf="hasFollowLocation && account?.showFollowMeTool" [selected]="watchPositionId > 0" (clicked)="onFollowMe()"
+      tooltipPosition="left"></go-button>
+  </go-button-group>
+
+  <go-button-group>
+    <go-button type="icon" icon="zoomin" title="Zoom in" (clicked)="onZoom(1)" tooltipPosition="left"></go-button>
+    <go-button type="icon" icon="zoomout" title="Zoom out" (clicked)="onZoom(-1)" tooltipPosition="left">
+      <div *ngIf="showZoomLevelIndicator" class="icon-number-value">{{zoomLevel}}</div>
+    </go-button>
+  </go-button-group>
+
+  <go-button-group *ngIf="account?.showPointOfInterest">
+    <go-button type="icon" icon="geo-traffic" title="Traffic layer" #traffic (clicked)="onTraffic(traffic)"
+      tooltipPosition="left"></go-button>
+    <go-button type="icon" icon="geo-poi" title="Points of interest" #poi (clicked)="onPoi(poi)" tooltipPosition="left">
+    </go-button>
+  </go-button-group>
+  <ps-button-group-column [items]="mapTypeColumnButtons" [active]="mapType" (clicked)="onMapType($event)">
+  </ps-button-group-column>
+</div>

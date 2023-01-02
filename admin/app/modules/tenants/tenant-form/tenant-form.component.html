@@ -1,0 +1,36 @@
+<button mat-icon-button mat-dialog-close>
+  <mat-icon>close</mat-icon>
+</button>
+
+<h1 mat-dialog-title>Edit Tenant</h1>
+
+<form class="position-relative" mat-dialog-content [formGroup]="form">
+  <go-spinner *ngIf="loading$ | async"></go-spinner>
+  <div class="overlay" *ngIf="loading$ | async"></div>
+  <mat-form-field>
+    <input matInput placeholder="Legal Entity" formControlName="legal_entity">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Account Manager" formControlName="account_manager">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Licence Expires" [matDatepicker]="picker" formControlName="tenantLicenceExpires">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Tenant status" formControlName="tenant_status">
+      <mat-option *ngFor="let status of tenantStatuses | async" [value]="status.id">{{status.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
+  </mat-form-field>
+</form>
+<div mat-dialog-actions>
+  <div class="separator"></div>
+  <button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
+  <button mat-raised-button [disabled]="form.invalid" (click)="onUpdate()" color="accent">
+    Update
+  </button>
+</div>

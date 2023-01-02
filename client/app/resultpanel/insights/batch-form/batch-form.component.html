@@ -1,0 +1,13 @@
+<ng-template [ngIf]="form">
+	<form class="layer-dropdown-wrap" [formGroup]="form">
+		<div class="row">
+			<label>Layer</label>
+      <ps-select [styleClass]="'ps-select'" [options]="layerOptions" formControlName="layer"
+        [placeholder]="'Select a layer'" [appendTo]="'body'">
+      </ps-select>
+		</div>
+		<div class="row">
+			<go-button button-raised (clicked)="onCreateBatch()">Create Batch</go-button>
+		</div>
+	</form>
+</ng-template>

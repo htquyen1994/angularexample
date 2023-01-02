@@ -1,0 +1,105 @@
+@import 'shared-mixins';
+
+:host {
+  .shadow-overlay();
+  display: flex;
+  flex-direction: column;
+  background-color: @color-inverted;
+  border-left: 1px solid @color-tertiary;
+  height: 100%;
+  .tabs {
+    display: flex;
+    flex-shrink: 0;
+    padding: 0 0 0 50px;
+    background-color: @color-primary;
+    position: relative;
+    color: @color-inverted;
+    height: 34px;
+    overflow: auto;
+    go-button[type='icon'] {
+      height: 100%;
+    }
+  }
+
+  .tabs-item {
+    display: flex;
+    position: relative;
+    align-items: center;
+    padding: 0 15px;
+    cursor: pointer;
+    margin-right: 2px;
+    margin-top: 3px;
+    font-weight: 400;
+    user-select: none;
+    text-transform: uppercase;
+
+    &[aria-selected='true'] {
+      background-color: @color-inverted;
+      color: @color-text;
+    }
+    &[aria-disabled='true'] {
+      color: @color-disabled;
+      cursor: unset;
+    }
+    go-button {
+      &.remove-tab {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        right: 0;
+        top: 0;
+      }
+    }
+  }
+}
+
+go-button[type='icon'].result-button {
+  .shadow-overlay();
+  height: 40px;
+  width: 40px;
+  position: fixed;
+  bottom: 25px;
+  right: 5px;
+  display: flex;
+  visibility: hidden;
+  opacity: 0;
+  justify-content: center;
+  transition: all 200ms ease-out;
+  :host[state='0'] & {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.separator {
+  flex-grow: 1;
+}
+
+.group-close {
+  align-self: center;
+  display: flex;
+}
+
+.button-fullscreen {
+  transition: transform 0.2s;
+
+  :host[state='2'] & {
+    transform: rotate(180deg);
+  }
+}
+
+.warning-wrap {
+  position: absolute;
+  top: -24px;
+  pointer-events: none;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.warning-message {
+  width: 200px;
+  text-align: center;
+  border-radius: 2px;
+  background-color: @color-warning;
+  padding: 3px;
+}
