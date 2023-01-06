@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>AngularClient</AssemblyName>
+    <OutputType>Library</OutputType>
+    <PackageId>AngularClient</PackageId>
+    <UserSecretsId>aspnet5-AngularClient-20160322051353</UserSecretsId>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="backup\**" />
+    <Compile Remove="node_modules\**\*" />
+    <EmbeddedResource Remove="backup\**" />
+    <EmbeddedResource Remove="node_modules\**\*" />
+    <None Remove="backup\**" />
+    <None Update="**.user;**.vspscc">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+</Project>

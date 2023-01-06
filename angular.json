@@ -1,0 +1,438 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "client": {
+      "root": "src",
+      "sourceRoot": "src/client",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "rbush",
+              "core-js",
+              "loglevel",
+              "applicationinsights-js",
+              "chart.js",
+              "@tweenjs/tween.js",
+              "element-resize-detector",
+              "batch-processor",
+              "file-saver"
+            ],
+            "aot": true,
+            "outputPath": "../PeriscopeCore/wwwroot/client",
+            "index": "src/client/index.html",
+            "main": "src/client/main.ts",
+            "tsConfig": "src/client/tsconfig.app.json",
+            "polyfills": "src/client/polyfills.ts",
+            "assets": [
+              {
+                "glob": "**/*",
+                "ignore": ["**/Legend.psd"],
+                "input": "src/client/assets",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "../Identity.Core/wwwroot/documents",
+                "output": "/assets/documents/"
+              }
+            ],
+            "styles": [
+              "src/client/assets/css/fontawesome.css",
+              "src/periscope-lib/src/lib/styles/common.less",
+              "src/client/theme.scss",
+              "src/client/styles.less"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/signalr/jquery.signalR.min.js"
+            ],
+            "showCircularDependencies": false,
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/periscope-lib/src/lib/styles",
+                "src/client/assets/less"
+              ]
+            }
+          },
+          "configurations": {
+            "dev": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "sourceMap": true
+            },
+            "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/client/environments/environment.ts",
+                  "with": "src/client/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/client/environments/environment.ts",
+                  "with": "src/client/environments/environment.staging.ts"
+                }
+              ]
+            }
+          }
+        },
+        "build-worker-dev": {
+          "builder": "@angular-builders/custom-webpack:server",
+          "options": {
+            "customWebpackConfig": {
+              "path": "./webpackdev.webworker.config.js",
+              "mergeStrategies": {
+                "externals": "append"
+              }
+            },
+            "outputPath": "../PeriscopeCore/wwwroot/client/assets/workers",
+            "main": "src/worker_bundle/tile.worker.ts",
+            "tsConfig": "src/worker_bundle/tsconfig.worker.json"
+          },
+          "configurations": {
+            "staging": {
+              "fileReplacements": [
+                {
+                  "replace": "src/client/environments/environment.ts",
+                  "with": "src/client/environments/environment.staging.ts"
+                }
+              ]
+            }
+          }
+        },
+        "build-worker": {
+          "builder": "@angular-builders/custom-webpack:server",
+          "options": {
+            "customWebpackConfig": {
+              "path": "./webpacknew.webworker.config.js",
+              "mergeStrategies": {
+                "externals": "append"
+              }
+            },
+            "outputPath": "../PeriscopeCore/wwwroot/client/assets/workers",
+            "main": "src/worker_bundle/tile.worker.ts",
+            "tsConfig": "src/worker_bundle/tsconfig.worker.json"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/client/environments/environment.ts",
+                  "with": "src/client/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "client:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/client/",
+            "karmaConfig": "./karma.conf.js",
+            "polyfills": "src/client/polyfills.ts",
+            "tsConfig": "src/client/tsconfig.spec.json",
+            "scripts": [],
+            "styles": [
+              "src/periscope-lib/src/lib/styles/common.less",
+              "src/client/theme.scss",
+              "src/client/styles.css"
+            ],
+            "assets": ["src/client/icons"]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["src/client/tsconfig.app.json"],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "client-e2e": {
+      "root": "src",
+      "sourceRoot": "src/e2e",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "client:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "admin": {
+      "root": "src/admin",
+      "sourceRoot": "src/admin",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "element-resize-detector",
+              "loglevel",
+              "batch-processor",
+              "file-saver"
+            ],
+            "aot": true,
+            "outputPath": "../Periscope.Admin/wwwroot/admin",
+            "index": "src/admin/index.html",
+            "main": "src/admin/main.ts",
+            "tsConfig": "src/admin/tsconfig.app.json",
+            "polyfills": "src/admin/polyfills.ts",
+            "assets": ["src/admin/assets"],
+            "styles": [
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "src/periscope-lib/src/lib/styles/common.less",
+              "src/admin/styles.less",
+              "src/admin/theme.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/signalr/jquery.signalR.min.js"
+            ],
+            "showCircularDependencies": false,
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/periscope-lib/src/lib/styles",
+                "src/admin/assets/less"
+              ]
+            }
+          },
+          "configurations": {
+            "dev": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "sourceMap": true
+            },
+            "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/admin/environments/environment.ts",
+                  "with": "src/admin/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/admin/environments/environment.ts",
+                  "with": "src/admin/environments/environment.staging.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "admin:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "admin:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "admin:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/admin/",
+            "karmaConfig": "./karma.conf.js",
+            "polyfills": "src/admin/polyfills.ts",
+            "tsConfig": "src/admin/tsconfig.spec.json",
+            "scripts": [],
+            "styles": [
+              "src/periscope-lib/src/lib/styles/common.less",
+              "src/admin/theme.scss",
+              "src/admin/styles.less"
+            ],
+            "assets": ["src/admin/assets"]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["src/admin/tsconfig.app.json"],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "admin-e2e": {
+      "root": "src",
+      "sourceRoot": "src/e2e",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "admin:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "periscope-lib": {
+      "projectType": "library",
+      "root": "src/periscope-lib",
+      "sourceRoot": "src/periscope-lib/src",
+      "prefix": "ps",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "src/periscope-lib/tsconfig.lib.json",
+            "project": "src/periscope-lib/ng-package.json",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/periscope-lib/src/lib/styles"]
+            }
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "src/periscope-lib/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/periscope-lib/src/test.ts",
+            "tsConfig": "src/periscope-lib/tsconfig.spec.json",
+            "karmaConfig": "src/periscope-lib/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/periscope-lib/tsconfig.lib.json",
+              "src/periscope-lib/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "client",
+  "schematics": {
+    "@schematics/angular:component": {
+      "prefix": "ps",
+      "style": "less"
+    },
+    "@schematics/angular:directive": {
+      "prefix": "ps"
+    }
+  },
+  "cli": {
+    "defaultCollection": "@ngrx/schematics",
+    "analytics": "d27c98d4-86df-42fe-b050-10cb8cbc5ea0"
+  }
+}

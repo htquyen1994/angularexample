@@ -1,0 +1,26 @@
+{
+  "rulesDirectory": ["node_modules/codelyzer"],
+  "extends": [
+    "tslint:latest",
+    "angular-tslint-rules",
+    "tslint-plugin-prettier"
+  ],
+  "rules": {
+    "component-selector": "go",
+    "deprecation": {
+      "severity": "warning"
+    },
+    "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+    "no-submodule-imports": false,
+    "ordered-imports": false,
+    "member-access": false,
+    "member-ordering": false,
+    "object-literal-sort-keys": false,
+    "interface-name": false,
+    "typedef": false,
+    "curly": false,
+    "no-null-keyword": false,
+    "prefer-inline-decorator": false,
+    "no-output-native": false
+  }
+}
